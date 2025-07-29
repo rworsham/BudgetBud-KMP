@@ -28,13 +28,17 @@ kotlin {
 
     jvm()
 
+    val ktorVersion = "2.3.9"
+
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-core:2.3.4")
-                implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-client-auth:$ktorVersion")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:${ktorVersion}")
             }
         }
 
@@ -47,7 +51,7 @@ kotlin {
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:2.3.4")
+                implementation("io.ktor:ktor-client-darwin:$ktorVersion")
             }
         }
 
@@ -63,13 +67,13 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-okhttp:2.3.4")
+                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-cio:2.3.4")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
             }
         }
     }
