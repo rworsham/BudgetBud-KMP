@@ -8,6 +8,8 @@ plugins {
 }
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    android
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
@@ -31,6 +33,14 @@ kotlin {
     val ktorVersion = "2.3.9"
 
     sourceSets {
+        val androidMain by getting {
+            kotlin.srcDirs("src/androidMain/kotlin")
+            dependencies {
+                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+                implementation("androidx.security:security-crypto:1.1.0-alpha03")
+            }
+        }
+
         val commonMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -39,6 +49,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-cio:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:${ktorVersion}")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
             }
         }
 
@@ -56,19 +67,10 @@ kotlin {
         }
 
         val iosX64Main by getting {
-            dependsOn(iosMain)
         }
         val iosArm64Main by getting {
-            dependsOn(iosMain)
         }
         val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-
-        val androidMain by getting {
-            dependencies {
-                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-            }
         }
 
         val jvmMain by getting {
