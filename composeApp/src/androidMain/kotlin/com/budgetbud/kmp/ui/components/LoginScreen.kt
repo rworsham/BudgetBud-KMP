@@ -1,4 +1,4 @@
-package com.example.budgetbud.ui.screens
+package com.budgetbud.kmp.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import com.example.budgetbud.ui.components.AlertHandler
+import com.example.budgetbud.ui.components.GradientTitle
 import kotlinx.coroutines.launch
 
 @Composable
