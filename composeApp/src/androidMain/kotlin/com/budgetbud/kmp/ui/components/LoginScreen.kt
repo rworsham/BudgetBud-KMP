@@ -9,8 +9,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
-import com.example.budgetbud.ui.components.AlertHandler
-import com.example.budgetbud.ui.components.GradientTitle
+import com.budgetbud.kmp.ui.components.AlertHandler
+import com.budgetbud.kmp.ui.components.GradientTitle
 import kotlinx.coroutines.launch
 
 @Composable

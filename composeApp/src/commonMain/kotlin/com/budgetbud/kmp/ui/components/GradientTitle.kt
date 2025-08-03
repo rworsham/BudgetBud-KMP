@@ -1,4 +1,4 @@
-package com.example.budgetbud.ui.components
+package com.budgetbud.kmp.ui.components
 
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
