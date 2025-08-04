@@ -25,7 +25,7 @@ expect fun provideHttpClientEngine(): HttpClientEngine
 class ApiClient(private val tokenStorage: TokenStorage) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    private val client = HttpClient(provideHttpClientEngine()) {
+    val client = HttpClient(provideHttpClientEngine()) {
         install(ContentNegotiation) {
             json(json)
         }

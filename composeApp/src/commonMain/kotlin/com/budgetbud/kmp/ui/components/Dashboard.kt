@@ -1,4 +1,4 @@
-package com.budgetbud.kpm.ui.components
+package com.budgetbud.kmp.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,17 +8,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.budgetbud.kpm.ui.components.forms.BudgetForm
-import com.budgetbud.kpm.ui.components.forms.TransactionForm
-import com.budgetbud.kpm.ui.components.forms.CategoryForm
-import com.budgetbud.kpm.ui.components.profile.ProfileScreen
-import com.budgetbud.kpm.ui.components.sections.*
+import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.ui.components.forms.BudgetForm
+import com.budgetbud.kmp.ui.components.forms.TransactionForm
+import com.budgetbud.kmp.ui.components.forms.CategoryForm
+import com.budgetbud.kmp.ui.components.profile.ProfileScreen
+import com.budgetbud.kmp.ui.components.sections.*
 import kotlinx.coroutines.launch
 
 @Composable
 fun Dashboard(
     modifier: Modifier = Modifier,
-    initialSegment: String = "dashboard"
+    initialSegment: String = "dashboard",
+    apiClient: ApiClient
 ) {
     val scaffoldState = rememberScaffoldState()
     val drawerOpen = remember { mutableStateOf(true) }
@@ -111,7 +113,11 @@ fun Dashboard(
                     }
                     "Budget" -> Dialog(onDismissRequest = { closeDialog() }) {
                         Surface {
-                            BudgetForm(onSuccess = { closeDialog() }, familyView = familyView.value)
+                            BudgetForm(
+                                apiClient = apiClient,
+                                onSuccess = { closeDialog() },
+                                familyView = familyView.value
+                            )
                         }
                     }
                     "Category" -> Dialog(onDismissRequest = { closeDialog() }) {
