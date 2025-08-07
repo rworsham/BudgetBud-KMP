@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.ui.components.AlertHandler
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -214,11 +215,7 @@ fun TransactionForm(
         }
 
         errorMessage?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            AlertHandler(alertMessage = it)
         }
     }
 }

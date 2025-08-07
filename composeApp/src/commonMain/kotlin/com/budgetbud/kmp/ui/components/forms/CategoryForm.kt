@@ -14,18 +14,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun BudgetForm(
+fun CategoryForm(
     modifier: Modifier = Modifier,
     apiClient: ApiClient,
     onSuccess: () -> Unit,
     familyView: Boolean = false
 ) {
-    var newBudget by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
+    var newCategory by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
-    var existingBudgets by remember { mutableStateOf<List<String>>(emptyList()) }
+    var existingCategories by remember { mutableStateOf<List<String>>(emptyList()) }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -33,8 +32,8 @@ fun BudgetForm(
         isLoading = true
         try {
             val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/")
-            val budgets = response.body<List<BudgetItem>>()
-            existingBudgets = budgets.map { it.name }
+            val categories = response.body<List<CategoryItem>>()
+            existingCategories = categories.map { it.name }
         } catch (e: Exception) {
             errorMessage = "Failed to fetch existing budgets"
         } finally {
@@ -43,13 +42,13 @@ fun BudgetForm(
     }
 
     fun validateForm(): Boolean {
-        if (newBudget.isBlank() || amount.isBlank()) {
+        if (newCategory.isBlank()) {
             errorMessage = "Please fill in all required fields"
             return false
         }
 
-        if (existingBudgets.contains(newBudget)) {
-            errorMessage = "Budget name already exists"
+        if (existingCategories.contains(newCategory)) {
+            errorMessage = "Category name already exists"
             return false
         }
 
@@ -64,12 +63,11 @@ fun BudgetForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
-                apiClient.client.post("https://api.budgetingbud.com/api/budget/") {
+                apiClient.client.post("https://api.budgetingbud.com/api/categories/") {
                     contentType(io.ktor.http.ContentType.Application.Json)
                     setBody(
                         mapOf(
-                            "name" to newBudget,
-                            "total_amount" to amount
+                            "name" to newCategory,
                         )
                     )
                 }
@@ -91,17 +89,9 @@ fun BudgetForm(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         OutlinedTextField(
-            value = newBudget,
-            onValueChange = { newBudget = it },
+            value = newCategory,
+            onValueChange = { newCategory = it },
             label = { Text("New Budget") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = amount,
-            onValueChange = { amount = it },
-            label = { Text("Amount") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -121,4 +111,4 @@ fun BudgetForm(
 }
 
 @kotlinx.serialization.Serializable
-data class BudgetItem(val name: String)
+data class CategoryItem(val name: String)
