@@ -51,6 +51,7 @@ kotlin {
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
             implementation("io.ktor:ktor-client-auth:$ktorVersion")
             implementation("io.ktor:ktor-client-logging:$ktorVersion")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
