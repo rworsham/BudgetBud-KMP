@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Budget(
-    val id: String,
-    val name: String
+    val id: Int,
+    val name: String,
+    val totalAmount: String
 )
