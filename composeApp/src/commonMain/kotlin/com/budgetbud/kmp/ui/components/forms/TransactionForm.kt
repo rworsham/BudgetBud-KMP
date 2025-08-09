@@ -1,8 +1,8 @@
 package com.budgetbud.kmp.ui.components.forms
 
-import com.budgetbud.kmp.models.Category
-import com.budgetbud.kmp.models.Budget
-import com.budgetbud.kmp.models.Account
+import com.budgetbud.kmp.models.CategoryData
+import com.budgetbud.kmp.models.BudgetData
+import com.budgetbud.kmp.models.AccountData
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -36,9 +36,9 @@ fun TransactionForm(
     var recurringType by remember { mutableStateOf("") }
     var nextOccurrence by remember { mutableStateOf("") }
 
-    var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
-    var budgets by remember { mutableStateOf<List<Budget>>(emptyList()) }
-    var accounts by remember { mutableStateOf<List<Account>>(emptyList()) }
+    var categories by remember { mutableStateOf<List<CategoryData>>(emptyList()) }
+    var budgetData by remember { mutableStateOf<List<BudgetData>>(emptyList()) }
+    var accounts by remember { mutableStateOf<List<AccountData>>(emptyList()) }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
@@ -60,7 +60,7 @@ fun TransactionForm(
             }
 
             categories = catsResponse.body()
-            budgets = budgetsResponse.body()
+            budgetData = budgetsResponse.body()
             accounts = accountsResponse.body()
         } catch (e: Exception) {
             errorMessage = "Failed to fetch data"
@@ -171,7 +171,7 @@ fun TransactionForm(
 
         DropdownSelector(
             label = "Budget",
-            options = budgets.map { it.id to it.name },
+            options = budgetData.map { it.id to it.name },
             selectedOption = budget,
             onOptionSelected = { budget = it }
         )

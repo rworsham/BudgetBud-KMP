@@ -52,6 +52,7 @@ kotlin {
             implementation("io.ktor:ktor-client-auth:$ktorVersion")
             implementation("io.ktor:ktor-client-logging:$ktorVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+            implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

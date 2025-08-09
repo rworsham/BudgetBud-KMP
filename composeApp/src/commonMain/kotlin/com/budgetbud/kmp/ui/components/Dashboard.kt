@@ -94,13 +94,13 @@ fun Dashboard(
         ) { innerPadding ->
             Box(modifier = modifier.padding(innerPadding).fillMaxSize()) {
                 when (currentSegment) {
-                    "dashboard" -> DashboardReports(familyView = familyView.value)
-                    "budget" -> BudgetTransactionOverview(familyView = familyView.value)
-                    "category" -> CategoryOverview(familyView = familyView.value)
-                    "reports" -> ReportDashboard(familyView = familyView.value)
-                    "transactions" -> TransactionTableView(familyView = familyView.value)
-                    "accounts" -> AccountOverview(familyView = familyView.value)
-                    "family" -> FamilyOverview()
+                    "dashboard" -> DashboardReports(familyView = familyView.value, apiClient = apiClient)
+                    "budget" -> BudgetTransactionOverview(familyView = familyView.value, apiClient = apiClient)
+                    "category" -> CategoryOverview(familyView = familyView.value, apiClient = apiClient)
+                    "reports" -> ReportDashboard(familyView = familyView.value, apiClient = apiClient)
+                    "transactions" -> TransactionTableView(familyView = familyView.value, apiClient = apiClient)
+                    "accounts" -> AccountOverview(familyView = familyView.value, apiClient = apiClient)
+                    "family" -> FamilyOverview(apiClient = apiClient)
                 }
 
                 if (showDialog) {

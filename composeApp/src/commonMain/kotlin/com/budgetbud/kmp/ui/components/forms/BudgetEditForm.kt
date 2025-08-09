@@ -5,7 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.budgetbud.kmp.models.Budget
+import com.budgetbud.kmp.models.BudgetData
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.AlertHandler
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +23,7 @@ fun BudgetEditForm(
     var selectedBudgetId by remember { mutableStateOf<Int?>(null) }
     var newName by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
-    var existingBudgets by remember { mutableStateOf<List<Budget>>(emptyList()) }
+    var existingBudgetData by remember { mutableStateOf<List<BudgetData>>(emptyList()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
@@ -34,7 +34,7 @@ fun BudgetEditForm(
         isLoading = true
         try {
             val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/")
-            existingBudgets = response.body()
+            existingBudgetData = response.body()
         } catch (e: Exception) {
             errorMessage = "Failed to fetch budgets"
         } finally {
@@ -44,7 +44,7 @@ fun BudgetEditForm(
 
     fun handleBudgetChange(budgetId: Int) {
         selectedBudgetId = budgetId
-        val selected = existingBudgets.find { it.id == budgetId }
+        val selected = existingBudgetData.find { it.id == budgetId }
         if (selected != null) {
             newName = selected.name
             amount = selected.totalAmount
@@ -81,7 +81,7 @@ fun BudgetEditForm(
         }
     }
 
-    val budgetOptions = existingBudgets.map { it.id.toString() to it.name }
+    val budgetOptions = existingBudgetData.map { it.id.toString() to it.name }
 
     Column(
         modifier = modifier
