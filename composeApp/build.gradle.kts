@@ -33,6 +33,8 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation("androidx.navigation:navigation-compose:2.7.7")
+            implementation("io.github.vanpra.compose-material-dialogs:core:0.9.0")
+            implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -52,7 +54,6 @@ kotlin {
             implementation("io.ktor:ktor-client-auth:$ktorVersion")
             implementation("io.ktor:ktor-client-logging:$ktorVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-            implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
