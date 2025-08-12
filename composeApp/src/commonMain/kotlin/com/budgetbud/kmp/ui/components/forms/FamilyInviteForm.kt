@@ -1,57 +1,55 @@
 package com.budgetbud.kmp.ui.components.forms
 
-import com.budgetbud.kmp.auth.ApiClient
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.models.FamilyData
 import com.budgetbud.kmp.ui.components.AlertHandler
-import io.ktor.client.request.*
 import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun BudgetForm(
+fun FamilyInviteForm(
     modifier: Modifier = Modifier,
     apiClient: ApiClient,
     onSuccess: () -> Unit,
 ) {
-    var newBudget by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
+    var newFamilyMember by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
-    var existingBudgets by remember { mutableStateOf<List<String>>(emptyList()) }
+    var existingFamily by remember { mutableStateOf<List<FamilyData>>(emptyList()) }
 
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/")
-            val budgets = response.body<List<BudgetItem>>()
-            existingBudgets = budgets.map { it.name }
+            val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/family/")
+            existingFamily = response.body()
         } catch (e: Exception) {
-            errorMessage = "Failed to fetch existing budgets"
+            errorMessage = "Failed to fetch family information"
         } finally {
             isLoading = false
         }
     }
 
     fun validateForm(): Boolean {
-        if (newBudget.isBlank() || amount.isBlank()) {
+        if (newFamilyMember.isBlank()) {
             errorMessage = "Please fill in all required fields"
             return false
         }
-
-        if (existingBudgets.contains(newBudget)) {
-            errorMessage = "Budget name already exists"
+        if (existingFamily.isEmpty()) {
+            errorMessage = "You must be a member of a family to invite others"
             return false
         }
-
         return true
     }
 
@@ -63,20 +61,13 @@ fun BudgetForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
-                apiClient.client.post("https://api.budgetingbud.com/api/budget/") {
-                    contentType(io.ktor.http.ContentType.Application.Json)
-                    setBody(
-                        mapOf(
-                            "name" to newBudget,
-                            "total_amount" to amount
-                        )
-                    )
+                apiClient.client.post("https://api.budgetingbud.com/api/family/invite/") {
+                    contentType(ContentType.Application.Json)
+                    setBody(mapOf("invited_user" to newFamilyMember))
                 }
-
                 onSuccess()
-
             } catch (e: Exception) {
-                errorMessage = "Failed to create new budget"
+                errorMessage = "Failed to invite member. Please try again."
             } finally {
                 isSubmitting = false
             }
@@ -90,17 +81,9 @@ fun BudgetForm(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         OutlinedTextField(
-            value = newBudget,
-            onValueChange = { newBudget = it },
-            label = { Text("New Budget") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = amount,
-            onValueChange = { amount = it },
-            label = { Text("Amount") },
+            value = newFamilyMember,
+            onValueChange = { newFamilyMember = it },
+            label = { Text("New Family Member") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -118,6 +101,3 @@ fun BudgetForm(
         }
     }
 }
-
-@kotlinx.serialization.Serializable
-data class BudgetItem(val name: String)

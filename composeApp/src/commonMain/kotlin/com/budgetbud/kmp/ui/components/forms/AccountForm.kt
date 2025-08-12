@@ -1,54 +1,56 @@
 package com.budgetbud.kmp.ui.components.forms
 
-import com.budgetbud.kmp.auth.ApiClient
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.models.AccountData
 import com.budgetbud.kmp.ui.components.AlertHandler
-import io.ktor.client.request.*
 import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun BudgetForm(
+fun AccountForm(
     modifier: Modifier = Modifier,
     apiClient: ApiClient,
     onSuccess: () -> Unit,
 ) {
-    var newBudget by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
+    var newAccount by remember { mutableStateOf("") }
+    var newAccountBalance by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
-    var existingBudgets by remember { mutableStateOf<List<String>>(emptyList()) }
+    var existingAccounts by remember { mutableStateOf<List<AccountData>>(emptyList()) }
 
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/")
-            val budgets = response.body<List<BudgetItem>>()
-            existingBudgets = budgets.map { it.name }
+            val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/accounts/")
+            existingAccounts = response.body()
         } catch (e: Exception) {
-            errorMessage = "Failed to fetch existing budgets"
+            errorMessage = "Failed to fetch existing accounts"
         } finally {
             isLoading = false
         }
     }
 
     fun validateForm(): Boolean {
-        if (newBudget.isBlank() || amount.isBlank()) {
+        if (newAccount.isBlank()) {
             errorMessage = "Please fill in all required fields"
             return false
         }
 
-        if (existingBudgets.contains(newBudget)) {
-            errorMessage = "Budget name already exists"
+        val accountExists = existingAccounts.any { it.name == newAccount }
+        if (accountExists) {
+            errorMessage = "Account name already exists"
             return false
         }
 
@@ -63,20 +65,19 @@ fun BudgetForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
-                apiClient.client.post("https://api.budgetingbud.com/api/budget/") {
-                    contentType(io.ktor.http.ContentType.Application.Json)
+                apiClient.client.post("https://api.budgetingbud.com/api/accounts/") {
+                    contentType(ContentType.Application.Json)
                     setBody(
                         mapOf(
-                            "name" to newBudget,
-                            "total_amount" to amount
+                            "name" to newAccount,
+                            "balance" to newAccountBalance
                         )
                     )
                 }
 
                 onSuccess()
-
             } catch (e: Exception) {
-                errorMessage = "Failed to create new budget"
+                errorMessage = "Failed to create new Account. Please try again"
             } finally {
                 isSubmitting = false
             }
@@ -90,17 +91,18 @@ fun BudgetForm(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         OutlinedTextField(
-            value = newBudget,
-            onValueChange = { newBudget = it },
-            label = { Text("New Budget") },
+            value = newAccount,
+            onValueChange = { newAccount = it },
+            label = { Text("New Account") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = amount,
-            onValueChange = { amount = it },
-            label = { Text("Amount") },
+            value = newAccountBalance,
+            onValueChange = { newAccountBalance = it },
+            label = { Text("Balance") },
+            leadingIcon = { Text("$") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -118,6 +120,3 @@ fun BudgetForm(
         }
     }
 }
-
-@kotlinx.serialization.Serializable
-data class BudgetItem(val name: String)

@@ -3,8 +3,7 @@ package com.budgetbud.kmp.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AccountData(
+data class FamilyData(
     val id: String,
-    val name: String,
-    val balance: String
+    val name: String
 )
