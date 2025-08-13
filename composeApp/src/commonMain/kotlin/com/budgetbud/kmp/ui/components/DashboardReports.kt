@@ -159,15 +159,8 @@ fun DashboardReports(
     }
 
     if (showSuccessDialog) {
-        AlertDialog(
-            onDismissRequest = { showSuccessDialog = false },
-            confirmButton = {
-                TextButton(onClick = { showSuccessDialog = false }) {
-                    Text("Close")
-                }
-            },
-            title = { Text("Success") },
-            text = { Text("Operation completed successfully.") }
+        SuccessDialog(
+            onDismiss = { showSuccessDialog = false }
         )
     }
 

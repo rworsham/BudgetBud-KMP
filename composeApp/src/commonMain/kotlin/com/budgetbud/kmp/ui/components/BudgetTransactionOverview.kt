@@ -11,6 +11,9 @@ import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.ui.components.forms.BudgetForm
 import com.budgetbud.kmp.ui.components.forms.BudgetEditForm
 import com.budgetbud.kmp.ui.components.forms.BudgetGoalForm
+import com.budgetbud.kmp.models.BudgetData
+import com.budgetbud.kmp.models.BudgetReportData
+import com.budgetbud.kmp.models.TransactionPieChartData
 import io.ktor.client.request.*
 import io.ktor.client.call.*
 import io.ktor.http.*
@@ -29,9 +32,9 @@ fun BudgetTransactionOverview(
     var endDate by remember { mutableStateOf(DateUtils.lastDayOfCurrentMonth()) }
 
     var reportData by remember { mutableStateOf<BudgetReportData?>(null) }
-    var pieChartData by remember { mutableStateOf<List<PieChartItem>>(emptyList()) }
+    var pieChartData by remember { mutableStateOf<List<TransactionPieChartData>>(emptyList()) }
 
-    var existingBudgets by remember { mutableStateOf<List<Budget>>(emptyList()) }
+    var existingBudgets by remember { mutableStateOf<List<BudgetData>>(emptyList()) }
     var selectedBudgetId by remember { mutableStateOf<Int?>(null) }
 
     var openDialog by remember { mutableStateOf(false) }
@@ -51,11 +54,11 @@ fun BudgetTransactionOverview(
         openDialog = false
         modalType = ""
         selectedBudgetId = null
-        successAlertOpen = false
+        showSuccessDialog = false
     }
 
     fun handleFormSuccess() {
-        successAlertOpen = true
+        showSuccessDialog = true
         coroutineScope.launch {
             kotlinx.coroutines.delay(5000)
             handleClose()
@@ -88,13 +91,13 @@ fun BudgetTransactionOverview(
                     url {
                         queryParams.forEach { (key, value) -> parameters.append(key, value) }
                     }
-                }.body<List<PieChartItem>>()
+                }.body<List<TransactionPieChartData>>()
 
                 val budgetsResponse = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
                     url {
                         queryParams.forEach { (key, value) -> parameters.append(key, value) }
                     }
-                }.body<List<Budget>>()
+                }.body<List<BudgetData>>()
 
                 reportData = reportResponse
                 pieChartData = pieResponse
@@ -117,16 +120,16 @@ fun BudgetTransactionOverview(
     }
 
     val budgetChartData = remember(reportData) {
-        reportData?.budgetsRemaining?.map {
-            BudgetChartItem(
-                name = it.budgetName,
-                starting = it.startingBudget,
-                remaining = it.remainingBudget
+        reportData?.budgets_remaining?.map {
+            BudgetReportData(
+                name = it.budget_name,
+                starting = it.starting_budget,
+                remaining = it.remaining_budget
             )
         } ?: emptyList()
     }
 
-    LaunchedEffect(familyView, startDate, endDate, successAlertOpen) {
+    LaunchedEffect(familyView, startDate, endDate) {
         fetchData()
     }
 
@@ -144,13 +147,21 @@ fun BudgetTransactionOverview(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        BudgetCharts(
-            pieChartData = pieChartData,
-            incomeExpenseData = incomeExpenseData,
-            budgetData = budgetChartData
-        )
+        Text("Budget Charts", style = MaterialTheme.typography.titleMedium)
+
+        if (pieChartData.isNotEmpty() || incomeExpenseData.any { it.value > 0.0 } || budgetChartData.isNotEmpty()) {
+            BudgetCharts(
+                pieChartData = pieChartData,
+                incomeExpenseData = incomeExpenseData,
+                budgetData = budgetChartData
+            )
+        } else {
+            ChartDataError()
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Actions", style = MaterialTheme.typography.titleMedium)
 
         BudgetActions(
             onAddBudget = { handleOpen("addBudget") },
@@ -159,21 +170,33 @@ fun BudgetTransactionOverview(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        BudgetList(
-            budgets = existingBudgets,
-            onViewHistory = { id -> handleOpen("viewHistory", id) },
-            onSetGoal = { id -> handleOpen("setBudgetGoal", id) }
-        )
+        Text("Your Budgets", style = MaterialTheme.typography.titleMedium)
+
+        if (existingBudgets.isNotEmpty()) {
+            BudgetList(
+                budgets = existingBudgets,
+                onViewHistory = { id -> handleOpen("viewHistory", id) },
+                onSetGoal = { id -> handleOpen("setBudgetGoal", id) }
+            )
+        } else {
+            ChartDataError()
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        FinancialOverview(
-            startDate = startDate.value,
-            endDate = endDate.value,
-            income = incomeExpenseData[0].value,
-            expense = incomeExpenseData[1].value,
-            remaining = budgetChartData.sumOf { it.remaining }
-        )
+        Text("Financial Overview", style = MaterialTheme.typography.titleMedium)
+
+        if (incomeExpenseData.any { it.value > 0.0 } || budgetChartData.isNotEmpty()) {
+            FinancialOverview(
+                startDate = startDate.value,
+                endDate = endDate.value,
+                income = incomeExpenseData[0].value,
+                expense = incomeExpenseData[1].value,
+                remaining = budgetChartData.sumOf { it.remaining }
+            )
+        } else {
+            ChartDataError()
+        }
     }
 
     if (openDialog) {
@@ -237,15 +260,8 @@ fun BudgetTransactionOverview(
     }
 
     if (showSuccessDialog) {
-        AlertDialog(
-            onDismissRequest = { showSuccessDialog = false },
-            confirmButton = {
-                TextButton(onClick = { showSuccessDialog = false }) {
-                    Text("Close")
-                }
-            },
-            title = { Text("Success") },
-            text = { Text("Operation completed successfully.") }
+        SuccessDialog(
+            onDismiss = { showSuccessDialog = false }
         )
     }
 
