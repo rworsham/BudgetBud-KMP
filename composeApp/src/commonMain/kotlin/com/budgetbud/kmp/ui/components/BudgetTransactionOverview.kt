@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.ui.components.forms.BudgetForm
