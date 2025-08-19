@@ -3,7 +3,7 @@ package com.budgetbud.kmp.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AccountHistoryData(
+data class TransactionHistoryTableData(
     val id: Int,
     val amount: String,
     val description: String,

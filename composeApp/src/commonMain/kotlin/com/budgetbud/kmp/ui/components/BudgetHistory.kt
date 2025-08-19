@@ -8,20 +8,23 @@ import io.ktor.http.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-suspend fun fetchAccountHistory(
+suspend fun fetchBudgetHistory(
     apiClient: ApiClient,
-    accountId: Int,
+    budgetId: Int,
     startDate: String,
     endDate: String,
-    familyView: Boolean
+    familyView: Boolean,
+    asPdf: Boolean = false
 ): List<TransactionHistoryTableData> {
     val queryParams = listOf("familyView" to familyView.toString())
-    val payload = mapOf(
-        "account_id" to accountId,
-        "start_date" to startDate,
-        "end_date" to endDate
-    )
-    return apiClient.client.post("https://api.budgetingbud.com/api/account/history/") {
+    val payload = buildMap {
+        put("budget_id", budgetId)
+        put("start_date", startDate)
+        put("end_date", endDate)
+        if (asPdf) put("format", "pdf")
+    }
+
+    return apiClient.client.post("https://api.budgetingbud.com/api/budget-history/") {
         contentType(ContentType.Application.Json)
         setBody(payload)
         url { queryParams.forEach { (k, v) -> parameters.append(k, v) } }
@@ -29,8 +32,8 @@ suspend fun fetchAccountHistory(
 }
 
 @Composable
-expect fun AccountHistory(
-    accountId: Int,
+expect fun BudgetHistory(
+    budgetId: Int,
     apiClient: ApiClient,
     familyView: Boolean,
     modifier: Modifier = Modifier

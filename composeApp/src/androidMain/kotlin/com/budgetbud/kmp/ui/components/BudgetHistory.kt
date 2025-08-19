@@ -11,8 +11,8 @@ import com.budgetbud.kmp.utils.DateUtils
 import kotlinx.coroutines.launch
 
 @Composable
-actual fun AccountHistory(
-    accountId: Int,
+actual fun BudgetHistory(
+    budgetId: Int,
     apiClient: ApiClient,
     familyView: Boolean,
     modifier: Modifier
@@ -31,7 +31,7 @@ actual fun AccountHistory(
             isLoading = true
             errorMessage = null
             try {
-                transactions = fetchAccountHistory(apiClient, accountId, startDate.toString(), endDate.toString(), familyView)
+                transactions = fetchBudgetHistory(apiClient, budgetId, startDate.toString(), endDate.toString(), familyView)
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Failed to load account history"
             } finally {
@@ -40,12 +40,12 @@ actual fun AccountHistory(
         }
     }
 
-    LaunchedEffect(accountId, startDate, endDate, familyView) {
+    LaunchedEffect(budgetId, startDate, endDate, familyView) {
         fetchTransactions()
     }
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-       // DatePicker
+        // DatePicker
 
         if (isLoading) {
             CircularProgressIndicator()
