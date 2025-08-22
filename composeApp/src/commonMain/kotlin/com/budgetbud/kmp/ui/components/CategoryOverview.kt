@@ -9,6 +9,7 @@ import androidx.compose.ui.window.Dialog
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.CategoryOverviewData
 import com.budgetbud.kmp.models.CategoryHistoryLineChartData
+import com.budgetbud.kmp.ui.components.charts.CategoryLineChart
 import com.budgetbud.kmp.ui.components.forms.CategoryForm
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.utils.DateUtils
@@ -138,7 +139,14 @@ fun CategoryOverview(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (categoryHistory.isNotEmpty()) {
-            CategoryLineChart(categoryHistory, categoryData)
+            CategoryLineChart(
+                historyData = categoryHistory,
+                categoryData = categoryData,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            )
+
         }
 
         Button(onClick = {}) {
