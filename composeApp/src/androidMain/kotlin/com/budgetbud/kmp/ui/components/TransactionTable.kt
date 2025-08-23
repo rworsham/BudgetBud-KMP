@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TransactionHistoryTable(
-    budgetId: Int,
     familyView: Boolean,
     dataSource: TransactionTableDataSource,
     modifier: Modifier = Modifier
@@ -43,7 +42,7 @@ fun TransactionHistoryTable(
             isLoading = true
             errorMessage = null
             try {
-                transactions = dataSource.fetchHistory(budgetId, startDate.toString(), endDate.toString(), familyView)
+                transactions = dataSource.fetchHistory(startDate.toString(), endDate.toString(), familyView)
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Failed to load transactions"
             } finally {
@@ -52,7 +51,7 @@ fun TransactionHistoryTable(
         }
     }
 
-    LaunchedEffect(budgetId, startDate, endDate, familyView) {
+    LaunchedEffect( startDate, endDate, familyView) {
         fetchTransactions()
     }
 

@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 
 @Composable
 expect fun TransactionTable(
-    budgetId: Int,
     familyView: Boolean,
     dataSource: TransactionTableDataSource,
     modifier: Modifier = Modifier

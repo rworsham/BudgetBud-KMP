@@ -22,7 +22,8 @@ import com.budgetbud.kmp.utils.DateUtils
 fun DashboardReports(
     familyView: Boolean,
     modifier: Modifier = Modifier,
-    apiClient: ApiClient
+    apiClient: ApiClient,
+    transactionTableDataSource: TransactionTableDataSource
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -127,31 +128,8 @@ fun DashboardReports(
         Text("Transaction Grid", style = MaterialTheme.typography.titleMedium)
         if (transactionRows.isNotEmpty()) {
             TransactionTable(
-                transactions = transactionRows,
-                onDelete = { id ->
-                    coroutineScope.launch {
-                        try {
-                            apiClient.delete("/transaction/$id")
-                            transactionRows = transactionRows.filterNot { it.id == id }
-                            showSuccessDialog = true
-                        } catch (e: Exception) {
-                            errorMessage = "Failed to delete transaction"
-                        }
-                    }
-                },
-                onUpdate = { updated ->
-                    coroutineScope.launch {
-                        try {
-                            apiClient.put("/transaction/${updated.id}", updated)
-                            transactionRows = transactionRows.map {
-                                if (it.id == updated.id) updated else it
-                            }
-                            showSuccessDialog = true
-                        } catch (e: Exception) {
-                            errorMessage = "Failed to update transaction"
-                        }
-                    }
-                }
+                familyView = familyView,
+                dataSource = transactionTableDataSource
             )
         } else {
             ChartDataError()

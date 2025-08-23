@@ -23,7 +23,7 @@ actual class TransactionTableDataSource(private val apiClient: ApiClient) {
             if (asPdf) put("format", "pdf")
         }
 
-        return apiClient.client.post("https://api.budgetingbud.com/api/budget-history/") {
+        return apiClient.client.post("https://api.budgetingbud.com/api/transaction-table-view/") {
             contentType(ContentType.Application.Json)
             setBody(payload)
             url { queryParams.forEach { (k, v) -> parameters.append(k, v) } }
