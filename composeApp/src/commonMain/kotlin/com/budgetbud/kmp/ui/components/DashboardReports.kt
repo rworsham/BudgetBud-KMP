@@ -9,6 +9,8 @@ import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.TransactionBarChartData
 import com.budgetbud.kmp.models.TransactionPieChartData
 import com.budgetbud.kmp.models.TransactionTableData
+import com.budgetbud.kmp.ui.components.charts.TransactionBarChart
+import com.budgetbud.kmp.ui.components.charts.TransactionPieChart
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import io.ktor.client.request.*
 import io.ktor.client.call.*
@@ -109,7 +111,7 @@ fun DashboardReports(
 
         Text("Transaction Bar Chart", style = MaterialTheme.typography.titleMedium)
         if (barChartData.isNotEmpty()) {
-            BarChartComponent(barChartData)
+            TransactionBarChart(barChartData)
         } else {
             ChartDataError()
         }
@@ -118,7 +120,7 @@ fun DashboardReports(
 
         Text("Expense Pie Chart", style = MaterialTheme.typography.titleMedium)
         if (pieChartData.isNotEmpty()) {
-            PieChartComponent(pieChartData)
+            TransactionPieChart(pieChartData)
         } else {
             ChartDataError()
         }
