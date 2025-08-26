@@ -25,7 +25,8 @@ import kotlinx.coroutines.launch
 fun Dashboard(
     modifier: Modifier = Modifier,
     initialSegment: String = "dashboard",
-    apiClient: ApiClient
+    apiClient: ApiClient,
+    transactionTableDataSource: TransactionTableDataSource
 ) {
     var currentSegment by remember { mutableStateOf(initialSegment) }
     var drawerOpen by remember { mutableStateOf(true) }
@@ -112,11 +113,11 @@ fun Dashboard(
                 .fillMaxSize()
             ) {
                 when (currentSegment) {
-                    "dashboard" -> DashboardReports(familyView = familyView.value, apiClient = apiClient)
+                    "dashboard" -> DashboardReports(familyView = familyView.value, apiClient = apiClient, transactionTableDataSource = transactionTableDataSource)
                     "budget" -> BudgetTransactionOverview(familyView = familyView.value, apiClient = apiClient)
                     "category" -> CategoryOverview(familyView = familyView.value, apiClient = apiClient)
                     "reports" -> ReportDashboard(familyView = familyView.value, apiClient = apiClient)
-                    "transactions" -> TransactionTableView(familyView = familyView.value, apiClient = apiClient)
+                    "transactions" -> TransactionTable(familyView = familyView.value, dataSource = transactionTableDataSource)
                     "accounts" -> AccountOverview(familyView = familyView.value, apiClient = apiClient)
                     "family" -> FamilyOverview(apiClient = apiClient)
                 }
