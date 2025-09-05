@@ -24,7 +24,7 @@ import java.util.*
 actual fun CategoryLineChart(
     historyData: List<CategoryHistoryLineChartData>,
     categoryData: List<CategoryOverviewData>,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     if (historyData.isEmpty() || categoryData.isEmpty()) return
 
