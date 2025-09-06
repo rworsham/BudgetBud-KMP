@@ -8,6 +8,8 @@ import com.budgetbud.kmp.auth.ApiClient
 expect fun IncomeExpenseBarChart(
     startDate: String,
     endDate: String,
+    xSizePercent: Int,
+    ySizePercent: Int,
     familyView: Boolean,
     modifier: Modifier,
     apiClient: ApiClient

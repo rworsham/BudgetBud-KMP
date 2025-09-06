@@ -27,6 +27,8 @@ import java.util.*
 
 @Composable
  actual fun AccountBalanceHistoryLineChart(
+    xSizePercent: Int,
+    ySizePercent: Int,
     apiClient: ApiClient,
     familyView: Boolean,
     modifier: Modifier

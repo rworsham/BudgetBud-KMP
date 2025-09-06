@@ -7,6 +7,8 @@ import com.budgetbud.kmp.auth.ApiClient
 
 @Composable
 expect fun AccountBalanceHistoryLineChart(
+    xSizePercent: Int,
+    ySizePercent: Int,
     apiClient: ApiClient,
     familyView: Boolean,
     modifier: Modifier = Modifier,

@@ -20,6 +20,8 @@ import kotlin.math.ceil
 actual fun IncomeExpenseBarChart(
     startDate: String,
     endDate: String,
+    xSizePercent: Int,
+    ySizePercent: Int,
     familyView: Boolean,
     modifier: Modifier,
     apiClient: ApiClient

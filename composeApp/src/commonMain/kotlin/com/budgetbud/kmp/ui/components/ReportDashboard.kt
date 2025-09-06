@@ -12,13 +12,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.ReportDashboardData
+import com.budgetbud.kmp.ui.components.charts.*
 import com.budgetbud.kmp.ui.components.forms.ReportDashboardEditForm
 import com.budgetbud.kmp.ui.components.forms.ReportDashboardSelectionForm
+import com.budgetbud.kmp.utils.DateUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 
 @Composable
 fun ReportDashboard(
@@ -123,6 +124,9 @@ fun ReportDashboard(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (userReports.isNotEmpty()) {
+            val startDate = DateUtils.firstDayOfCurrentMonth().toString()
+            val endDate = DateUtils.lastDayOfCurrentMonth().toString()
+
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -130,14 +134,74 @@ fun ReportDashboard(
             ) {
                 userReports.forEach { report ->
                     when (report.displayName) {
-                        "Expense Categories Pie Chart" -> ExpenseCategoriesPieChart(report, familyView)
-                        "Budget Vs Remaining Budget" -> BudgetRemainingBudgetBarChart(report, familyView)
-                        "Expense Categories Bar Chart" -> ExpenseCategoriesBarChart(report, familyView)
-                        "Account Balance History Line Chart" -> AccountBalanceHistoryLineChart(report, familyView)
-                        "Income vs. Expense Bar Chart" -> IncomeExpenseBarChart(report, familyView)
-                        "Category Expense Line Chart" -> CategoryExpenseLineChart(report, familyView)
-                        "Family Contributions Bar Chart" -> FamilyContributionsBarChart(report, familyView)
-                        "Family Category Usage Bar Chart" -> CategoryUsagePerUserBarChart(report, familyView)
+                        "Expense Categories Pie Chart" -> ExpenseCategoriesPieChart(
+                            startDate = startDate,
+                            endDate = endDate,
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
+                        "Budget Vs Remaining Budget" -> BudgetRemainingBudgetBarChart(
+                            startDate = startDate,
+                            endDate = endDate,
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
+                        "Expense Categories Bar Chart" -> ExpenseCategoriesBarChart(
+                            startDate = startDate,
+                            endDate = endDate,
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
+                        "Account Balance History Line Chart" -> AccountBalanceHistoryLineChart(
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
+                        "Income vs. Expense Bar Chart" -> IncomeExpenseBarChart(
+                            startDate = startDate,
+                            endDate = endDate,
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
+                        "Category Expense Line Chart" -> CategoryExpenseLineChart(
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
+                        "Family Contributions Bar Chart" -> FamilyContributionsBarChart(
+                            startDate = startDate,
+                            endDate = endDate,
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
+                        "Family Category Usage Bar Chart" -> CategoryUsagePerUserBarChart(
+                            startDate = startDate,
+                            endDate = endDate,
+                            xSizePercent = report.xSize,
+                            ySizePercent = report.ySize,
+                            familyView = familyView,
+                            modifier = Modifier,
+                            apiClient = apiClient
+                        )
                     }
                 }
             }
