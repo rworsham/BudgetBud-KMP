@@ -13,7 +13,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.UserStatsData
-import kotlinx.coroutines.launch
+import com.budgetbud.kmp.models.UserDetailsData
+import io.ktor.client.call.*
+import io.ktor.client.request.*
 
 @Composable
 actual fun ProfileScreen(
@@ -24,21 +26,16 @@ actual fun ProfileScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var userStats by remember { mutableStateOf<UserStatsData?>(null) }
     var userDetails by remember { mutableStateOf<UserDetailsData?>(null) }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        scope.launch {
-            isLoading = true
-            try {
-                val user = apiClient.client.get("/user/")
-                val stats = apiClient.client.get("/profile/stats/")
-                userDetails = user
-                userStats = stats
-            } catch (e: Exception) {
-                error = "Failed to fetch profile"
-            } finally {
-                isLoading = false
-            }
+        isLoading = true
+        try {
+            userDetails = apiClient.client.get("/user/").body()
+            userStats = apiClient.client.get("/profile/stats/").body()
+        } catch (e: Exception) {
+            error = "Failed to fetch profile: ${e.message}"
+        } finally {
+            isLoading = false
         }
     }
 
@@ -68,11 +65,11 @@ actual fun ProfileScreen(
             )
             Column {
                 Text(
-                    text = userDetails["username"]?.toString() ?: "N/A",
+                    text = userDetails?.username ?: "N/A",
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = userDetails["email"]?.toString() ?: "N/A",
+                    text = userDetails?.email ?: "N/A",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -91,9 +88,9 @@ actual fun ProfileScreen(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    StatItem("Transactions", userStats["total_transactions"])
-                    StatItem("Joined", userStats["joined_date"])
-                    StatItem("Goals Met", userStats["savings_goals_met"])
+                    StatItem("Transactions", userStats?.totalTransactions)
+                    StatItem("Joined", userStats?.joinedDate)
+                    StatItem("Goals Met", userStats?.savingsGoalsMet)
                 }
             }
         }
@@ -104,9 +101,9 @@ actual fun ProfileScreen(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    StatItem("Income", "$${userStats["net_income"]}")
-                    StatItem("Expense", "$${userStats["net_expense"]}")
-                    StatItem("Balance", "$${userStats["net_balance"]}")
+                    StatItem("Income", "$${userStats?.netIncome}")
+                    StatItem("Expense", "$${userStats?.netExpense}")
+                    StatItem("Balance", "$${userStats?.netBalance}")
                 }
             }
         }

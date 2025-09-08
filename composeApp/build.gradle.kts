@@ -34,6 +34,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation("androidx.navigation:navigation-compose:2.7.7")
             implementation("androidx.compose.ui:ui:1.6.1")
+            implementation("io.coil-kt:coil-compose:2.4.0")
             implementation("io.github.vanpra.compose-material-dialogs:core:0.9.0")
             implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
         }
