@@ -16,9 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.zIndex
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.forms.*
-import com.budgetbud.kmp.ui.components.profile.ProfileScreen
-import com.budgetbud.kmp.ui.components.sections.*
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -141,7 +138,9 @@ fun Dashboard(
                                     onSuccess = { closeDialog() },
                                     familyView = familyView.value
                                 )
-                                "Profile" -> ProfileScreen()
+                                "Profile" -> ProfileScreen(
+                                    apiClient = apiClient
+                                )
                                 "FAB" -> FabDialog(
                                     onSelect = { type -> openDialog(type) },
                                     onDismiss = { closeDialog() }

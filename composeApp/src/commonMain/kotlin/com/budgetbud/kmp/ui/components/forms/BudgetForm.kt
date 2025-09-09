@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 fun BudgetForm(
     modifier: Modifier = Modifier,
     apiClient: ApiClient,
+    familyView: Boolean = false,
     onSuccess: () -> Unit,
 ) {
     var newBudget by remember { mutableStateOf("") }
