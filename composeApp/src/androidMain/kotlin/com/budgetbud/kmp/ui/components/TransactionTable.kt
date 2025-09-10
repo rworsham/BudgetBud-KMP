@@ -18,10 +18,10 @@ import io.ktor.http.*
 import kotlinx.coroutines.launch
 
 @Composable
-fun TransactionHistoryTable(
+actual fun TransactionTable(
     familyView: Boolean,
     dataSource: TransactionTableDataSource,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -117,7 +117,7 @@ fun TransactionHistoryTable(
                                     onValueChange = {
                                         amount = it
                                         editedTransaction = tx.copy(
-                                            amount = it.toDoubleOrNull() ?: tx.amount
+                                            amount = tx.amount
                                         )
                                     },
                                     label = { Text("Amount") }

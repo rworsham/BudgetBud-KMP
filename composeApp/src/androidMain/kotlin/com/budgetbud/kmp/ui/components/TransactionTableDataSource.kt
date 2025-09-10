@@ -9,7 +9,6 @@ import io.ktor.http.*
 actual class TransactionTableDataSource(private val apiClient: ApiClient) {
 
     actual suspend fun fetchHistory(
-        budgetId: Int,
         startDate: String,
         endDate: String,
         familyView: Boolean,
@@ -17,7 +16,6 @@ actual class TransactionTableDataSource(private val apiClient: ApiClient) {
     ): List<TransactionHistoryTableData> {
         val queryParams = listOf("familyView" to familyView.toString())
         val payload = buildMap {
-            put("budget_id", budgetId)
             put("start_date", startDate)
             put("end_date", endDate)
             if (asPdf) put("format", "pdf")

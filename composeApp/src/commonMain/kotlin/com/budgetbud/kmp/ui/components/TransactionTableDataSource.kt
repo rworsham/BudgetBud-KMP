@@ -4,7 +4,6 @@ import com.budgetbud.kmp.models.TransactionHistoryTableData
 
 expect class TransactionTableDataSource {
     suspend fun fetchHistory(
-        budgetId: Int,
         startDate: String,
         endDate: String,
         familyView: Boolean,
