@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class IncomeExpenseBarChartData(
     val name: String,
-    val value: Float
+    val value: Double
 )

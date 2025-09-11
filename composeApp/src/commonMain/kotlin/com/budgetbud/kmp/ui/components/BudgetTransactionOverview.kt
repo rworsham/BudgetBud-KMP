@@ -13,7 +13,9 @@ import com.budgetbud.kmp.ui.components.forms.BudgetForm
 import com.budgetbud.kmp.ui.components.forms.BudgetEditForm
 import com.budgetbud.kmp.ui.components.forms.BudgetGoalForm
 import com.budgetbud.kmp.models.BudgetData
+import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
 import com.budgetbud.kmp.models.BudgetReportData
+import com.budgetbud.kmp.models.IncomeExpenseBarChartData
 import com.budgetbud.kmp.models.TransactionPieChartData
 import io.ktor.client.request.*
 import io.ktor.client.call.*
@@ -68,7 +70,7 @@ fun BudgetTransactionOverview(
 
     fun fetchData() {
         coroutineScope.launch {
-            if (!apiClient.isAuthenticated()) return@launch
+            if (!apiClient.isLoggedIn.value) return@launch
 
             isLoading = true
             try {
@@ -115,17 +117,17 @@ fun BudgetTransactionOverview(
 
     val incomeExpenseData = remember(reportData) {
         listOf(
-            ChartValue("Income", reportData?.transactions?.filter { it.transactionType == "income" }?.sumOf { it.amount } ?: 0.0),
-            ChartValue("Expense", reportData?.transactions?.filter { it.transactionType == "expense" }?.sumOf { it.amount } ?: 0.0)
+            IncomeExpenseBarChartData("Income", reportData?.transactions?.filter { it.transactionType.toString() == "income" }?.sumOf { it.amount.toDouble() } ?: 0.0),
+            IncomeExpenseBarChartData("Expense", reportData?.transactions?.filter { it.transactionType.toString() == "expense" }?.sumOf { it.amount.toDouble() } ?: 0.0)
         )
     }
 
     val budgetChartData = remember(reportData) {
-        reportData?.budgets_remaining?.map {
-            BudgetReportData(
-                name = it.budget_name,
-                starting = it.starting_budget,
-                remaining = it.remaining_budget
+        reportData?.budgets_remaining?.map { budget ->
+            BudgetRemainingBudgetBarChartData(
+                name = budget.budget_name,
+                starting_budget = budget.starting_budget.toDoubleOrNull() ?: 0.0,
+                remaining_budget = budget.remaining_budget.toDoubleOrNull() ?: 0.0
             )
         } ?: emptyList()
     }
@@ -150,15 +152,6 @@ fun BudgetTransactionOverview(
 
         Text("Budget Charts", style = MaterialTheme.typography.titleMedium)
 
-        if (pieChartData.isNotEmpty() || incomeExpenseData.any { it.value > 0.0 } || budgetChartData.isNotEmpty()) {
-            BudgetCharts(
-                pieChartData = pieChartData,
-                incomeExpenseData = incomeExpenseData,
-                budgetData = budgetChartData
-            )
-        } else {
-            ChartDataError()
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -173,15 +166,39 @@ fun BudgetTransactionOverview(
 
         Text("Your Budgets", style = MaterialTheme.typography.titleMedium)
 
-        if (existingBudgets.isNotEmpty()) {
-            BudgetList(
-                budgets = existingBudgets,
-                onViewHistory = { id -> handleOpen("viewHistory", id) },
-                onSetGoal = { id -> handleOpen("setBudgetGoal", id) }
-            )
-        } else {
-            ChartDataError()
-        }
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (pieChartData.isNotEmpty()) {
+                ExpenseCategoriesBudgetPieChart(
+                    data = pieChartData,
+                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                ChartDataError()
+            }
+
+
+            if (incomeExpenseData.any { it.value > 0 }) {
+                IncomeExpenseBudgetBarChart(
+                    data = incomeExpenseData,
+                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                ChartDataError()
+            }
+
+
+            if (budgetData.isNotEmpty()) {
+                BudgetRemainingBarChart(
+                    data = budgetData,
+                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                ChartDataError()
+            }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 

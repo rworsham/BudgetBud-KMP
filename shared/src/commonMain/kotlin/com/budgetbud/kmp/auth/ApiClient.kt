@@ -84,7 +84,7 @@ class ApiClient(private val tokenStorage: TokenStorage) {
             setBody(mapOf("refresh" to refresh))
         }
 
-        if (!response.status.isSuccess()) throw Exception("Refresh failed")
+        if (!response.status.isSuccess()) throw Exception("Refresh failed") else _isLoggedIn.value = true
         return json.decodeFromString(response.bodyAsText())
     }
 
