@@ -20,9 +20,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun AccountBalanceLineChart(
+actual fun AccountBalanceLineChart(
     chartData: AccountBalanceChartData,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
     val accounts = chartData.accounts
     val history = chartData.history

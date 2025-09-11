@@ -7,11 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.models.AccountBalanceChartData
 import com.budgetbud.kmp.models.AccountData
 import com.budgetbud.kmp.models.AccountOverviewData
 import com.budgetbud.kmp.ui.components.forms.AccountForm
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.ui.components.forms.SavingsGoalForm
+import com.budgetbud.kmp.ui.components.charts.AccountBalanceLineChart
 import com.budgetbud.kmp.utils.DateUtils
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -29,6 +31,7 @@ fun AccountOverview(
 
     var accountData by remember { mutableStateOf<List<AccountData>>(emptyList()) }
     var accountHistory by remember { mutableStateOf<List<AccountOverviewData>>(emptyList()) }
+    var chartData by remember { mutableStateOf<AccountBalanceChartData?>(null) }
 
     var openDialog by remember { mutableStateOf(false) }
     var modalType by remember { mutableStateOf("") }
@@ -61,8 +64,17 @@ fun AccountOverview(
                     url { queryParams.forEach { (k, v) -> parameters.append(k, v) } }
                 }.body<List<AccountOverviewData>>()
 
+                val dataMax = resAccounts.maxOfOrNull { it.balance.toDouble() } ?: 0.0
+
                 accountData = resAccounts
                 accountHistory = resHistory
+
+                chartData = AccountBalanceChartData(
+                    accounts = resAccounts,
+                    history = resHistory,
+                    dataMax = dataMax
+                )
+
                 errorMessage = null
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Failed to fetch account data"
@@ -131,8 +143,8 @@ fun AccountOverview(
 
         Spacer(Modifier.height(16.dp))
 
-        if (accountHistory.isNotEmpty()) {
-            AccountLineChart(accountHistory, accountData)
+        chartData?.let { data ->
+            AccountBalanceLineChart(chartData = data)
         }
 
         Button(onClick = {
@@ -142,7 +154,6 @@ fun AccountOverview(
         }
     }
 
-    // Dialogs
     if (openDialog) {
         when (modalType) {
             "addAccount" -> {
@@ -168,7 +179,7 @@ fun AccountOverview(
             "setSavingsGoal" -> {
                 selectedAccountId?.let {
                     FormDialog(title = "Set Savings Goal", onDismiss = { handleClose() }) {
-                        SavingsGoalForm(accountId = it, apiClient = apiClient, onSuccess = { handleFormSuccess() })
+                        SavingsGoalForm(accountId = it.toString(), apiClient = apiClient, onSuccess = { handleFormSuccess() })
                     }
                 }
             }
