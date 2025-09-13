@@ -46,8 +46,8 @@ actual fun BudgetRemainingBudgetBarChart(
             chartItems = reportData.budgets_remaining.map {
                 BudgetRemainingBudgetBarChartData(
                     name = it.budget_name,
-                    starting_budget = it.starting_budget.toFloatOrNull() ?: 0f,
-                    remaining_budget = it.remaining_budget.toFloatOrNull() ?: 0f
+                    starting_budget = it.starting_budget.toDoubleOrNull() ?: 0.0,
+                    remaining_budget = it.remaining_budget.toDoubleOrNull() ?: 0.0
                 )
             }
         } catch (e: Exception) {
@@ -75,8 +75,8 @@ actual fun BudgetRemainingBudgetBarChart(
 
 @Composable
 private fun DrawChart(data: List<BudgetRemainingBudgetBarChartData>, modifier: Modifier) {
-    val maxBudget = data.flatMap { listOf(it.starting_budget, it.remaining_budget) }.maxOrNull() ?: 1f
-    val roundedMax = ceil(maxBudget / 1000f) * 1000f
+    val maxBudget = data.flatMap { listOf(it.starting_budget, it.remaining_budget) }.maxOrNull() ?: 1.0
+    val roundedMax = ceil(maxBudget / 1000.0) * 1000.0
 
     Column(modifier = modifier.fillMaxWidth()) {
         Canvas(
@@ -89,8 +89,8 @@ private fun DrawChart(data: List<BudgetRemainingBudgetBarChartData>, modifier: M
             val heightScale = size.height / roundedMax
 
             data.forEachIndexed { index, item ->
-                val startHeight = item.starting_budget * heightScale
-                val remainHeight = item.remaining_budget * heightScale
+                val startHeight = (item.starting_budget * heightScale).toFloat()
+                val remainHeight = (item.remaining_budget * heightScale).toFloat()
                 val barX = index * barGroupWidth
                 val barWidth = barGroupWidth / 2.5f
 

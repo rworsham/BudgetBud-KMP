@@ -48,13 +48,11 @@ actual fun IncomeExpenseBarChart(
                     name = "Income",
                     value = rawData.filter { it["transaction_type"] == "income" }
                         .sumOf { (it["amount"]?.toFloatOrNull() ?: 0f).toDouble() }
-                        .toFloat()
                 ),
                 IncomeExpenseBarChartData(
                     name = "Expense",
                     value = rawData.filter { it["transaction_type"] == "expense" }
                         .sumOf { (it["amount"]?.toFloatOrNull() ?: 0f).toDouble() }
-                        .toFloat()
                 )
             )
         } catch (e: Exception) {
@@ -74,8 +72,8 @@ actual fun IncomeExpenseBarChart(
 
 @Composable
 private fun DrawIncomeExpenseChart(data: List<IncomeExpenseBarChartData>, modifier: Modifier) {
-    val maxValue = data.maxOfOrNull { it.value } ?: 1f
-    val roundedMaxValue = ceil(maxValue / 1000f) * 1000f
+    val maxValue = data.maxOfOrNull { it.value } ?: 1.0
+    val roundedMaxValue = ceil(maxValue / 1000.0) * 1000.0
 
     Column(modifier = modifier.fillMaxWidth()) {
         Canvas(
@@ -84,8 +82,8 @@ private fun DrawIncomeExpenseChart(data: List<IncomeExpenseBarChartData>, modifi
                 .height(250.dp)
                 .padding(horizontal = 16.dp)
         ) {
-            val barWidth = size.width / data.size * 0.6f
-            val spaceBetween = size.width / data.size
+            val barWidth = (size.width / data.size * 0.6f).toDouble()
+            val spaceBetween = (size.width / data.size).toDouble()
             val heightScale = size.height / roundedMaxValue
 
             data.forEachIndexed { index, item ->
@@ -94,8 +92,8 @@ private fun DrawIncomeExpenseChart(data: List<IncomeExpenseBarChartData>, modifi
 
                 drawRect(
                     color = if (item.name == "Income") Color.Green else Color.Red,
-                    topLeft = Offset(xOffset, size.height - barHeight),
-                    size = Size(barWidth, barHeight)
+                    topLeft = Offset(xOffset.toFloat(), (size.height - barHeight).toFloat()),
+                    size = Size(barWidth.toFloat(), barHeight.toFloat())
                 )
             }
         }

@@ -155,12 +155,42 @@ fun BudgetTransactionOverview(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Actions", style = MaterialTheme.typography.titleMedium)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Button(onClick = { handleOpen("addBudget") }) {
+                Text("Add Budget")
+            }
 
-        BudgetActions(
-            onAddBudget = { handleOpen("addBudget") },
-            onEditBudget = { handleOpen("editBudget") }
-        )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(onClick = { handleOpen("editBudget") }) {
+                Text("Edit Budget")
+            }
+        }
+
+        if (openDialog) {
+            when (modalType) {
+                "addBudget" -> {
+                    Dialog(onDismissRequest = { handleClose() }) {
+                        Surface(modifier = Modifier.padding(16.dp)) {
+                            BudgetForm(
+                                apiClient = apiClient,
+                                onSuccess = { handleFormSuccess() }
+                            )
+                        }
+                    }
+                }
+                "editBudget" -> {
+                    Dialog(onDismissRequest = { handleClose() }) {
+                        Surface(modifier = Modifier.padding(16.dp)) {
+                            BudgetEditForm(
+                                apiClient = apiClient,
+                                onSuccess = { handleFormSuccess() }
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -206,11 +236,11 @@ fun BudgetTransactionOverview(
 
         if (incomeExpenseData.any { it.value > 0.0 } || budgetChartData.isNotEmpty()) {
             FinancialOverview(
-                startDate = startDate.value,
-                endDate = endDate.value,
+                startDate = startDate,
+                endDate = endDate,
                 income = incomeExpenseData[0].value,
                 expense = incomeExpenseData[1].value,
-                remaining = budgetChartData.sumOf { it.remaining }
+                remaining = budgetChartData.sumOf { it.remaining_budget }
             )
         } else {
             ChartDataError()
