@@ -17,6 +17,7 @@ import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
 import com.budgetbud.kmp.models.BudgetReportData
 import com.budgetbud.kmp.models.IncomeExpenseBarChartData
 import com.budgetbud.kmp.models.TransactionPieChartData
+import com.budgetbud.kmp.ui.components.charts.IncomeExpenseBudgetBarChart
 import io.ktor.client.request.*
 import io.ktor.client.call.*
 import io.ktor.http.*
