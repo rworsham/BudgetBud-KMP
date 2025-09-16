@@ -15,10 +15,11 @@ import com.budgetbud.kmp.ui.components.forms.BudgetGoalForm
 import com.budgetbud.kmp.models.BudgetData
 import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
 import com.budgetbud.kmp.models.BudgetReportData
+import com.budgetbud.kmp.models.ExpenseCategoriesPieChartData
 import com.budgetbud.kmp.models.IncomeExpenseBarChartData
-import com.budgetbud.kmp.models.TransactionPieChartData
 import com.budgetbud.kmp.ui.components.charts.IncomeExpenseBudgetBarChart
 import com.budgetbud.kmp.ui.components.charts.ExpenseCategoriesBudgetPieChart
+import com.budgetbud.kmp.ui.components.charts.BudgetRemainingBarChart
 import io.ktor.client.request.*
 import io.ktor.client.call.*
 import io.ktor.http.*
@@ -37,7 +38,7 @@ fun BudgetTransactionOverview(
     var endDate by remember { mutableStateOf(DateUtils.lastDayOfCurrentMonth()) }
 
     var reportData by remember { mutableStateOf<BudgetReportData?>(null) }
-    var pieChartData by remember { mutableStateOf<List<TransactionPieChartData>>(emptyList()) }
+    var pieChartData by remember { mutableStateOf<List<ExpenseCategoriesPieChartData>>(emptyList()) }
 
     var existingBudgets by remember { mutableStateOf<List<BudgetData>>(emptyList()) }
     var selectedBudgetId by remember { mutableStateOf<Int?>(null) }
@@ -96,7 +97,7 @@ fun BudgetTransactionOverview(
                     url {
                         queryParams.forEach { (key, value) -> parameters.append(key, value) }
                     }
-                }.body<List<TransactionPieChartData>>()
+                }.body<List<ExpenseCategoriesPieChartData>>()
 
                 val budgetsResponse = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
                     url {
@@ -222,9 +223,9 @@ fun BudgetTransactionOverview(
             }
 
 
-            if (budgetData.isNotEmpty()) {
+            if (budgetChartData.isNotEmpty()) {
                 BudgetRemainingBarChart(
-                    data = budgetData,
+                    data = budgetChartData,
                     modifier = Modifier.weight(1f)
                 )
             } else {
@@ -283,7 +284,6 @@ fun BudgetTransactionOverview(
 
             "viewHistory" -> FormDialog(
                 title = "Account History",
-                fullWidth = true,
                 onDismiss = { handleClose() }
             ) {
                 selectedBudgetId?.let {
