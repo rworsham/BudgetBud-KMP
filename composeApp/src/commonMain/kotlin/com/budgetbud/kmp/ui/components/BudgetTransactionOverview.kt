@@ -231,20 +231,49 @@ fun BudgetTransactionOverview(
             } else {
                 ChartDataError()
             }
-
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text("Financial Overview", style = MaterialTheme.typography.titleMedium)
 
         if (incomeExpenseData.any { it.value > 0.0 } || budgetChartData.isNotEmpty()) {
-            FinancialOverview(
-                startDate = startDate,
-                endDate = endDate,
-                income = incomeExpenseData[0].value,
-                expense = incomeExpenseData[1].value,
-                remaining = budgetChartData.sumOf { it.remaining_budget }
-            )
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Text(
+                        text = "Financial Overview",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                        )
+                    )
+
+                    Text(
+                        text = "$startDate - $endDate",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    )
+
+                    Text(
+                        text = "Total Income: $${"%.2f".format(incomeExpenseData[0].value)}",
+                    )
+
+                    Text(
+                        text = "Total Expenses: $${"%.2f".format(incomeExpenseData[1].value)}",
+                    )
+
+                    Text(
+                        text = "Remaining Budget: $${"%.2f".format(budgetChartData.sumOf { it.remaining_budget })}",
+                    )
+                }
+            }
         } else {
             ChartDataError()
         }
@@ -299,10 +328,9 @@ fun BudgetTransactionOverview(
                         shape = MaterialTheme.shapes.medium,
                         tonalElevation = 4.dp
                     ) {
-                        BudgetGoalForm(
-                            apiClient = apiClient,
-                            onSuccess = { handleFormSuccess() }
-                        )
+                        selectedBudgetId?.let {
+                            BudgetGoalForm(budgetId = it, apiClient = apiClient)
+                        }
                     }
                 }
             }
