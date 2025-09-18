@@ -81,13 +81,13 @@ fun SavingsGoalForm(
             modifier = Modifier.fillMaxWidth()
         )
 
-        DatePickerField(
+        FormDatePicker(
             label = "Start Date",
             selectedDate = startDate,
             onDateSelected = { startDate = it }
         )
 
-        DatePickerField(
+        FormDatePicker(
             label = "End Date",
             selectedDate = endDate,
             onDateSelected = { endDate = it }

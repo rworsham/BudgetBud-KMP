@@ -7,17 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.AlertHandler
+import com.budgetbud.kmp.ui.components.SuccessDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import io.ktor.client.request.*
-import io.ktor.client.call.*
 import io.ktor.http.*
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toKotlinLocalDate
-import java.time.format.DateTimeFormatter
-import java.time.LocalDate as JavaLocalDate
-import com.budgetbud.kmp.ui.components.DatePickerField
+
 
 @Composable
 fun BudgetGoalForm(
@@ -31,6 +27,7 @@ fun BudgetGoalForm(
     var endDate by remember { mutableStateOf<LocalDate?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isSubmitting by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -84,13 +81,13 @@ fun BudgetGoalForm(
             }
         )
 
-        DatePickerField(
+        FormDatePicker(
             label = "Start Date",
             selectedDate = startDate,
             onDateSelected = { startDate = it }
         )
 
-        DatePickerField(
+        FormDatePicker(
             label = "End Date",
             selectedDate = endDate,
             onDateSelected = { endDate = it }
@@ -102,6 +99,10 @@ fun BudgetGoalForm(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(if (isSubmitting) "Submitting..." else "Submit")
+        }
+
+        if (showSuccessDialog) {
+            SuccessDialog(onDismiss = { showSuccessDialog = false })
         }
 
         errorMessage?.let {

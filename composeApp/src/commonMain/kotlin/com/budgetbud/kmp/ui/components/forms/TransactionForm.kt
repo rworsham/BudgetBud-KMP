@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -18,6 +19,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun TransactionForm(
@@ -25,7 +27,7 @@ fun TransactionForm(
     onSuccess: () -> Unit,
     familyView: Boolean = false
 ) {
-    var date by remember { mutableStateOf("") } // Replace with LocalDate if using DatePicker
+    var date by remember { mutableStateOf<LocalDate?>(null) }
     var amount by remember { mutableStateOf("") }
     var transactionType by remember { mutableStateOf("expense") }
     var description by remember { mutableStateOf("") }
@@ -122,12 +124,10 @@ fun TransactionForm(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // DatePicker solution needed
-        OutlinedTextField(
-            value = date,
-            onValueChange = { date = it },
-            label = { Text("Date (YYYY-MM-DD)") },
-            singleLine = true,
+        FormDatePicker(
+            label = "Date",
+            selectedDate = date,
+            onDateSelected = { date = it },
             modifier = Modifier.fillMaxWidth()
         )
 
