@@ -329,7 +329,7 @@ fun BudgetTransactionOverview(
                         tonalElevation = 4.dp
                     ) {
                         selectedBudgetId?.let {
-                            BudgetGoalForm(budgetId = it, apiClient = apiClient)
+                            BudgetGoalForm(budgetId = it, apiClient = apiClient, onSuccess = {showSuccessDialog = true})
                         }
                     }
                 }

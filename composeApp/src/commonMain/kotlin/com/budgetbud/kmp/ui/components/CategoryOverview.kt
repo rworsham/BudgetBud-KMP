@@ -130,7 +130,7 @@ fun CategoryOverview(
         if (categoryData.isNotEmpty()) {
             CategoryCardList(
                 categories = categoryData,
-                onViewHistory = { id -> handleOpen("viewHistory", id) }
+                onViewHistory = { id -> handleOpen("viewHistory", id.toInt()) }
             )
         } else {
             Text("No category data found.")

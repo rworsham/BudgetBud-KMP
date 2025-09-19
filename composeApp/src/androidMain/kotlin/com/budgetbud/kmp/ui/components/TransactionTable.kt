@@ -10,11 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.TransactionHistoryTableData
+import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.utils.DateUtils
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,7 +77,15 @@ actual fun TransactionTable(
     }
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-        //DatePicker
+        DateRangeFilterForm(
+            startDate = startDate,
+            endDate = endDate,
+            onStartDateChange = { startDate = it },
+            onEndDateChange = { endDate = it },
+            onSubmit = {
+                fetchTransactions()
+            }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

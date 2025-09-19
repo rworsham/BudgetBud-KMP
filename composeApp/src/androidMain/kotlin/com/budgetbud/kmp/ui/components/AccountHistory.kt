@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.TransactionHistoryTableData
+import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.utils.DateUtils
 import kotlinx.coroutines.launch
 
@@ -45,7 +46,13 @@ actual fun AccountHistory(
     }
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-       // DatePicker
+        DateRangeFilterForm(
+            startDate = startDate,
+            endDate = endDate,
+            onStartDateChange = { startDate = it },
+            onEndDateChange = { endDate = it },
+            onSubmit = { fetchTransactions() }
+        )
 
         if (isLoading) {
             CircularProgressIndicator()
