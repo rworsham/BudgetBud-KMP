@@ -5,8 +5,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import com.budgetbud.kmp.auth.models.User
 import com.budgetbud.kmp.models.CategoryOverviewData
+import com.budgetbud.kmp.models.FamilyTransactionOverviewData
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.ui.components.forms.FamilyCreateForm
@@ -26,12 +29,12 @@ fun FamilyOverview(
     val coroutineScope = rememberCoroutineScope()
 
     var familyData by remember { mutableStateOf<List<User>>(emptyList()) }
-    var transactionOverview by remember { mutableStateOf<List<TransactionOverview>>(emptyList()) }
+    var transactionOverview by remember { mutableStateOf<List<FamilyTransactionOverviewData>>(emptyList()) }
     var categoryOverview by remember { mutableStateOf<List<CategoryOverviewData>>(emptyList()) }
 
     var openDialog by remember { mutableStateOf(false) }
     var modalType by remember { mutableStateOf("") }
-    var selectedUserId by remember { mutableStateOf<Int?>(null) }
+    var selectedUserId by remember { mutableStateOf<String?>(null) }
 
     var startDate by remember { mutableStateOf(DateUtils.firstDayOfCurrentMonth()) }
     var endDate by remember { mutableStateOf(DateUtils.lastDayOfCurrentMonth()) }
@@ -72,7 +75,7 @@ fun FamilyOverview(
         }
     }
 
-    fun handleOpen(type: String, userId: Int? = null) {
+    fun handleOpen(type: String, userId: String? = null) {
         modalType = type
         selectedUserId = userId
         openDialog = true
