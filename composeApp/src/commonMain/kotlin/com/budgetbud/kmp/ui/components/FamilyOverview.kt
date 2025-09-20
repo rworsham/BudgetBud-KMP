@@ -8,13 +8,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import com.budgetbud.kmp.auth.models.User
-import com.budgetbud.kmp.models.CategoryOverviewData
-import com.budgetbud.kmp.models.FamilyTransactionOverviewData
 import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.models.FamilyTransactionOverviewData
+import com.budgetbud.kmp.models.FamilyCategoryOverviewData
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.ui.components.forms.FamilyCreateForm
 import com.budgetbud.kmp.ui.components.forms.FamilyInviteForm
 import com.budgetbud.kmp.utils.DateUtils
+import com.budgetbud.kmp.ui.components.charts.FamilyCategoryBarChart
+import com.budgetbud.kmp.ui.components.charts.FamilyTransactionBarChart
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -30,7 +32,7 @@ fun FamilyOverview(
 
     var familyData by remember { mutableStateOf<List<User>>(emptyList()) }
     var transactionOverview by remember { mutableStateOf<List<FamilyTransactionOverviewData>>(emptyList()) }
-    var categoryOverview by remember { mutableStateOf<List<CategoryOverviewData>>(emptyList()) }
+    var categoryOverview by remember { mutableStateOf<List<FamilyCategoryOverviewData>>(emptyList()) }
 
     var openDialog by remember { mutableStateOf(false) }
     var modalType by remember { mutableStateOf("") }
