@@ -72,7 +72,7 @@ fun TransactionForm(
     }
 
     fun validateForm(): Boolean {
-        if (date.isBlank() || amount.isBlank() || category.isBlank() || budget.isBlank() || account.isBlank()) {
+        if (date == null || amount.isBlank() || category.isBlank() || budget.isBlank() || account.isBlank()) {
             errorMessage = "Please fill in all required fields."
             return false
         }
@@ -171,7 +171,7 @@ fun TransactionForm(
 
         DropdownSelector(
             label = "Budget",
-            options = budgetData.map { it.id to it.name },
+            options = budgetData.map { it.id.toString() to it.name },
             selectedOption = budget,
             onOptionSelected = { budget = it }
         )

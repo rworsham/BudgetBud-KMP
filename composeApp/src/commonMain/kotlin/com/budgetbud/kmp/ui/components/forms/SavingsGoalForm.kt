@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
-import com.budgetbud.kmp.ui.components.DatePickerField
+import com.budgetbud.kmp.ui.components.forms.FormDatePicker
 
 @Composable
 fun SavingsGoalForm(

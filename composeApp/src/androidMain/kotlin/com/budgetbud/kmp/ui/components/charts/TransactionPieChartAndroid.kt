@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.TransactionPieChartData
-import kotlin.math.min
 
 @Composable
 actual fun TransactionPieChart(

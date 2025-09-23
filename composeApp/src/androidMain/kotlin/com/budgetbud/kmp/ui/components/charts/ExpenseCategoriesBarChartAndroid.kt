@@ -16,7 +16,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlin.math.ceil
-import kotlinx.coroutines.launch
 
 @Composable
 actual fun ExpenseCategoriesBarChart(
