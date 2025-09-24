@@ -24,7 +24,6 @@ fun DashboardReports(
     familyView: Boolean,
     modifier: Modifier = Modifier,
     apiClient: ApiClient,
-    transactionTableDataSource: TransactionTableDataSource
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -130,7 +129,7 @@ fun DashboardReports(
         if (transactionRows.isNotEmpty()) {
             TransactionTable(
                 familyView = familyView,
-                dataSource = transactionTableDataSource
+                apiClient = apiClient
             )
         } else {
             ChartDataError()

@@ -23,7 +23,6 @@ fun Dashboard(
     modifier: Modifier = Modifier,
     initialSegment: String = "dashboard",
     apiClient: ApiClient,
-    transactionTableDataSource: TransactionTableDataSource
 ) {
     var currentSegment by remember { mutableStateOf(initialSegment) }
     var drawerOpen by remember { mutableStateOf(true) }
@@ -110,11 +109,11 @@ fun Dashboard(
                 .fillMaxSize()
             ) {
                 when (currentSegment) {
-                    "dashboard" -> DashboardReports(familyView = familyView.value, apiClient = apiClient, transactionTableDataSource = transactionTableDataSource)
+                    "dashboard" -> DashboardReports(familyView = familyView.value, apiClient = apiClient)
                     "budget" -> BudgetTransactionOverview(familyView = familyView.value, apiClient = apiClient)
                     "category" -> CategoryOverview(familyView = familyView.value, apiClient = apiClient)
                     "reports" -> ReportDashboard(familyView = familyView.value, apiClient = apiClient)
-                    "transactions" -> TransactionTable(familyView = familyView.value, dataSource = transactionTableDataSource)
+                    "transactions" -> TransactionTable(familyView = familyView.value, apiClient = apiClient)
                     "accounts" -> AccountOverview(familyView = familyView.value, apiClient = apiClient)
                     "family" -> FamilyOverview(apiClient = apiClient)
                 }
