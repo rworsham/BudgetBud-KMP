@@ -78,6 +78,33 @@ class ApiClient(private val tokenStorage: TokenStorage) {
         }
     }
 
+    suspend fun register(
+        email: String,
+        username: String,
+        firstName: String,
+        lastName: String,
+        password: String,
+        token: String? = null
+    ): Boolean {
+        val response = client.post("https://api.budgetingbud.com/api/user/create/") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                buildMap {
+                    put("email", email)
+                    put("username", username)
+                    put("first_name", firstName)
+                    put("last_name", lastName)
+                    put("password", password)
+                    if (!token.isNullOrBlank()) {
+                        put("token", token)
+                    }
+                }
+            )
+        }
+
+        return response.status == HttpStatusCode.OK
+    }
+
     private suspend fun postRefreshToken(refresh: String): AuthTokens {
         val response = client.post("https://api.budgetingbud.com/api/token/refresh/") {
             contentType(ContentType.Application.Json)

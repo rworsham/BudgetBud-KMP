@@ -6,6 +6,8 @@ import androidx.navigation.compose.*
 import com.budgetbud.kmp.ui.*
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.Dashboard
+import com.budgetbud.kmp.ui.components.LoginScreen
+import com.budgetbud.kmp.ui.components.SignUpScreen
 
 @Composable
 fun AppNavigation(apiClient: ApiClient = AppDependencies.apiClient) {
@@ -19,7 +21,7 @@ fun AppNavigation(apiClient: ApiClient = AppDependencies.apiClient) {
         startDestination = startDestination
     ) {
         composable("login") {
-            LoginForm(
+            LoginScreen(
                 navController = navController,
                 loginUser = { username, password, _ ->
                     val success = apiClient.login(username, password)
@@ -33,7 +35,21 @@ fun AppNavigation(apiClient: ApiClient = AppDependencies.apiClient) {
         }
 
         composable("signup") {
-            SignupForm(navController)
+            SignUpScreen(
+                navController = navController,
+                token = null,
+                createUser = { email, username, firstName, lastName, password, token ->
+                    val success = apiClient.register(
+                        email = email,
+                        username = username,
+                        firstName = firstName,
+                        lastName = lastName,
+                        password = password,
+                        token = token
+                    )
+                    if (success) Result.success(Unit) else Result.failure(Exception("Registration failed"))
+                }
+            )
         }
     }
 }
