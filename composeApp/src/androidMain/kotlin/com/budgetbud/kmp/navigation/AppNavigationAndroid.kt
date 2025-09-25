@@ -2,15 +2,15 @@ package com.budgetbud.kmp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.*
-import com.budgetbud.kmp.ui.*
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.Dashboard
 import com.budgetbud.kmp.ui.components.LoginScreen
 import com.budgetbud.kmp.ui.components.SignUpScreen
 
 @Composable
-fun AppNavigation(apiClient: ApiClient = AppDependencies.apiClient) {
+actual fun AppNavigation(apiClient: ApiClient) {
     val navController = rememberNavController()
     val isLoggedIn by apiClient.isLoggedIn.collectAsState()
 
