@@ -7,41 +7,51 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.budgetbud.kmp.navigation.AppNavigation
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.auth.tokenStorage
 
 private val BBGreen = Color(0xFF1DB954)
 private val LightGray = Color(0xFFB3B3B3)
-private val BackgroundColor = Color(0xFFFFFFFF)
-private val SurfaceColor = Color(0xFFF7F7F7)
-private val TextPrimary = Color(0xFF000000)
-private val TextSecondary = LightGray
+private val DarkGray = Color(0xFF121212)
 
 private val AppTypography = Typography(
     displayLarge = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold),
     bodyLarge = TextStyle(fontSize = 16.sp),
-    bodyMedium = TextStyle(fontSize = 14.sp, color = TextSecondary)
+    bodyMedium = TextStyle(fontSize = 14.sp, color = LightGray)
 )
 
-private val AppColorScheme = lightColorScheme(
+private val AppLightColors = lightColorScheme(
     primary = BBGreen,
     onPrimary = Color.White,
     secondary = BBGreen,
     onSecondary = Color.White,
-    background = BackgroundColor,
-    onBackground = TextPrimary,
-    surface = SurfaceColor,
-    onSurface = TextPrimary
+    background = Color.White,
+    onBackground = Color.Black,
+    surface = Color(0xFFF7F7F7),
+    onSurface = Color.Black
+)
+
+private val AppDarkColors = darkColorScheme(
+    primary = BBGreen,
+    onPrimary = Color.Black,
+    secondary = BBGreen,
+    onSecondary = Color.Black,
+    background = DarkGray,
+    onBackground = Color.White,
+    surface = Color(0xFF1E1E1E),
+    onSurface = Color.White
 )
 
 @Composable
 @Preview
 fun App() {
     val apiClient = ApiClient(tokenStorage)
+    val isDarkTheme = isSystemInDarkTheme()
 
     MaterialTheme(
-        colorScheme = AppColorScheme,
+        colorScheme = if (!isDarkTheme) AppLightColors else AppDarkColors ,
         typography = AppTypography
     ) {
         AppNavigation(apiClient)

@@ -8,6 +8,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.*
+import androidx.compose.foundation.background
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
@@ -28,6 +29,7 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
