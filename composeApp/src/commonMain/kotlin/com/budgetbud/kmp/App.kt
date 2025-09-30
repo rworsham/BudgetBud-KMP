@@ -30,7 +30,9 @@ private val AppLightColors = lightColorScheme(
     background = Color.White,
     onBackground = Color.Black,
     surface = Color(0xFFF7F7F7),
-    onSurface = Color.Black
+    onSurface = Color.Black,
+    error = Color.Red,
+    onError = Color.Black
 )
 
 private val AppDarkColors = darkColorScheme(

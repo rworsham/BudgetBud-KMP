@@ -17,14 +17,14 @@ fun AlertHandler(
         Snackbar(
             action = {
                 TextButton(onClick = { visible = false }) {
-                    Text("Dismiss", color = MaterialTheme.colorScheme.onError)
+                    Text("Dismiss", color = MaterialTheme.colorScheme.onError.copy(alpha = 1f))
                 }
             },
             modifier = modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError
+            containerColor = MaterialTheme.colorScheme.error.copy(alpha = 1f),
+            contentColor = MaterialTheme.colorScheme.onError.copy(alpha = 1f)
         ) {
             Text(alertMessage)
         }
