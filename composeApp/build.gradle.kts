@@ -25,10 +25,10 @@ kotlin {
     sourceSets {
         val desktopMain by getting
         val androidMain by getting {
-            kotlin.srcDirs("src/androidMain/kotlin")
-            resources.srcDirs("src/androidMain/res")
+            kotlin.srcDir("src/androidMain/kotlin")
+            resources.srcDir("src/androidMain/res")
         }
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -37,6 +37,7 @@ kotlin {
             implementation("io.coil-kt:coil-compose:2.4.0")
             implementation("io.github.vanpra.compose-material-dialogs:core:0.9.0")
             implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -55,7 +56,7 @@ kotlin {
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
             implementation("io.ktor:ktor-client-auth:$ktorVersion")
             implementation("io.ktor:ktor-client-logging:$ktorVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

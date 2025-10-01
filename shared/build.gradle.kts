@@ -34,10 +34,11 @@ kotlin {
 
     sourceSets {
         val androidMain by getting {
-            kotlin.srcDirs("src/androidMain/kotlin")
+            kotlin.srcDir("src/androidMain/kotlin")
             dependencies {
                 implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
                 implementation("androidx.security:security-crypto:1.1.0-alpha03")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
             }
         }
 
@@ -49,7 +50,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-cio:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:${ktorVersion}")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
             }
         }
 
