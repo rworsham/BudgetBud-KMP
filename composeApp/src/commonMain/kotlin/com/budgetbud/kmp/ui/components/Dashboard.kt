@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Alignment
@@ -102,6 +103,7 @@ fun Dashboard(
                 ExtendedFloatingActionButton(
                     text = { Text("New") },
                     icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                    containerColor = MaterialTheme.colorScheme.primary,
                     onClick = { openDialog("FAB") }
                 )
             }
