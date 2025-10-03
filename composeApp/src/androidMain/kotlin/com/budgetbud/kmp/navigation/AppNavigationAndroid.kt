@@ -1,5 +1,6 @@
 package com.budgetbud.kmp.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,6 +17,8 @@ actual fun AppNavigation(apiClient: ApiClient) {
 
     val startDestination = if (isLoggedIn) "dashboard" else "login"
 
+    Log.d("AppNavigation", "AppNavigation Composable called")
+
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -25,6 +28,8 @@ actual fun AppNavigation(apiClient: ApiClient) {
                 navController = navController,
                 loginUser = { username, password, _ ->
                     val success = apiClient.login(username, password)
+                    val savedTokens = apiClient.getTokens()
+                    Log.d("Login", "Verified saved tokens before navigating: $savedTokens")
                     if (success) Result.success(Unit) else Result.failure(Exception("Login failed"))
                 }
             )

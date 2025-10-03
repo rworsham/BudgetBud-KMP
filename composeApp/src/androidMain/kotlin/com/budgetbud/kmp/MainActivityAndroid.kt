@@ -13,8 +13,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        appContext = this
-
         setContent {
             App()
         }
