@@ -42,13 +42,14 @@ fun DashboardReports(
         coroutineScope.launch {
             isLoading = true
             try {
+                val tokens = apiClient.getTokens()
                 val queryParams = listOf("familyView" to familyView.toString())
                 val datePayload = mapOf(
                     "start_date" to startDate.toString(),
                     "end_date" to endDate.toString()
                 )
 
-                val barResponse = apiClient.client.post("https://api.budgetingbud.com/api/transaction-bar-chart/") {
+                fun HttpRequestBuilder.attachAuthAndQueryParams() {
                     contentType(ContentType.Application.Json)
                     setBody(datePayload)
                     url {
@@ -56,26 +57,23 @@ fun DashboardReports(
                             parameters.append(key, value)
                         }
                     }
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
+                }
+
+                val barResponse = apiClient.client.post("https://api.budgetingbud.com/api/transaction-bar-chart/") {
+                    attachAuthAndQueryParams()
                 }.body<List<TransactionBarChartData>>()
 
                 val pieResponse = apiClient.client.post("https://api.budgetingbud.com/api/transaction-pie-chart/") {
-                    contentType(ContentType.Application.Json)
-                    setBody(datePayload)
-                    url {
-                        queryParams.forEach { (key, value) ->
-                            parameters.append(key, value)
-                        }
-                    }
+                    attachAuthAndQueryParams()
                 }.body<List<TransactionPieChartData>>()
 
                 val tableResponse = apiClient.client.post("https://api.budgetingbud.com/api/transaction-table-view/") {
-                    contentType(ContentType.Application.Json)
-                    setBody(datePayload)
-                    url {
-                        queryParams.forEach { (key, value) ->
-                            parameters.append(key, value)
-                        }
-                    }
+                    attachAuthAndQueryParams()
                 }.body<List<TransactionTableData>>()
 
                 barChartData = barResponse
