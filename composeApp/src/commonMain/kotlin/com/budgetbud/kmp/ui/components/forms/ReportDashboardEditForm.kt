@@ -69,6 +69,8 @@ fun ReportDashboardEditForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.patch("/user/reports/") {
                     contentType(ContentType.Application.Json)
                     setBody(
@@ -78,6 +80,11 @@ fun ReportDashboardEditForm(
                             "y_size" to ySize
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
                 onSuccess()
             } catch (e: Exception) {

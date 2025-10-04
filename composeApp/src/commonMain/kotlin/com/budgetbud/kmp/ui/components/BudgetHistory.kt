@@ -17,6 +17,7 @@ suspend fun fetchBudgetHistory(
     asPdf: Boolean = false
 ): List<TransactionHistoryTableData> {
     val queryParams = listOf("familyView" to familyView.toString())
+    val tokens = apiClient.getTokens()
     val payload = buildMap {
         put("budget_id", budgetId)
         put("start_date", startDate)
@@ -28,6 +29,11 @@ suspend fun fetchBudgetHistory(
         contentType(ContentType.Application.Json)
         setBody(payload)
         url { queryParams.forEach { (k, v) -> parameters.append(k, v) } }
+        headers {
+            tokens?.let {
+                append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+            }
+        }
     }.body()
 }
 

@@ -31,7 +31,14 @@ fun CategoryForm(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/")
+            val tokens = apiClient.getTokens()
+            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
+            }
             val categories = response.body<List<CategoryItem>>()
             existingCategories = categories.map { it.name }
         } catch (e: Exception) {
@@ -63,6 +70,8 @@ fun CategoryForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.post("https://api.budgetingbud.com/api/categories/") {
                     contentType(io.ktor.http.ContentType.Application.Json)
                     setBody(
@@ -70,6 +79,11 @@ fun CategoryForm(
                             "name" to newCategory,
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
 
                 onSuccess()

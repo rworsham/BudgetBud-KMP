@@ -44,6 +44,7 @@ fun SavingsGoalForm(
         coroutineScope.launch(Dispatchers.IO) {
             try {
                 val formatter = DateTimeFormatter.ISO_LOCAL_DATE
+                val tokens = apiClient.getTokens()
                 val response = apiClient.client.post("https://api.budgetingbud.com/api/account/savings-goal/") {
                     contentType(ContentType.Application.Json)
                     setBody(
@@ -54,6 +55,11 @@ fun SavingsGoalForm(
                             "end_date" to formatter.format(endDate!!.toJavaLocalDate())
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
 
                 response.body<Unit>()

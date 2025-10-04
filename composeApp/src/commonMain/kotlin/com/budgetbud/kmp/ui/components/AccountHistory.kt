@@ -16,6 +16,7 @@ suspend fun fetchAccountHistory(
     familyView: Boolean
 ): List<TransactionHistoryTableData> {
     val queryParams = listOf("familyView" to familyView.toString())
+    val tokens = apiClient.getTokens()
     val payload = mapOf(
         "account_id" to accountId,
         "start_date" to startDate,
@@ -25,6 +26,11 @@ suspend fun fetchAccountHistory(
         contentType(ContentType.Application.Json)
         setBody(payload)
         url { queryParams.forEach { (k, v) -> parameters.append(k, v) } }
+        headers {
+            tokens?.let {
+                append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+            }
+        }
     }.body()
 }
 

@@ -20,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.HttpHeaders
 
 @Composable
 fun ReportDashboard(
@@ -42,10 +43,15 @@ fun ReportDashboard(
             isLoading = true
             try {
                 val queryParams = listOf("familyView" to familyView.toString())
-
+                val tokens = apiClient.getTokens()
                 val response = apiClient.client.get("https://api.budgetingbud.com/api/user/reports") {
                     url {
                         queryParams.forEach { (k, v) -> parameters.append(k, v) }
+                    }
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
                     }
                 }.body<List<ReportDashboardData>>()
 

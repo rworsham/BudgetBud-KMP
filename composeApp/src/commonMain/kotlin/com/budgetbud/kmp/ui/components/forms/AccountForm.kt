@@ -33,7 +33,14 @@ fun AccountForm(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/accounts/")
+            val tokens = apiClient.getTokens()
+            val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/accounts/") {
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
+            }
             existingAccounts = response.body()
         } catch (e: Exception) {
             errorMessage = "Failed to fetch existing accounts"
@@ -65,6 +72,8 @@ fun AccountForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.post("https://api.budgetingbud.com/api/accounts/") {
                     contentType(ContentType.Application.Json)
                     setBody(
@@ -73,6 +82,11 @@ fun AccountForm(
                             "balance" to newAccountBalance
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
 
                 onSuccess()

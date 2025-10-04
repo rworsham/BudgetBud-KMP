@@ -32,7 +32,14 @@ fun BudgetForm(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/")
+            val tokens = apiClient.getTokens()
+            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
+            }
             val budgets = response.body<List<BudgetItem>>()
             existingBudgets = budgets.map { it.name }
         } catch (e: Exception) {
@@ -64,14 +71,21 @@ fun BudgetForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.post("https://api.budgetingbud.com/api/budget/") {
-                    contentType(io.ktor.http.ContentType.Application.Json)
+                    contentType(ContentType.Application.Json)
                     setBody(
                         mapOf(
                             "name" to newBudget,
                             "total_amount" to amount
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
 
                 onSuccess()

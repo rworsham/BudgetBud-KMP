@@ -78,31 +78,37 @@ fun BudgetTransactionOverview(
             isLoading = true
             try {
                 val queryParams = listOf("familyView" to familyView.toString())
+                val tokens = apiClient.getTokens()
                 val datePayload = mapOf(
                     "start_date" to startDate.toString(),
                     "end_date" to endDate.toString()
                 )
 
-                val reportResponse = apiClient.client.post("https://api.budgetingbud.com/api/budget-transaction-overview/") {
+                fun HttpRequestBuilder.attachAuthAndQueryParams() {
                     contentType(ContentType.Application.Json)
                     setBody(datePayload)
                     url {
-                        queryParams.forEach { (key, value) -> parameters.append(key, value) }
+                        queryParams.forEach { (key, value) ->
+                            parameters.append(key, value)
+                        }
                     }
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
+                }
+
+                val reportResponse = apiClient.client.post("https://api.budgetingbud.com/api/budget-transaction-overview/") {
+                    attachAuthAndQueryParams()
                 }.body<BudgetReportData>()
 
                 val pieResponse = apiClient.client.post("https://api.budgetingbud.com/api/transaction-pie-chart/") {
-                    contentType(ContentType.Application.Json)
-                    setBody(datePayload)
-                    url {
-                        queryParams.forEach { (key, value) -> parameters.append(key, value) }
-                    }
+                    attachAuthAndQueryParams()
                 }.body<List<ExpenseCategoriesPieChartData>>()
 
                 val budgetsResponse = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
-                    url {
-                        queryParams.forEach { (key, value) -> parameters.append(key, value) }
-                    }
+                    attachAuthAndQueryParams()
                 }.body<List<BudgetData>>()
 
                 reportData = reportResponse

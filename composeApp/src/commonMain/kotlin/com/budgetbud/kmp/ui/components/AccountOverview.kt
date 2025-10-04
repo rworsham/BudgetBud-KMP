@@ -49,6 +49,7 @@ fun AccountOverview(
             isLoading = true
             try {
                 val queryParams = listOf("familyView" to familyView.toString())
+                val tokens = apiClient.getTokens()
                 val payload = mapOf(
                     "start_date" to startDate.toString(),
                     "end_date" to endDate.toString()
@@ -56,12 +57,22 @@ fun AccountOverview(
 
                 val resAccounts = apiClient.client.get("https://api.budgetingbud.com/api/accounts/") {
                     url { queryParams.forEach { (k, v) -> parameters.append(k, v) } }
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }.body<List<AccountData>>()
 
                 val resHistory = apiClient.client.post("https://api.budgetingbud.com/api/accounts/overview-report/") {
                     contentType(ContentType.Application.Json)
                     setBody(payload)
                     url { queryParams.forEach { (k, v) -> parameters.append(k, v) } }
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }.body<List<AccountOverviewData>>()
 
                 val dataMax = resAccounts.maxOfOrNull { it.balance.toDouble() } ?: 0.0

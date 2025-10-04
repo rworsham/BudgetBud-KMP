@@ -63,11 +63,18 @@ fun FamilyCreateForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.post("https://api.budgetingbud.com/api/family/create/") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         mapOf("name" to newFamily)
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
                 onSuccess()
             } catch (e: Exception) {

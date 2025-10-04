@@ -42,6 +42,8 @@ fun BudgetGoalForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 val payload = mapOf(
                     "budget" to budgetId,
                     "target_balance" to amount,
@@ -52,6 +54,11 @@ fun BudgetGoalForm(
                 apiClient.client.post("https://api.budgetingbud.com/api/budget-goal/") {
                     contentType(ContentType.Application.Json)
                     setBody(payload)
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
 
                 onSuccess()

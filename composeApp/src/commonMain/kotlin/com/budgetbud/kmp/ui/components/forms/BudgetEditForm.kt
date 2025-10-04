@@ -33,7 +33,14 @@ fun BudgetEditForm(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/")
+            val tokens = apiClient.getTokens()
+            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
+            }
             existingBudgetData = response.body()
         } catch (e: Exception) {
             errorMessage = "Failed to fetch budgets"
@@ -62,6 +69,8 @@ fun BudgetEditForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.patch("https://api.budgetingbud.com/api/budget/") {
                     contentType(ContentType.Application.Json)
                     setBody(
@@ -71,6 +80,11 @@ fun BudgetEditForm(
                             "total_amount" to amount
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
                 onSuccess()
             } catch (e: Exception) {

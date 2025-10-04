@@ -20,6 +20,7 @@ import com.budgetbud.kmp.ui.components.charts.FamilyTransactionBarChart
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.client.call.body
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -49,7 +50,8 @@ fun FamilyOverview(
         coroutineScope.launch {
             isLoading = true
             try {
-                val payload = mapOf(
+                val tokens = apiClient.getTokens()
+                val datePayload = mapOf(
                     "start_date" to startDate.toString(),
                     "end_date" to endDate.toString()
                 )
@@ -59,14 +61,24 @@ fun FamilyOverview(
                 if (familyData.isNotEmpty()) {
                     transactionOverview = apiClient.client.post("/family/overview/") {
                         contentType(ContentType.Application.Json)
-                        setBody(payload)
+                        setBody(datePayload)
                         url { parameters.append("Transaction", "true") }
+                        headers {
+                            tokens?.let {
+                                append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                            }
+                        }
                     }.body()
 
                     categoryOverview = apiClient.client.post("/family/overview/") {
                         contentType(ContentType.Application.Json)
-                        setBody(payload)
+                        setBody(datePayload)
                         url { parameters.append("Category", "true") }
+                        headers {
+                            tokens?.let {
+                                append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                            }
+                        }
                     }.body()
                 }
             } catch (e: Exception) {

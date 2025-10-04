@@ -61,9 +61,16 @@ fun FamilyInviteForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.post("https://api.budgetingbud.com/api/family/invite/") {
                     contentType(ContentType.Application.Json)
                     setBody(mapOf("invited_user" to newFamilyMember))
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
                 onSuccess()
             } catch (e: Exception) {

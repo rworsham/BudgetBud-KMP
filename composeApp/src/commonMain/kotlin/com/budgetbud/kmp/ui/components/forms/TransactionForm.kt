@@ -51,14 +51,31 @@ fun TransactionForm(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
+            val tokens = apiClient.getTokens()
+
             val catsResponse: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/categories/") {
                 parameter("familyView", familyView)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }
             val budgetsResponse: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
                 parameter("familyView", familyView)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }
             val accountsResponse: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/accounts/") {
                 parameter("familyView", familyView)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }
 
             categories = catsResponse.body()
@@ -91,6 +108,8 @@ fun TransactionForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.post("https://api.budgetingbud.com/api/transaction/") {
                     contentType(ContentType.Application.Json)
                     parameter("familyView", familyView)
@@ -108,6 +127,11 @@ fun TransactionForm(
                             "next_occurrence" to nextOccurrence
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
                 onSuccess()
             } catch (e: Exception) {

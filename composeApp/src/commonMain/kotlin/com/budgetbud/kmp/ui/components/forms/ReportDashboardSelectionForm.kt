@@ -60,6 +60,8 @@ fun ReportDashboardSelectionForm(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
+                val tokens = apiClient.getTokens()
+
                 apiClient.client.post("/user/reports/") {
                     contentType(ContentType.Application.Json)
                     setBody(
@@ -69,6 +71,11 @@ fun ReportDashboardSelectionForm(
                             "y_size" to ySize
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
                 onSuccess()
             } catch (e: Exception) {
