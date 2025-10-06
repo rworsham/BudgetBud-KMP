@@ -20,6 +20,7 @@ import com.budgetbud.kmp.models.CategoryHistoryLineChartData
 import com.budgetbud.kmp.models.CategoryOverviewData
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.HttpHeaders
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,12 +40,23 @@ actual fun CategoryExpenseLineChart(
     LaunchedEffect(familyView) {
         isLoading = true
         try {
+            val tokens = apiClient.getTokens()
             val categories = apiClient.client.get("https://api.budgetingbud.com/api/category/data/") {
                 parameter("familyView", familyView)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }.body<List<CategoryOverviewData>>()
 
             val history = apiClient.client.get("https://api.budgetingbud.com/api/category/history/line-chart/") {
                 parameter("familyView", familyView)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }.body<List<CategoryHistoryLineChartData>>()
 
             categoryData = categories

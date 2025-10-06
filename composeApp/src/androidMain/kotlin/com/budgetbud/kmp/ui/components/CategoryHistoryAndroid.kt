@@ -38,6 +38,7 @@ actual fun CategoryHistory(
             isLoading = true
             errorMessage = null
             try {
+                val tokens = apiClient.getTokens()
                 val response: HttpResponse = apiClient.client.post("https://api.budgetingbud.com/api/category/history/") {
                     parameter("familyView", familyView)
                     contentType(ContentType.Application.Json)
@@ -48,6 +49,11 @@ actual fun CategoryHistory(
                             "category_id" to categoryId
                         )
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
 
                 val responseBody = response.bodyAsText()

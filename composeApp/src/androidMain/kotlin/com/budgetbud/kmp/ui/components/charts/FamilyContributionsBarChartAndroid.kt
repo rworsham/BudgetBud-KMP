@@ -35,9 +35,15 @@ actual fun FamilyContributionsBarChart(
     LaunchedEffect(familyView) {
         isLoading = true
         try {
+            val tokens = apiClient.getTokens()
             val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/family/overview/") {
                 parameter("Transaction", true)
                 contentType(ContentType.Application.Json)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }
 
             val rawData = response.body<List<Map<String, Any>>>()

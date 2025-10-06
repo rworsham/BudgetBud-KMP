@@ -21,6 +21,7 @@ import com.budgetbud.kmp.models.AccountOverviewData
 import com.budgetbud.kmp.auth.ApiClient
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.HttpHeaders
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,12 +41,23 @@ import java.util.*
     LaunchedEffect(familyView) {
         isLoading = true
         try {
+            val tokens = apiClient.getTokens()
             val accounts = apiClient.client.get("https://api.budgetingbud.com/api/accounts/") {
                 parameter("familyView", familyView)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }.body<List<AccountData>>()
 
             val history = apiClient.client.get("https://api.budgetingbud.com/api/accounts/overview-report/") {
                 parameter("familyView", familyView)
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }.body<List<AccountOverviewData>>()
 
             val dataMax: Double = history

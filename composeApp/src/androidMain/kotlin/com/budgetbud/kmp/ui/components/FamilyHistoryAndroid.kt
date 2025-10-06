@@ -38,6 +38,7 @@ actual fun FamilyHistory(
             errorMessage = null
 
             try {
+                val tokens = apiClient.getTokens()
                 val response: HttpResponse = apiClient.client.post("https://api.budgetingbud.com/api/family/history/") {
                     contentType(ContentType.Application.Json)
                     setBody(
@@ -48,6 +49,11 @@ actual fun FamilyHistory(
                             if (downloadPdf) put("format", "pdf")
                         }
                     )
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }
 
                 if (downloadPdf) {

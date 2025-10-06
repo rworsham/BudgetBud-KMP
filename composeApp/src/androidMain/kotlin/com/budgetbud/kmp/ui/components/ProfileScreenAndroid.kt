@@ -17,6 +17,8 @@ import com.budgetbud.kmp.models.UserStatsData
 import com.budgetbud.kmp.models.UserDetailsData
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpHeaders
 
 @Composable
 actual fun ProfileScreen(
@@ -31,8 +33,23 @@ actual fun ProfileScreen(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            userDetails = apiClient.client.get("/user/").body()
-            userStats = apiClient.client.get("/profile/stats/").body()
+            val tokens = apiClient.getTokens()
+            val details: HttpResponse = apiClient.client.get("/user/") {
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
+            }
+            val stats: HttpResponse = apiClient.client.get("/profile/stats/") {
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
+            }
+            userDetails = details.body()
+            userStats = stats.body()
         } catch (e: Exception) {
             error = "Failed to fetch profile: ${e.message}"
         } finally {

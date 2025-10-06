@@ -34,10 +34,16 @@ actual fun IncomeExpenseBarChart(
     LaunchedEffect(startDate, endDate, familyView) {
         isLoading = true
         try {
+            val tokens = apiClient.getTokens()
             val response = apiClient.client.post("https://api.budgetingbud.com/api/budget-transaction-overview/") {
                 parameter("familyView", familyView)
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("start_date" to startDate, "end_date" to endDate))
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }
 
             val rawData = response.body<List<Map<String, String>>>()

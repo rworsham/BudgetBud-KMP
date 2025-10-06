@@ -36,10 +36,16 @@ actual fun ExpenseCategoriesPieChart(
         error = null
 
         try {
+            val tokens = apiClient.getTokens()
             val response: HttpResponse = apiClient.client.post("https://api.budgetingbud.com/api/transaction-pie-chart/") {
                 parameter("familyView", familyView)
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("start_date" to startDate, "end_date" to endDate))
+                headers {
+                    tokens?.let {
+                        append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                    }
+                }
             }
 
             val rawData = response.body<List<Map<String, String>>>()
