@@ -13,6 +13,6 @@ data class BudgetSummary(
     val budget_name: String,
     val starting_budget: String,
     val remaining_budget: String,
-    val total_income: String,
-    val total_expense: String
+    val total_income: Long,
+    val total_expense: Long
 )
