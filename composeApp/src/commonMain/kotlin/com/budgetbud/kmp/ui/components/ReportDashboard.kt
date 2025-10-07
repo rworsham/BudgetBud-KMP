@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 
 @Composable
 fun ReportDashboard(
@@ -38,13 +39,14 @@ fun ReportDashboard(
     var modalType by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
 
-    fun fetchReports() {
+    fun fetchReports(isRetry: Boolean = false) {
         coroutineScope.launch {
             isLoading = true
             try {
                 val queryParams = listOf("familyView" to familyView.toString())
                 val tokens = apiClient.getTokens()
-                val response = apiClient.client.get("https://api.budgetingbud.com/api/user/reports") {
+
+                val response = apiClient.client.get("https://api.budgetingbud.com/api/user/reports/") {
                     url {
                         queryParams.forEach { (k, v) -> parameters.append(k, v) }
                     }
@@ -53,9 +55,21 @@ fun ReportDashboard(
                             append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
                         }
                     }
-                }.body<List<ReportDashboardData>>()
+                }
 
-                userReports = response
+                val refreshFailed = apiClient.checkTokens(response)
+
+                if (response.status == HttpStatusCode.Unauthorized) {
+                    if (refreshFailed) {
+                        errorMessage = "Session expired. Please log in again."
+                        return@launch
+                    } else if (!isRetry) {
+                        fetchReports(isRetry = true)
+                        return@launch
+                    }
+                }
+
+                userReports = response.body<List<ReportDashboardData>>()
                 errorMessage = null
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Failed to fetch user reports"

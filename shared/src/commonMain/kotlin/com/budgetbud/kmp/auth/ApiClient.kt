@@ -32,6 +32,8 @@ class ApiClient(private val tokenStorage: TokenStorage) {
         install(Auth) {
             bearer {
                 loadTokens {
+                    val tokens = tokenStorage.getTokens()
+                    println("loadTokens called, tokens = $tokens")
                     tokenStorage.getTokens()?.let {
                         BearerTokens(it.accessToken, it.refreshToken)
                     }
@@ -70,7 +72,14 @@ class ApiClient(private val tokenStorage: TokenStorage) {
 
         return if (response.status == HttpStatusCode.OK) {
             val tokens = json.decodeFromString<AuthTokens>(response.bodyAsText())
-            tokenStorage.saveTokens(TokenPair(tokens.access, tokens.refresh))
+            try {
+                println("Calling saveTokens...")
+                tokenStorage.saveTokens(TokenPair(tokens.access, tokens.refresh))
+                println("saveTokens completed")
+            } catch (e: Exception) {
+                println("Exception while saving tokens: ${e.message}")
+                e.printStackTrace()
+            }
             _isLoggedIn.value = true
             true
         } else {
@@ -105,6 +114,33 @@ class ApiClient(private val tokenStorage: TokenStorage) {
         return response.status == HttpStatusCode.OK
     }
 
+    suspend fun checkTokens(response: HttpResponse): Boolean {
+        return if (response.status == HttpStatusCode.Unauthorized) {
+            println("Detected 401 response, attempting token refresh")
+
+            val current = tokenStorage.getTokens()
+            if (current?.refreshToken.isNullOrEmpty()) {
+                println("No refresh token available, clearing tokens")
+                tokenStorage.clearTokens()
+                _isLoggedIn.value = false
+                return true
+            }
+
+            return try {
+                val newTokens = postRefreshToken(current.refreshToken)
+                tokenStorage.saveTokens(TokenPair(newTokens.access, newTokens.refresh))
+                println("Token refresh successful")
+                false
+            } catch (e: Exception) {
+                println("Token refresh failed: ${e.message}")
+                tokenStorage.clearTokens()
+                _isLoggedIn.value = false
+                true
+            }
+        } else {
+            false
+        }
+    }
     private suspend fun postRefreshToken(refresh: String): AuthTokens {
         val response = client.post("https://api.budgetingbud.com/api/token/refresh/") {
             contentType(ContentType.Application.Json)
