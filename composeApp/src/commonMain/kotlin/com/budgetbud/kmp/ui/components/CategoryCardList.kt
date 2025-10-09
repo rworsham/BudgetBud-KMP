@@ -11,7 +11,7 @@ import com.budgetbud.kmp.models.CategoryOverviewData
 @Composable
 fun CategoryCardList(
     categories: List<CategoryOverviewData>,
-    onViewHistory: (String) -> Unit
+    onViewHistory: (Int) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),

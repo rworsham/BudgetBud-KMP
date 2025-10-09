@@ -20,9 +20,9 @@ fun ReportDashboardSelectionForm(
     apiClient: ApiClient,
     onSuccess: () -> Unit
 ) {
-    var selectedReportId by remember { mutableStateOf("") }
-    var xSize by remember { mutableStateOf("") }
-    var ySize by remember { mutableStateOf("") }
+    var selectedReportId by remember { mutableIntStateOf(0) }
+    var xSize by remember { mutableIntStateOf(0) }
+    var ySize by remember { mutableIntStateOf(0) }
     var reports by remember { mutableStateOf<List<ReportDashboardEditData>>(emptyList()) }
 
     var error by remember { mutableStateOf<String?>(null) }
@@ -44,7 +44,7 @@ fun ReportDashboardSelectionForm(
     }
 
     fun validateForm(): Boolean {
-        return if (selectedReportId.isBlank() || xSize.isBlank() || ySize.isBlank()) {
+        return if (selectedReportId == 0 || xSize == 0  || ySize == 0 ) {
             error = "Please fill in all required fields."
             false
         } else {
@@ -101,14 +101,14 @@ fun ReportDashboardSelectionForm(
 
         DropdownSelector(
             label = "Select X Size",
-            options = listOf("33" to "Small", "66" to "Medium", "100" to "Large"),
+            options = listOf(33 to "Small", 66 to "Medium", 100 to "Large"),
             selectedOption = xSize,
             onOptionSelected = { xSize = it }
         )
 
         DropdownSelector(
             label = "Select Y Size",
-            options = listOf("33" to "Small", "66" to "Medium", "100" to "Large"),
+            options = listOf(33 to "Small", 66 to "Medium", 100 to "Large"),
             selectedOption = ySize,
             onOptionSelected = { ySize = it }
         )

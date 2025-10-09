@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TransactionTableData(
-    val id: String,
+    val id: Int,
     val amount: String,
     val description: String,
     val budget: String,

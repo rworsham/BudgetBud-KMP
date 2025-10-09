@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 @Composable
 fun DropdownSelector(
     label: String,
-    options: List<Pair<String, String>>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit
+    options: List<Pair<Int, String>>,
+    selectedOption: Int,
+    onOptionSelected: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 

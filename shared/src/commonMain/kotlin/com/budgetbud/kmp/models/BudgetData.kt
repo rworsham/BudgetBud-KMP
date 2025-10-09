@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class BudgetData(
     val id: Int,
     val name: String,
-    val totalAmount: String
+    val total_amount: String
 )

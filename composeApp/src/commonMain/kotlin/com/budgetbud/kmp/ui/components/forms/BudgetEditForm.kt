@@ -54,7 +54,7 @@ fun BudgetEditForm(
         val selected = existingBudgetData.find { it.id == budgetId }
         if (selected != null) {
             newName = selected.name
-            amount = selected.totalAmount
+            amount = selected.total_amount
         }
     }
 
@@ -95,7 +95,7 @@ fun BudgetEditForm(
         }
     }
 
-    val budgetOptions = existingBudgetData.map { it.id.toString() to it.name }
+    val budgetOptions = existingBudgetData.map { it.id to it.name }
 
     Column(
         modifier = modifier
@@ -107,11 +107,9 @@ fun BudgetEditForm(
             DropdownSelector(
                 label = "Select Budget",
                 options = budgetOptions,
-                selectedOption = selectedBudgetId?.toString() ?: "",
-                onOptionSelected = { selectedIdString ->
-                    selectedIdString.toIntOrNull()?.let { id ->
-                        handleBudgetChange(id)
-                    }
+                selectedOption = selectedBudgetId?: 0,
+                onOptionSelected = { selectedId ->
+                    handleBudgetChange(selectedId)
                 }
             )
         }
