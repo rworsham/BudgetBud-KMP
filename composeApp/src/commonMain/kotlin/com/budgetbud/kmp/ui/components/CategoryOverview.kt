@@ -46,6 +46,7 @@ fun CategoryOverview(
         coroutineScope.launch {
             isLoading = true
             try {
+                val tokens = apiClient.getTokens()
                 val queryParams = listOf("familyView" to familyView.toString())
                 val payload = mapOf(
                     "start_date" to startDate.toString(),
@@ -58,6 +59,11 @@ fun CategoryOverview(
                     url {
                         queryParams.forEach { (k, v) -> parameters.append(k, v) }
                     }
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
+                    }
                 }.body<List<CategoryOverviewData>>()
 
                 val historyRes = apiClient.client.post("https://api.budgetingbud.com/api/category/history/line-chart/") {
@@ -65,6 +71,11 @@ fun CategoryOverview(
                     setBody(payload)
                     url {
                         queryParams.forEach { (k, v) -> parameters.append(k, v) }
+                    }
+                    headers {
+                        tokens?.let {
+                            append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
+                        }
                     }
                 }.body<List<CategoryHistoryLineChartData>>()
 

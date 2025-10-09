@@ -31,9 +31,9 @@ fun TransactionForm(
     var amount by remember { mutableStateOf("") }
     var transactionType by remember { mutableStateOf("expense") }
     var description by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var budget by remember { mutableStateOf("") }
-    var account by remember { mutableStateOf("") }
+    var category by remember { mutableIntStateOf(0) }
+    var budget by remember { mutableIntStateOf(0) }
+    var account by remember { mutableIntStateOf(0) }
     var isRecurring by remember { mutableStateOf(false) }
     var recurringType by remember { mutableStateOf("") }
     var nextOccurrence by remember { mutableStateOf("") }
@@ -89,7 +89,7 @@ fun TransactionForm(
     }
 
     fun validateForm(): Boolean {
-        if (date == null || amount.isBlank() || category.isBlank() || budget.isBlank() || account.isBlank()) {
+        if (date == null || amount.isBlank() || category == 0 || budget == 0 || account == 0) {
             errorMessage = "Please fill in all required fields."
             return false
         }
@@ -195,7 +195,7 @@ fun TransactionForm(
 
         DropdownSelector(
             label = "Budget",
-            options = budgetData.map { it.id.toString() to it.name },
+            options = budgetData.map { it.id to it.name },
             selectedOption = budget,
             onOptionSelected = { budget = it }
         )
