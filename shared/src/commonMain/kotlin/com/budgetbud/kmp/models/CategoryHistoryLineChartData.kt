@@ -10,7 +10,7 @@ import kotlinx.serialization.json.floatOrNull
 @Serializable
 data class CategoryHistoryLineChartData(
     val name: String,
-    val balances: Map<String, Float?>
+    val balances: Map<String, Float?> = emptyMap()
 )
 
 object CategoryHistoryParser {

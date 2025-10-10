@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AccountOverviewData(
     val name: String,
-    val balances: Map<String, String?>
+    val balances: Map<String, String?> = emptyMap()
 )

@@ -34,19 +34,37 @@ class ApiClient(private val tokenStorage: TokenStorage) {
                 loadTokens {
                     val tokens = tokenStorage.getTokens()
                     println("loadTokens called, tokens = $tokens")
-                    tokenStorage.getTokens()?.let {
-                        BearerTokens(it.accessToken, it.refreshToken)
+                    tokens?.let {
+                        val access = it.accessToken
+                        val refresh = it.refreshToken ?: ""
+                        BearerTokens(access, refresh)
                     }
                 }
+
                 refreshTokens {
+                    println("Token Refresh initiated")
                     val current = tokenStorage.getTokens()
-                    if (current?.refreshToken.isNullOrEmpty()) return@refreshTokens null
+                    println("Current tokens: $current")
+
+                    if (current?.refreshToken.isNullOrEmpty()) {
+                        println("No refresh token found — returning null")
+                        tokenStorage.clearTokens()
+                        return@refreshTokens null
+                    }
 
                     try {
                         val response = postRefreshToken(current.refreshToken)
-                        tokenStorage.saveTokens(TokenPair(response.access, response.refresh))
-                        BearerTokens(response.access, response.refresh)
+                        println("Refresh response: $response")
+
+                        val newAccess = response.access
+                        val newRefresh = response.refresh ?: current.refreshToken
+
+                        tokenStorage.saveTokens(TokenPair(newAccess, newRefresh))
+
+                        println("Token refresh successful")
+                        BearerTokens(newAccess, newRefresh)
                     } catch (e: Exception) {
+                        println("Token refresh failed: ${e.message}")
                         tokenStorage.clearTokens()
                         null
                     }
@@ -54,6 +72,7 @@ class ApiClient(private val tokenStorage: TokenStorage) {
             }
         }
     }
+
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> get() = _isLoggedIn
@@ -128,7 +147,9 @@ class ApiClient(private val tokenStorage: TokenStorage) {
 
             return try {
                 val newTokens = postRefreshToken(current.refreshToken)
-                tokenStorage.saveTokens(TokenPair(newTokens.access, newTokens.refresh))
+                tokenStorage.saveTokens(
+                    TokenPair(newTokens.access, newTokens.refresh ?: current.refreshToken)
+                )
                 println("Token refresh successful")
                 false
             } catch (e: Exception) {
@@ -141,6 +162,7 @@ class ApiClient(private val tokenStorage: TokenStorage) {
             false
         }
     }
+
     private suspend fun postRefreshToken(refresh: String): AuthTokens {
         val response = client.post("https://api.budgetingbud.com/api/token/refresh/") {
             contentType(ContentType.Application.Json)

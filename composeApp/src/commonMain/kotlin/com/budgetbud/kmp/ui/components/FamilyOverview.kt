@@ -56,10 +56,10 @@ fun FamilyOverview(
                     "end_date" to endDate.toString()
                 )
 
-                familyData = apiClient.client.get("/family/").body()
+                familyData = apiClient.client.get("https://api.budgetingbud.com/api/family/").body()
 
                 if (familyData.isNotEmpty()) {
-                    transactionOverview = apiClient.client.post("/family/overview/") {
+                    transactionOverview = apiClient.client.post("https://api.budgetingbud.com/api/family/overview/") {
                         contentType(ContentType.Application.Json)
                         setBody(datePayload)
                         url { parameters.append("Transaction", "true") }
@@ -70,7 +70,7 @@ fun FamilyOverview(
                         }
                     }.body()
 
-                    categoryOverview = apiClient.client.post("/family/overview/") {
+                    categoryOverview = apiClient.client.post("https://api.budgetingbud.com/api/family/overview/") {
                         contentType(ContentType.Application.Json)
                         setBody(datePayload)
                         url { parameters.append("Category", "true") }
