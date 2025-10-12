@@ -1,16 +1,25 @@
 package com.budgetbud.kmp.ui.components.forms
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.vanpra.composematerialdialogs.*
+import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import com.budgetbud.kmp.utils.toJavaLocalDate
 import com.budgetbud.kmp.utils.toKotlinLocalDate
 import kotlinx.datetime.LocalDate as KxLocalDate
-import java.time.LocalDate as JavaLocalDate
 
 @Composable
 actual fun DateRangeFilterForm(
@@ -29,9 +38,7 @@ actual fun DateRangeFilterForm(
         tonalElevation = 4.dp,
         shape = MaterialTheme.shapes.medium,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             OutlinedButton(
                 onClick = { startDialogState.show() },
                 modifier = Modifier.fillMaxWidth()
@@ -61,32 +68,70 @@ actual fun DateRangeFilterForm(
 
     MaterialDialog(
         dialogState = startDialogState,
+        backgroundColor = MaterialTheme.colorScheme.surface,
         buttons = {
-            positiveButton("OK")
-            negativeButton("Cancel")
+            positiveButton(
+                text = "OK",
+                textStyle = MaterialTheme.typography.labelLarge.copy(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+            negativeButton(
+                text = "Cancel",
+                textStyle = MaterialTheme.typography.labelLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            )
         }
     ) {
         datepicker(
             initialDate = startDate.toJavaLocalDate(),
             title = "Select Start Date",
-            allowedDateValidator = { it <= endDate.toJavaLocalDate() }
-        ) { date: JavaLocalDate ->
+            allowedDateValidator = { it <= endDate.toJavaLocalDate() },
+            colors = DatePickerDefaults.colors(
+                headerBackgroundColor = MaterialTheme.colorScheme.primary,
+                headerTextColor = MaterialTheme.colorScheme.onPrimary,
+                calendarHeaderTextColor = MaterialTheme.colorScheme.onSurface,
+                dateActiveBackgroundColor = MaterialTheme.colorScheme.primary,
+                dateActiveTextColor = MaterialTheme.colorScheme.onPrimary,
+                dateInactiveTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        ) { date ->
             onStartDateChange(date.toKotlinLocalDate())
         }
     }
 
     MaterialDialog(
         dialogState = endDialogState,
+        backgroundColor = MaterialTheme.colorScheme.surface,
         buttons = {
-            positiveButton("OK")
-            negativeButton("Cancel")
+            positiveButton(
+                text = "OK",
+                textStyle = MaterialTheme.typography.labelLarge.copy(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+            negativeButton(
+                text = "Cancel",
+                textStyle = MaterialTheme.typography.labelLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            )
         }
     ) {
         datepicker(
             initialDate = endDate.toJavaLocalDate(),
             title = "Select End Date",
-            allowedDateValidator = { it >= startDate.toJavaLocalDate() }
-        ) { date: JavaLocalDate ->
+            allowedDateValidator = { it >= startDate.toJavaLocalDate() },
+            colors = DatePickerDefaults.colors(
+                headerBackgroundColor = MaterialTheme.colorScheme.primary,
+                headerTextColor = MaterialTheme.colorScheme.onPrimary,
+                calendarHeaderTextColor = MaterialTheme.colorScheme.onSurface,
+                dateActiveBackgroundColor = MaterialTheme.colorScheme.primary,
+                dateActiveTextColor = MaterialTheme.colorScheme.onPrimary,
+                dateInactiveTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        ) { date ->
             onEndDateChange(date.toKotlinLocalDate())
         }
     }
