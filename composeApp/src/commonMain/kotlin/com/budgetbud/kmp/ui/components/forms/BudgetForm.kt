@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.budgetbud.kmp.models.BudgetData
 import com.budgetbud.kmp.ui.components.AlertHandler
 import io.ktor.client.request.*
 import io.ktor.client.call.*
@@ -40,7 +41,7 @@ fun BudgetForm(
                     }
                 }
             }
-            val budgets = response.body<List<BudgetItem>>()
+            val budgets = response.body<List<BudgetData>>()
             existingBudgets = budgets.map { it.name }
         } catch (e: Exception) {
             errorMessage = "Failed to fetch existing budgets"
@@ -133,6 +134,3 @@ fun BudgetForm(
         }
     }
 }
-
-@kotlinx.serialization.Serializable
-data class BudgetItem(val name: String)

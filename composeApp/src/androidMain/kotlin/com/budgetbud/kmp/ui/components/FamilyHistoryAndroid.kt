@@ -20,7 +20,7 @@ import kotlinx.serialization.json.Json
 
 @Composable
 actual fun FamilyHistory(
-    userId: String,
+    userId: Int,
     apiClient: ApiClient,
     modifier: Modifier
 ) {

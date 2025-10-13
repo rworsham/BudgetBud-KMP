@@ -6,7 +6,7 @@ import com.budgetbud.kmp.auth.ApiClient
 
 @Composable
 expect fun FamilyHistory(
-    userId: String,
+    userId: Int,
     apiClient: ApiClient,
     modifier: Modifier = Modifier
 )

@@ -37,7 +37,7 @@ fun FamilyOverview(
 
     var openDialog by remember { mutableStateOf(false) }
     var modalType by remember { mutableStateOf("") }
-    var selectedUserId by remember { mutableStateOf<String?>(null) }
+    var selectedUserId by remember { mutableStateOf<Int?>(null) }
 
     var startDate by remember { mutableStateOf(DateUtils.firstDayOfCurrentMonth()) }
     var endDate by remember { mutableStateOf(DateUtils.lastDayOfCurrentMonth()) }
@@ -89,7 +89,7 @@ fun FamilyOverview(
         }
     }
 
-    fun handleOpen(type: String, userId: String? = null) {
+    fun handleOpen(type: String, userId: Int? = null) {
         modalType = type
         selectedUserId = userId
         openDialog = true
