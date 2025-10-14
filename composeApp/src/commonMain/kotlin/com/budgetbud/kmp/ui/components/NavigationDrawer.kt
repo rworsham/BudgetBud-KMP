@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,39 +21,29 @@ fun MiniDrawer(
     onToggle: () -> Unit
 ) {
     val drawerItems = listOf(
-        DrawerItem.Header("Main"),
         DrawerItem.Segment("dashboard", "Dashboard", Icons.Default.Dashboard),
         DrawerItem.Segment("budget", "Budget", Icons.Default.AccountBalance),
         DrawerItem.Segment("transactions", "Transactions", Icons.Default.Receipt),
         DrawerItem.Divider,
-        DrawerItem.Header("Management"),
         DrawerItem.Segment("category", "Categories", Icons.Default.Category),
         DrawerItem.Segment("accounts", "Accounts", Icons.Default.AccountBox),
         DrawerItem.Segment("family", "Family", Icons.Default.Group),
         DrawerItem.Segment("reports", "Reports", Icons.Default.BarChart)
     )
 
-    val drawerWidth = if (expanded) 240.dp else 72.dp
+    val drawerWidth = if (expanded) 155.dp else 55.dp
 
     Surface(
-        tonalElevation = 4.dp,
         modifier = Modifier
             .width(drawerWidth)
             .fillMaxHeight()
     ) {
         Column {
-            IconButton(onClick = onToggle, modifier = Modifier.align(Alignment.End)) {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
-                    contentDescription = "Toggle Drawer"
-                )
-            }
-
             Spacer(Modifier.height(8.dp))
 
             drawerItems.forEach { item ->
                 when (item) {
-                    is DrawerItem.Divider -> Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    is DrawerItem.Divider -> HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     is DrawerItem.Header -> {
                         AnimatedVisibility(visible = expanded) {
                             Text(
@@ -77,17 +68,14 @@ fun MiniDrawer(
                         ) {
                             Row(
                                 modifier = Modifier
-                                    .padding(12.dp)
+                                    .padding(start = 18.dp, top = 12.dp, bottom = 12.dp, end = 8.dp)
                                     .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     imageVector = item.icon,
                                     contentDescription = item.title,
-                                    tint = if (selected)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurface
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                                 AnimatedVisibility(visible = expanded) {
                                     Text(
