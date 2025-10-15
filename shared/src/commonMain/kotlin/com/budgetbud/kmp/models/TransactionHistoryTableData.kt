@@ -12,5 +12,5 @@ data class TransactionHistoryTableData(
     val date: String,
     val account: String,
     val transaction_type: String,
-    val is_recurring: String,
+    val is_recurring: Boolean,
 )

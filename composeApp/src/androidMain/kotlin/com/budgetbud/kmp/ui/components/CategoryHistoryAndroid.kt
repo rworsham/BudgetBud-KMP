@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -127,9 +128,12 @@ actual fun CategoryHistory(
                             Text(tx.category, modifier = Modifier.weight(2f))
                             Text(tx.budget, modifier = Modifier.weight(2f))
                             Text(tx.account, modifier = Modifier.weight(2f))
-                            Text(tx.is_recurring, modifier = Modifier.weight(1f))
+                            Text(
+                                if (tx.is_recurring) "Yes" else "No",
+                                modifier = Modifier.weight(1f)
+                            )
                         }
-                        Divider()
+                        HorizontalDivider()
                     }
                 }
             }

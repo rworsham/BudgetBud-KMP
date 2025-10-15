@@ -31,7 +31,7 @@ fun MiniDrawer(
         DrawerItem.Segment("reports", "Reports", Icons.Default.BarChart)
     )
 
-    val drawerWidth = if (expanded) 155.dp else 55.dp
+    val drawerWidth = if (expanded) 160.dp else 55.dp
 
     Surface(
         modifier = Modifier
@@ -63,8 +63,8 @@ fun MiniDrawer(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(backgroundColor)
-                                .clickable { onSegmentSelected(item.segment) }
+                                .clickable { onSegmentSelected(item.segment) },
+                            color = backgroundColor
                         ) {
                             Row(
                                 modifier = Modifier
