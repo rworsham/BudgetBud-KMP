@@ -35,7 +35,6 @@ actual fun DateRangeFilterForm(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        tonalElevation = 4.dp,
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
