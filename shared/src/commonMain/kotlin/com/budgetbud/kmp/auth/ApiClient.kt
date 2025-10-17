@@ -13,16 +13,17 @@ import io.ktor.client.engine.*
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 expect fun provideHttpClientEngine(): HttpClientEngine
 
 class ApiClient(private val tokenStorage: TokenStorage) {
+
+    private val clientScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private val json = Json { ignoreUnknownKeys = true }
 
     val client = HttpClient(provideHttpClientEngine()) {
@@ -35,9 +36,7 @@ class ApiClient(private val tokenStorage: TokenStorage) {
                     val tokens = tokenStorage.getTokens()
                     println("loadTokens called, tokens = $tokens")
                     tokens?.let {
-                        val access = it.accessToken
-                        val refresh = it.refreshToken ?: ""
-                        BearerTokens(access, refresh)
+                        BearerTokens(it.accessToken, it.refreshToken ?: "")
                     }
                 }
 
@@ -60,9 +59,12 @@ class ApiClient(private val tokenStorage: TokenStorage) {
                         val newRefresh = response.refresh ?: current.refreshToken
 
                         tokenStorage.saveTokens(TokenPair(newAccess, newRefresh))
-
                         println("Token refresh successful")
+
                         BearerTokens(newAccess, newRefresh)
+                    } catch (e: CancellationException) {
+                        println("Token refresh cancelled: ${e.message}")
+                        throw e
                     } catch (e: Exception) {
                         println("Token refresh failed: ${e.message}")
                         tokenStorage.clearTokens()
@@ -73,32 +75,24 @@ class ApiClient(private val tokenStorage: TokenStorage) {
         }
     }
 
-
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> get() = _isLoggedIn
 
     init {
-        CoroutineScope(Dispatchers.Default).launch {
+        clientScope.launch {
             _isLoggedIn.value = tokenStorage.getTokens() != null
         }
     }
 
-    suspend fun login(username: String, password: String): Boolean {
+    suspend fun login(username: String, password: String): Boolean = withContext(clientScope.coroutineContext) {
         val response = client.post("https://api.budgetingbud.com/api/token/") {
             contentType(ContentType.Application.Json)
             setBody(mapOf("username" to username, "password" to password))
         }
 
-        return if (response.status == HttpStatusCode.OK) {
+        if (response.status == HttpStatusCode.OK) {
             val tokens = json.decodeFromString<AuthTokens>(response.bodyAsText())
-            try {
-                println("Calling saveTokens...")
-                tokenStorage.saveTokens(TokenPair(tokens.access, tokens.refresh))
-                println("saveTokens completed")
-            } catch (e: Exception) {
-                println("Exception while saving tokens: ${e.message}")
-                e.printStackTrace()
-            }
+            tokenStorage.saveTokens(TokenPair(tokens.access, tokens.refresh))
             _isLoggedIn.value = true
             true
         } else {
@@ -113,7 +107,7 @@ class ApiClient(private val tokenStorage: TokenStorage) {
         lastName: String,
         password: String,
         token: String? = null
-    ): Boolean {
+    ): Boolean = withContext(clientScope.coroutineContext) {
         val response = client.post("https://api.budgetingbud.com/api/user/create/") {
             contentType(ContentType.Application.Json)
             setBody(
@@ -129,61 +123,30 @@ class ApiClient(private val tokenStorage: TokenStorage) {
                 }
             )
         }
-
-        return response.status == HttpStatusCode.OK
+        response.status == HttpStatusCode.OK
     }
 
-    suspend fun checkTokens(response: HttpResponse): Boolean {
-        return if (response.status == HttpStatusCode.Unauthorized) {
-            println("Detected 401 response, attempting token refresh")
-
-            val current = tokenStorage.getTokens()
-            if (current?.refreshToken.isNullOrEmpty()) {
-                println("No refresh token available, clearing tokens")
-                tokenStorage.clearTokens()
-                _isLoggedIn.value = false
-                return true
-            }
-
-            return try {
-                val newTokens = postRefreshToken(current.refreshToken)
-                tokenStorage.saveTokens(
-                    TokenPair(newTokens.access, newTokens.refresh ?: current.refreshToken)
-                )
-                println("Token refresh successful")
-                false
-            } catch (e: Exception) {
-                println("Token refresh failed: ${e.message}")
-                tokenStorage.clearTokens()
-                _isLoggedIn.value = false
-                true
-            }
-        } else {
-            false
-        }
-    }
-
-    private suspend fun postRefreshToken(refresh: String): AuthTokens {
+    private suspend fun postRefreshToken(refresh: String): AuthTokens = withContext(clientScope.coroutineContext) {
         val response = client.post("https://api.budgetingbud.com/api/token/refresh/") {
             contentType(ContentType.Application.Json)
             setBody(mapOf("refresh" to refresh))
         }
 
-        if (!response.status.isSuccess()) throw Exception("Refresh failed") else _isLoggedIn.value = true
-        return json.decodeFromString(response.bodyAsText())
+        if (!response.status.isSuccess()) throw Exception("Refresh failed")
+        _isLoggedIn.value = true
+        json.decodeFromString(response.bodyAsText())
     }
 
-    suspend fun getUser(): User {
-        val response = client.get("https://api.budgetingbud.com/api/user/")
-        return response.body()
+    suspend fun getUser(): User = withContext(clientScope.coroutineContext) {
+        client.get("https://api.budgetingbud.com/api/user/").body()
     }
 
-    suspend fun logout() {
+    suspend fun logout() = withContext(clientScope.coroutineContext) {
         tokenStorage.clearTokens()
         _isLoggedIn.value = false
     }
 
-    suspend fun getTokens(): TokenPair? {
-        return tokenStorage.getTokens()
+    suspend fun getTokens(): TokenPair? = withContext(clientScope.coroutineContext) {
+        tokenStorage.getTokens()
     }
 }
