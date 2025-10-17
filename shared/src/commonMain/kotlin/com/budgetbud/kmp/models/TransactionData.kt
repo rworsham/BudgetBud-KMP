@@ -10,41 +10,14 @@ data class Transaction(
     val id: Long?,
     val date: LocalDate,
     val amount: String,
-    val transactionType: TransactionType,
+    val transaction_type: String,
     val description: String? = null,
-    val categoryId: Long,
-    val budgetId: Long,
-    val accountId: Long,
-    val isRecurring: Boolean,
-    val recurringType: RecurringType? = null,
-    val nextOccurrence: LocalDate? = null,
-    val userId: Long,
-    val familyId: Long? = null
+    val category: Long,
+    val budget: Long,
+    val account: Long,
+    val is_recurring: Boolean,
+    val recurring_type: String? = null,
+    val next_occurrence: LocalDate? = null,
+    val user: Long? = null,
+    val family: Long? = null
 )
-
-@Serializable
-enum class TransactionType {
-    @SerialName("income")
-    INCOME,
-
-    @SerialName("expense")
-    EXPENSE
-}
-
-@Serializable
-enum class RecurringType {
-    @SerialName("daily")
-    DAILY,
-
-    @SerialName("weekly")
-    WEEKLY,
-
-    @SerialName("monthly")
-    MONTHLY,
-
-    @SerialName("yearly")
-    YEARLY,
-
-    @SerialName("one-time")
-    ONE_TIME
-}

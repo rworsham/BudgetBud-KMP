@@ -126,8 +126,8 @@ fun BudgetTransactionOverview(
 
     val incomeExpenseData = remember(reportData) {
         listOf(
-            IncomeExpenseBarChartData("Income", reportData?.transactions?.filter { it.transactionType.toString() == "income" }?.sumOf { it.amount.toDouble() } ?: 0.0),
-            IncomeExpenseBarChartData("Expense", reportData?.transactions?.filter { it.transactionType.toString() == "expense" }?.sumOf { it.amount.toDouble() } ?: 0.0)
+            IncomeExpenseBarChartData("Income", reportData?.transactions?.filter { it.transaction_type == "income" }?.sumOf { it.amount.toDouble() } ?: 0.0),
+            IncomeExpenseBarChartData("Expense", reportData?.transactions?.filter { it.transaction_type == "expense" }?.sumOf { it.amount.toDouble() } ?: 0.0)
         )
     }
 

@@ -57,18 +57,6 @@ fun ReportDashboard(
                     }
                 }
 
-                val refreshFailed = apiClient.checkTokens(response)
-
-                if (response.status == HttpStatusCode.Unauthorized) {
-                    if (refreshFailed) {
-                        errorMessage = "Session expired. Please log in again."
-                        return@launch
-                    } else if (!isRetry) {
-                        fetchReports(isRetry = true)
-                        return@launch
-                    }
-                }
-
                 userReports = response.body<List<ReportDashboardData>>()
                 errorMessage = null
             } catch (e: Exception) {
