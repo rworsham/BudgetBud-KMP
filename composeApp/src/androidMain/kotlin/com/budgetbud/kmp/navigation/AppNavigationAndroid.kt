@@ -1,9 +1,7 @@
 package com.budgetbud.kmp.navigation
 
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.ui.components.Dashboard
@@ -15,13 +13,23 @@ actual fun AppNavigation(apiClient: ApiClient) {
     val navController = rememberNavController()
     val isLoggedIn by apiClient.isLoggedIn.collectAsState()
 
-    val startDestination = if (isLoggedIn) "dashboard" else "login"
+    Log.d("AppNavigation", "AppNavigation Composable called — isLoggedIn=$isLoggedIn")
 
-    Log.d("AppNavigation", "AppNavigation Composable called")
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            navController.navigate("dashboard") {
+                popUpTo("login") { inclusive = true }
+            }
+        } else {
+            navController.navigate("login") {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = if (isLoggedIn) "dashboard" else "login"
     ) {
         composable("login") {
             LoginScreen(

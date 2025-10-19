@@ -68,6 +68,7 @@ class ApiClient(private val tokenStorage: TokenStorage) {
                     } catch (e: Exception) {
                         println("Token refresh failed: ${e.message}")
                         tokenStorage.clearTokens()
+                        _isLoggedIn.value = false
                         null
                     }
                 }
@@ -126,15 +127,21 @@ class ApiClient(private val tokenStorage: TokenStorage) {
         response.status == HttpStatusCode.OK
     }
 
-    private suspend fun postRefreshToken(refresh: String): AuthTokens = withContext(clientScope.coroutineContext) {
-        val response = client.post("https://api.budgetingbud.com/api/token/refresh/") {
+    private suspend fun postRefreshToken(refresh: String): AuthTokens {
+        val refreshClient = HttpClient(provideHttpClientEngine()) {
+            install(ContentNegotiation) {
+                json(json)
+            }
+        }
+
+        val response = refreshClient.post("https://api.budgetingbud.com/api/token/refresh/") {
             contentType(ContentType.Application.Json)
             setBody(mapOf("refresh" to refresh))
         }
 
         if (!response.status.isSuccess()) throw Exception("Refresh failed")
         _isLoggedIn.value = true
-        json.decodeFromString(response.bodyAsText())
+        return json.decodeFromString(response.bodyAsText())
     }
 
     suspend fun getUser(): User = withContext(clientScope.coroutineContext) {
