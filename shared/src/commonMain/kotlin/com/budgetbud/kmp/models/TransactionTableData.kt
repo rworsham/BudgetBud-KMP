@@ -12,6 +12,6 @@ data class TransactionTableData(
     val account: String,
     val date: String,
     val transaction_type: String,
-    val is_recurring: String,
-    val next_occurrence: String
+    val is_recurring: Boolean,
+    val next_occurrence: String? = null
 )

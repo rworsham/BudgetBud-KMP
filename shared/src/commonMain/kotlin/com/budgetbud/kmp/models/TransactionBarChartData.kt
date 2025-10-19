@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TransactionBarChartData(
-    val category: CategoryData,
+    val category: String,
     val total_amount: String
 )

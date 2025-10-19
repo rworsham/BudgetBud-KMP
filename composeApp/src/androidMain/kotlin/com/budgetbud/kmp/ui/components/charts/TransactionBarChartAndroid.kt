@@ -59,7 +59,7 @@ actual fun TransactionBarChart(
         ) {
             parsedData.forEach { (item, _) ->
                 Text(
-                    text = item.category.name,
+                    text = item.category,
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.weight(1f),
                     maxLines = 1
