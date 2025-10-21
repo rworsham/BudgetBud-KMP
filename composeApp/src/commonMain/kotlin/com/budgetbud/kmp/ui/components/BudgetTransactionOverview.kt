@@ -1,6 +1,8 @@
 package com.budgetbud.kmp.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
@@ -145,8 +147,11 @@ fun BudgetTransactionOverview(
         fetchData()
     }
 
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp)
+        .verticalScroll(rememberScrollState())
+    ) {
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,

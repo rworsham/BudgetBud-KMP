@@ -1,6 +1,8 @@
 package com.budgetbud.kmp.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -92,7 +94,10 @@ fun DashboardReports(
         fetchData()
     }
 
-    Column(modifier = modifier.padding(16.dp)) {
+    Column(modifier = modifier
+        .padding(16.dp)
+        .verticalScroll(rememberScrollState())
+    ) {
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,

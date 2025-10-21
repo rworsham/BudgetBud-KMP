@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.budgetbud.kmp.auth.models.User
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyTransactionOverviewData
@@ -116,8 +118,11 @@ fun FamilyOverview(
         fetchData()
     }
 
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp)
+        .verticalScroll(rememberScrollState())
+    ) {
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,

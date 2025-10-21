@@ -1,6 +1,8 @@
 package com.budgetbud.kmp.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.Edit
@@ -91,7 +93,11 @@ fun ReportDashboard(
         fetchReports()
     }
 
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp)
+        .verticalScroll(rememberScrollState())
+    ) {
         Text(
             text = "Custom Reports",
             style = MaterialTheme.typography.headlineSmall,
