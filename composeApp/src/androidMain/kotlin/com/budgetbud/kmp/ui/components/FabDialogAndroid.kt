@@ -39,7 +39,6 @@ actual fun FabDialog(
                 exit = fadeOut()
             ) {
                 Surface(
-                    tonalElevation = 6.dp,
                     shadowElevation = 12.dp,
                     shape = RoundedCornerShape(16.dp),
                     color = MaterialTheme.colorScheme.surface,

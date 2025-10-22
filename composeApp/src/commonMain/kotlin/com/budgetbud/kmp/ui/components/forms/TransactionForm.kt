@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.models.NewTransactionData
 import com.budgetbud.kmp.ui.components.AlertHandler
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -110,23 +111,23 @@ fun TransactionForm(
             try {
                 val tokens = apiClient.getTokens()
 
+                val body = NewTransactionData(
+                    date = date?.toString(),
+                    amount = amount,
+                    transaction_type = transactionType,
+                    description = description.ifBlank { null },
+                    category = category.toLong(),
+                    budget = budget.toLong(),
+                    account = account.toLong(),
+                    is_recurring = isRecurring,
+                    recurring_type = if (isRecurring && recurringType.isNotBlank()) recurringType else null,
+                    next_occurrence = if (isRecurring && nextOccurrence.isNotBlank()) nextOccurrence else null
+                )
+
                 apiClient.client.post("https://api.budgetingbud.com/api/transaction/") {
                     contentType(ContentType.Application.Json)
                     parameter("familyView", familyView)
-                    setBody(
-                        mapOf(
-                            "date" to date,
-                            "amount" to amount,
-                            "transaction_type" to transactionType,
-                            "description" to description,
-                            "category" to category,
-                            "budget" to budget,
-                            "account" to account,
-                            "is_recurring" to isRecurring,
-                            "recurring_type" to recurringType,
-                            "next_occurrence" to nextOccurrence
-                        )
-                    )
+                    setBody(body)
                     headers {
                         tokens?.let {
                             append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
@@ -135,7 +136,7 @@ fun TransactionForm(
                 }
                 onSuccess()
             } catch (e: Exception) {
-                errorMessage = "Failed to create transaction. Please try again."
+                errorMessage = e.message ?: "Failed to create transaction. Please try again."
             } finally {
                 isSubmitting = false
             }
