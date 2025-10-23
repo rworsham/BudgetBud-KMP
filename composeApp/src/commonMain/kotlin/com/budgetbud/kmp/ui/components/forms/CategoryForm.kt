@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.budgetbud.kmp.models.CategoryData
 import com.budgetbud.kmp.ui.components.AlertHandler
 import io.ktor.client.request.*
 import io.ktor.client.call.*
@@ -32,17 +33,17 @@ fun CategoryForm(
         isLoading = true
         try {
             val tokens = apiClient.getTokens()
-            val response = apiClient.client.get("https://api.budgetingbud.com/api/budget/") {
+            val response = apiClient.client.get("https://api.budgetingbud.com/api/categories/") {
                 headers {
                     tokens?.let {
                         append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
                     }
                 }
             }
-            val categories = response.body<List<CategoryItem>>()
+            val categories = response.body<List<CategoryData>>()
             existingCategories = categories.map { it.name }
         } catch (e: Exception) {
-            errorMessage = "Failed to fetch existing budgets"
+            errorMessage = e.message ?: "Failed to fetch existing categories"
         } finally {
             isLoading = false
         }
@@ -73,7 +74,7 @@ fun CategoryForm(
                 val tokens = apiClient.getTokens()
 
                 apiClient.client.post("https://api.budgetingbud.com/api/categories/") {
-                    contentType(io.ktor.http.ContentType.Application.Json)
+                    contentType(ContentType.Application.Json)
                     setBody(
                         mapOf(
                             "name" to newCategory,
@@ -105,7 +106,7 @@ fun CategoryForm(
         OutlinedTextField(
             value = newCategory,
             onValueChange = { newCategory = it },
-            label = { Text("New Budget") },
+            label = { Text("New Category") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -123,6 +124,3 @@ fun CategoryForm(
         }
     }
 }
-
-@kotlinx.serialization.Serializable
-data class CategoryItem(val name: String)

@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class CategoryOverviewData(
     val id: Int,
     val name: String,
-    val balance: Long
+    val balance: Double
 )
