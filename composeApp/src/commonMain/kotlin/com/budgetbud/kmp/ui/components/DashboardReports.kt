@@ -132,7 +132,10 @@ fun DashboardReports(
         if (transactionRows.isNotEmpty()) {
             TransactionTable(
                 familyView = familyView,
-                apiClient = apiClient
+                apiClient = apiClient,
+                maxHeight = 400.dp,
+                startDate = startDate.toString(),
+                endDate = endDate.toString(),
             )
         } else {
             ChartDataError()

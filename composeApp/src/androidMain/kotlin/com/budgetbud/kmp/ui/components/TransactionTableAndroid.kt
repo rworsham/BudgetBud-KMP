@@ -3,8 +3,6 @@ package com.budgetbud.kmp.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,8 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.datetime.LocalDate
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.TransactionHistoryTableData
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
@@ -25,10 +25,16 @@ import kotlinx.coroutines.launch
 actual fun TransactionTable(
     familyView: Boolean,
     apiClient: ApiClient,
-    modifier: Modifier
+    modifier: Modifier,
+    maxHeight: Dp?,
+    startDate: String?,
+    endDate: String?
 ) {
     val coroutineScope = rememberCoroutineScope()
     val dataSource = remember { TransactionTableDataSource(apiClient = apiClient) }
+
+    fun String?.toLocalDateOrDefault(default: LocalDate): LocalDate =
+        this?.let { LocalDate.parse(it) } ?: default
 
     var transactions by remember { mutableStateOf<List<TransactionHistoryTableData>>(emptyList()) }
     var showSuccessDialog by remember { mutableStateOf(false) }
@@ -36,8 +42,8 @@ actual fun TransactionTable(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
-    var startDate by remember { mutableStateOf(DateUtils.firstDayOfCurrentMonth()) }
-    var endDate by remember { mutableStateOf(DateUtils.lastDayOfCurrentMonth()) }
+    var currentStartDate by remember { mutableStateOf(startDate.toLocalDateOrDefault(DateUtils.firstDayOfCurrentMonth())) }
+    var currentEndDate by remember { mutableStateOf(endDate.toLocalDateOrDefault(DateUtils.lastDayOfCurrentMonth())) }
 
     var editingRowId by remember { mutableStateOf<Int?>(null) }
     var editedTransaction by remember { mutableStateOf<TransactionHistoryTableData?>(null) }
@@ -48,8 +54,8 @@ actual fun TransactionTable(
             errorMessage = null
             try {
                 transactions = dataSource.fetchHistory(
-                    startDate.toString(),
-                    endDate.toString(),
+                    currentStartDate.toString(),
+                    currentEndDate.toString(),
                     familyView
                 )
             } catch (e: Exception) {
@@ -60,7 +66,7 @@ actual fun TransactionTable(
         }
     }
 
-    LaunchedEffect(startDate, endDate, familyView) {
+    LaunchedEffect(currentStartDate, currentEndDate, familyView) {
         fetchTransactions()
     }
 
@@ -89,21 +95,25 @@ actual fun TransactionTable(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        DateRangeFilterForm(
-            startDate = startDate,
-            endDate = endDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it },
-            onSubmit = { fetchTransactions() }
-        )
+    val columnModifier = if (maxHeight != null) {
+        Modifier.heightIn(max = maxHeight)
+    } else {
+        Modifier.fillMaxSize()
+    }
 
-        Spacer(Modifier.height(16.dp))
+    Column(
+        modifier = modifier.then(columnModifier).padding(16.dp)
+    ) {
+        if (startDate == null && endDate == null) {
+            DateRangeFilterForm(
+                startDate = currentStartDate,
+                endDate = currentEndDate,
+                onStartDateChange = { currentStartDate = it },
+                onEndDateChange = { currentEndDate = it },
+                onSubmit = { fetchTransactions() }
+            )
+            Spacer(Modifier.height(16.dp))
+        }
 
         when {
             isLoading -> CircularProgressIndicator()
