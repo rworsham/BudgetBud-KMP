@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
-import com.budgetbud.kmp.models.TransactionHistoryTableData
+import com.budgetbud.kmp.models.AccountHistoryTableData
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.utils.DateUtils
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ actual fun AccountHistory(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    var transactions by remember { mutableStateOf<List<TransactionHistoryTableData>>(emptyList()) }
+    var transactions by remember { mutableStateOf<List<AccountHistoryTableData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 

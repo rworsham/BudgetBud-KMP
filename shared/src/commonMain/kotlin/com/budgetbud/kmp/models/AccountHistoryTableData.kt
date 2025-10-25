@@ -1,0 +1,14 @@
+package com.budgetbud.kmp.models
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AccountHistoryTableData(
+    val id: Int,
+    val amount: String,
+    val description: String,
+    val budget: String,
+    val category: String,
+    val date: String,
+    val transaction_type: String,
+)

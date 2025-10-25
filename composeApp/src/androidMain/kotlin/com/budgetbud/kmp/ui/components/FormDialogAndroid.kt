@@ -20,7 +20,6 @@ actual fun FormDialog(
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = MaterialTheme.shapes.medium,
-            tonalElevation = 4.dp
         ) {
             Column(
                 modifier = Modifier
