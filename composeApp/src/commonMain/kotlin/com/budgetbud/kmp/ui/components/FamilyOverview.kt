@@ -113,39 +113,55 @@ fun FamilyOverview(
         }
     }
 
-
     LaunchedEffect(startDate, endDate, showSuccessDialog) {
         fetchData()
     }
 
-    Column(modifier = modifier
-        .fillMaxSize()
-        .padding(16.dp)
-        .verticalScroll(rememberScrollState())
-    ) {
-        DateRangeFilterForm(
-            startDate = startDate,
-            endDate = endDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it },
-            onSubmit = { fetchData() }
-        )
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
+            DateRangeFilterForm(
+                startDate = startDate,
+                endDate = endDate,
+                onStartDateChange = { startDate = it },
+                onEndDateChange = { endDate = it },
+                onSubmit = { fetchData() }
+            )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        if (familyData.isNotEmpty()) {
-            Button(
-                onClick = { handleOpen("addAccount") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Invite New Member")
+            if (familyData.isNotEmpty()) {
+                Button(
+                    onClick = { handleOpen("addAccount") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Invite New Member")
+                }
+            } else {
+                Button(
+                    onClick = { handleOpen("createFamily") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Create Family Group")
+                }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            LazyColumn {
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 300.dp, start = 10.dp, end = 10.dp)
+        ) {
+            if (familyData.isNotEmpty()) {
                 items(familyData) { user ->
-                    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 30.dp)) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(user.username, style = MaterialTheme.typography.titleMedium)
                             Spacer(Modifier.height(8.dp))
@@ -155,32 +171,38 @@ fun FamilyOverview(
                         }
                     }
                 }
-            }
 
-            Spacer(Modifier.height(24.dp))
+                item {
+                    Spacer(Modifier.height(24.dp))
 
-            Text("Contributions Per User", style = MaterialTheme.typography.titleMedium)
-            if (transactionOverview.isNotEmpty()) {
-                FamilyTransactionBarChart(data = transactionOverview)
+                    Text("Contributions Per User", style = MaterialTheme.typography.titleMedium)
+                    if (transactionOverview.isNotEmpty()) {
+                        FamilyTransactionBarChart(data = transactionOverview)
+                    } else {
+                        ChartDataError()
+                    }
+                }
+
+                item {
+                    Spacer(Modifier.height(24.dp))
+
+                    Text("Category Usage Per User", style = MaterialTheme.typography.titleMedium)
+                    if (categoryOverview.isNotEmpty()) {
+                        FamilyCategoryBarChart(data = categoryOverview)
+                    } else {
+                        ChartDataError()
+                    }
+                }
             } else {
-                ChartDataError()
+                item {
+                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                }
             }
 
-            Spacer(Modifier.height(24.dp))
-
-            Text("Category Usage Per User", style = MaterialTheme.typography.titleMedium)
-            if (categoryOverview.isNotEmpty()) {
-                FamilyCategoryBarChart(data = categoryOverview)
-            } else {
-                ChartDataError()
-            }
-
-        } else {
-            Button(
-                onClick = { handleOpen("createFamily") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Create Family Group")
+            errorMessage?.let {
+                item {
+                    AlertHandler(alertMessage = it)
+                }
             }
         }
     }
@@ -211,13 +233,5 @@ fun FamilyOverview(
 
     if (showSuccessDialog) {
         SuccessDialog(onDismiss = { showSuccessDialog = false })
-    }
-
-    if (isLoading) {
-        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-    }
-
-    errorMessage?.let {
-        AlertHandler(alertMessage = it)
     }
 }

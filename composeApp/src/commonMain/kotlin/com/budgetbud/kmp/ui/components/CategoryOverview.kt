@@ -178,7 +178,6 @@ fun CategoryOverview(
                     Surface(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         shape = MaterialTheme.shapes.medium,
-                        tonalElevation = 4.dp
                     ) {
                         CategoryForm(
                             apiClient = apiClient,

@@ -249,7 +249,6 @@ private fun CategoryExpenseChartCanvas(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset(x = tooltipOffset.x.dp, y = (tooltipOffset.y - 80).dp),
-                tonalElevation = 6.dp,
                 shadowElevation = 6.dp,
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surfaceVariant

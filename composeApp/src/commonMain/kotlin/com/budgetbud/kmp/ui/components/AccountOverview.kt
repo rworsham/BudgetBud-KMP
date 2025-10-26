@@ -177,7 +177,6 @@ fun AccountOverview(
                     Surface(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         shape = MaterialTheme.shapes.medium,
-                        tonalElevation = 4.dp
                     ) {
                         AccountForm(apiClient = apiClient, onSuccess = { handleFormSuccess() })
                     }

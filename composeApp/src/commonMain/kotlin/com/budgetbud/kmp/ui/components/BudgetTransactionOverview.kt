@@ -297,7 +297,6 @@ fun BudgetTransactionOverview(
                     Surface(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         shape = MaterialTheme.shapes.medium,
-                        tonalElevation = 4.dp
                     ) {
                         BudgetForm(
                             apiClient = apiClient,
@@ -312,7 +311,6 @@ fun BudgetTransactionOverview(
                     Surface(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         shape = MaterialTheme.shapes.medium,
-                        tonalElevation = 4.dp
                     ) {
                         BudgetEditForm(
                             apiClient = apiClient,
@@ -337,7 +335,6 @@ fun BudgetTransactionOverview(
                     Surface(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         shape = MaterialTheme.shapes.medium,
-                        tonalElevation = 4.dp
                     ) {
                         selectedBudgetId?.let {
                             BudgetGoalForm(budgetId = it, apiClient = apiClient, onSuccess = {showSuccessDialog = true})
