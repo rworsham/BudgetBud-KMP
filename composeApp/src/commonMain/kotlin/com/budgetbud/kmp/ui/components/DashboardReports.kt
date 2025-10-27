@@ -111,6 +111,13 @@ fun DashboardReports(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text("Transaction Bar Chart", style = MaterialTheme.typography.titleMedium)
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
+
         if (barChartData.isNotEmpty()) {
             TransactionBarChart(barChartData)
         } else {
@@ -120,6 +127,13 @@ fun DashboardReports(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text("Expense Pie Chart", style = MaterialTheme.typography.titleMedium)
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
+
         if (pieChartData.isNotEmpty()) {
             TransactionPieChart(pieChartData)
         } else {
@@ -129,6 +143,13 @@ fun DashboardReports(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text("Transaction Grid", style = MaterialTheme.typography.titleMedium)
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
+
         if (transactionRows.isNotEmpty()) {
             TransactionTable(
                 familyView = familyView,
