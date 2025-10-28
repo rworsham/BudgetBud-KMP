@@ -10,6 +10,5 @@ expect fun DateRangeFilterForm(
     endDate: LocalDate,
     onStartDateChange: (LocalDate) -> Unit,
     onEndDateChange: (LocalDate) -> Unit,
-    onSubmit: () -> Unit,
     modifier: Modifier = Modifier
 )

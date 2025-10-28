@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
 
 @Composable
 fun ReportDashboard(
@@ -104,9 +103,10 @@ fun ReportDashboard(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        Divider(
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(vertical = 16.dp)
+            thickness = 2.dp
         )
 
         Row(

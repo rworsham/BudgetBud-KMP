@@ -131,12 +131,24 @@ fun AccountOverview(
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it },
-            onSubmit = { fetchData() }
+            onStartDateChange = { newStartDate ->
+                startDate = newStartDate
+                fetchData()
+            },
+            onEndDateChange = { newEndDate ->
+                endDate = newEndDate
+                fetchData()
+            },
+            modifier = Modifier
         )
 
         Spacer(Modifier.height(16.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
 
         Button(
             onClick = { handleOpen("addAccount") },
@@ -158,6 +170,12 @@ fun AccountOverview(
         }
 
         Spacer(Modifier.height(16.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
 
         chartData?.let { data ->
             AccountBalanceLineChart(chartData = data)

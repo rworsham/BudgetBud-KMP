@@ -156,14 +156,24 @@ fun BudgetTransactionOverview(
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it },
-            onSubmit = {
+            onStartDateChange = { newStartDate ->
+                startDate = newStartDate
                 fetchData()
-            }
+            },
+            onEndDateChange = { newEndDate ->
+                endDate = newEndDate
+                fetchData()
+            },
+            modifier = Modifier
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
 
         Text("Budget Charts", style = MaterialTheme.typography.titleMedium)
 
@@ -232,6 +242,12 @@ fun BudgetTransactionOverview(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
+
         Text("Your Budgets", style = MaterialTheme.typography.titleMedium)
 
         Row(
@@ -269,6 +285,12 @@ fun BudgetTransactionOverview(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
 
         Text("Financial Overview", style = MaterialTheme.typography.titleMedium)
 

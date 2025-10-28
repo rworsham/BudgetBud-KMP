@@ -127,12 +127,24 @@ fun CategoryOverview(
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it },
-            onSubmit = { fetchData() }
+            onStartDateChange = { newStartDate ->
+                startDate = newStartDate
+                fetchData()
+            },
+            onEndDateChange = { newEndDate ->
+                endDate = newEndDate
+                fetchData()
+            },
+            modifier = Modifier
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
 
         Button(
             onClick = { handleOpen("addCategory") },
@@ -142,6 +154,12 @@ fun CategoryOverview(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
 
         if (categoryData.isNotEmpty()) {
             CategoryCardList(
@@ -153,6 +171,12 @@ fun CategoryOverview(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
 
         if (categoryHistory.isNotEmpty()) {
             CategoryLineChart(

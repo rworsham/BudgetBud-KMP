@@ -76,9 +76,15 @@ actual fun CategoryHistory(
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it },
-            onSubmit = { fetchTransactions() }
+            onStartDateChange = { newStartDate ->
+                startDate = newStartDate
+                fetchTransactions()
+            },
+            onEndDateChange = { newEndDate ->
+                endDate = newEndDate
+                fetchTransactions()
+            },
+            modifier = Modifier
         )
 
         Spacer(modifier = Modifier.height(16.dp))

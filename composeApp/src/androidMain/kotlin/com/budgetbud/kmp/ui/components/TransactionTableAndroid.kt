@@ -108,11 +108,23 @@ actual fun TransactionTable(
             DateRangeFilterForm(
                 startDate = currentStartDate,
                 endDate = currentEndDate,
-                onStartDateChange = { currentStartDate = it },
-                onEndDateChange = { currentEndDate = it },
-                onSubmit = { fetchTransactions() }
+                onStartDateChange = { newStartDate ->
+                    currentStartDate = newStartDate
+                    fetchTransactions()
+                },
+                onEndDateChange = { newEndDate ->
+                    currentEndDate = newEndDate
+                    fetchTransactions()
+                },
+                modifier = Modifier
             )
             Spacer(Modifier.height(16.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                thickness = 2.dp
+            )
         }
 
         when {

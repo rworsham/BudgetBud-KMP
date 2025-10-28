@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -27,7 +26,6 @@ actual fun DateRangeFilterForm(
     endDate: KxLocalDate,
     onStartDateChange: (KxLocalDate) -> Unit,
     onEndDateChange: (KxLocalDate) -> Unit,
-    onSubmit: () -> Unit,
     modifier: Modifier
 ) {
     val startDialogState = rememberMaterialDialogState()
@@ -52,15 +50,6 @@ actual fun DateRangeFilterForm(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("End Date: $endDate")
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = onSubmit,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Apply")
             }
         }
     }

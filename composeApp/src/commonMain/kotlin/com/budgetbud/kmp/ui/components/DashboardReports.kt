@@ -101,22 +101,26 @@ fun DashboardReports(
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it },
-            onSubmit = {
+            onStartDateChange = { newStartDate ->
+                startDate = newStartDate
                 fetchData()
-            }
+            },
+            onEndDateChange = { newEndDate ->
+                endDate = newEndDate
+                fetchData()
+            },
+            modifier = Modifier
         )
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        Text("Transaction Bar Chart", style = MaterialTheme.typography.titleMedium)
 
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary,
             thickness = 2.dp
         )
+
+        Text("Transaction Bar Chart", style = MaterialTheme.typography.titleMedium)
 
         if (barChartData.isNotEmpty()) {
             TransactionBarChart(barChartData)
@@ -126,13 +130,13 @@ fun DashboardReports(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text("Expense Pie Chart", style = MaterialTheme.typography.titleMedium)
-
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary,
             thickness = 2.dp
         )
+
+        Text("Expense Pie Chart", style = MaterialTheme.typography.titleMedium)
 
         if (pieChartData.isNotEmpty()) {
             TransactionPieChart(pieChartData)
@@ -142,13 +146,13 @@ fun DashboardReports(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text("Transaction Grid", style = MaterialTheme.typography.titleMedium)
-
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary,
             thickness = 2.dp
         )
+
+        Text("Transaction Grid", style = MaterialTheme.typography.titleMedium)
 
         if (transactionRows.isNotEmpty()) {
             TransactionTable(

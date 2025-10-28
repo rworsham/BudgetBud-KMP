@@ -7,8 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import com.budgetbud.kmp.auth.models.User
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyTransactionOverviewData
@@ -19,7 +17,6 @@ import com.budgetbud.kmp.ui.components.forms.FamilyInviteForm
 import com.budgetbud.kmp.utils.DateUtils
 import com.budgetbud.kmp.ui.components.charts.FamilyCategoryBarChart
 import com.budgetbud.kmp.ui.components.charts.FamilyTransactionBarChart
-import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.client.call.body
@@ -124,12 +121,24 @@ fun FamilyOverview(
             DateRangeFilterForm(
                 startDate = startDate,
                 endDate = endDate,
-                onStartDateChange = { startDate = it },
-                onEndDateChange = { endDate = it },
-                onSubmit = { fetchData() }
+                onStartDateChange = { newStartDate ->
+                    startDate = newStartDate
+                    fetchData()
+                },
+                onEndDateChange = { newEndDate ->
+                    endDate = newEndDate
+                    fetchData()
+                },
+                modifier = Modifier
             )
 
             Spacer(Modifier.height(16.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                thickness = 2.dp
+            )
 
             if (familyData.isNotEmpty()) {
                 Button(
@@ -175,6 +184,12 @@ fun FamilyOverview(
                 item {
                     Spacer(Modifier.height(24.dp))
 
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        thickness = 2.dp
+                    )
+
                     Text("Contributions Per User", style = MaterialTheme.typography.titleMedium)
                     if (transactionOverview.isNotEmpty()) {
                         FamilyTransactionBarChart(data = transactionOverview)
@@ -185,6 +200,12 @@ fun FamilyOverview(
 
                 item {
                     Spacer(Modifier.height(24.dp))
+
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        thickness = 2.dp
+                    )
 
                     Text("Category Usage Per User", style = MaterialTheme.typography.titleMedium)
                     if (categoryOverview.isNotEmpty()) {
