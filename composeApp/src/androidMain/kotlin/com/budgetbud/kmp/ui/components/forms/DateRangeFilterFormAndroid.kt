@@ -12,6 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
@@ -38,18 +40,24 @@ actual fun DateRangeFilterForm(
         Column(modifier = Modifier.padding(16.dp)) {
             OutlinedButton(
                 onClick = { startDialogState.show() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                Text("Start Date: $startDate")
+                Text("Start Date: $startDate",
+                    maxLines = 1,
+                    style = TextStyle(fontSize = 14.sp))
             }
 
             Spacer(Modifier.height(8.dp))
 
             OutlinedButton(
                 onClick = { endDialogState.show() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                Text("End Date: $endDate")
+                Text("End Date: $endDate",
+                    maxLines = 1,
+                    style = TextStyle(fontSize = 14.sp))
             }
         }
     }
