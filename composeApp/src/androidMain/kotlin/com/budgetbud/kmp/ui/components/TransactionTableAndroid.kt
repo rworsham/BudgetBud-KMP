@@ -125,6 +125,8 @@ actual fun TransactionTable(
                 color = MaterialTheme.colorScheme.primary,
                 thickness = 2.dp
             )
+
+            Spacer(Modifier.height(16.dp))
         }
 
         when {
