@@ -38,6 +38,7 @@ kotlin {
             implementation("io.github.vanpra.compose-material-dialogs:core:0.9.0")
             implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+            implementation("com.patrykandpatrick.vico:compose-m3:2.2.1")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
