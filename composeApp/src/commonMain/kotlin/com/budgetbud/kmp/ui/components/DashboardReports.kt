@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
@@ -120,7 +121,12 @@ fun DashboardReports(
             thickness = 2.dp
         )
 
-        Text("Transaction Bar Chart", style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Transaction Bar Chart", style = MaterialTheme.typography.titleMedium)
+        }
 
         if (barChartData.isNotEmpty()) {
             TransactionBarChart(barChartData)
@@ -136,7 +142,12 @@ fun DashboardReports(
             thickness = 2.dp
         )
 
-        Text("Expense Pie Chart", style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Expense Pie Chart", style = MaterialTheme.typography.titleMedium)
+        }
 
         if (pieChartData.isNotEmpty()) {
             TransactionPieChart(pieChartData)
@@ -152,7 +163,12 @@ fun DashboardReports(
             thickness = 2.dp
         )
 
-        Text("Transaction Grid", style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Transaction Grid", style = MaterialTheme.typography.titleMedium)
+        }
 
         if (transactionRows.isNotEmpty()) {
             TransactionTable(
@@ -181,3 +197,4 @@ fun DashboardReports(
         AlertHandler(alertMessage = it)
     }
 }
+

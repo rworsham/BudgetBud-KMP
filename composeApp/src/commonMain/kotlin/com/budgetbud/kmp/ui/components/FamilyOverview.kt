@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Alignment
 import com.budgetbud.kmp.auth.models.User
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyTransactionOverviewData
@@ -190,7 +191,13 @@ fun FamilyOverview(
                         thickness = 2.dp
                     )
 
-                    Text("Contributions Per User", style = MaterialTheme.typography.titleMedium)
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Contributions Per User", style = MaterialTheme.typography.titleMedium)
+                    }
+
                     if (transactionOverview.isNotEmpty()) {
                         FamilyTransactionBarChart(data = transactionOverview)
                     } else {
@@ -207,7 +214,12 @@ fun FamilyOverview(
                         thickness = 2.dp
                     )
 
-                    Text("Category Usage Per User", style = MaterialTheme.typography.titleMedium)
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Category Usage Per User", style = MaterialTheme.typography.titleMedium)
+                    }
                     if (categoryOverview.isNotEmpty()) {
                         FamilyCategoryBarChart(data = categoryOverview)
                     } else {

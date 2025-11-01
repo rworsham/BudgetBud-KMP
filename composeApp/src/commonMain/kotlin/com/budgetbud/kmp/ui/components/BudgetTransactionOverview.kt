@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -175,7 +176,12 @@ fun BudgetTransactionOverview(
             thickness = 2.dp
         )
 
-        Text("Budget Charts", style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Budgets", style = MaterialTheme.typography.titleMedium)
+        }
 
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -248,7 +254,12 @@ fun BudgetTransactionOverview(
             thickness = 2.dp
         )
 
-        Text("Your Budgets", style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Budget Charts", style = MaterialTheme.typography.titleMedium)
+        }
 
         Row(
             modifier = modifier.fillMaxWidth(),
@@ -292,7 +303,12 @@ fun BudgetTransactionOverview(
             thickness = 2.dp
         )
 
-        Text("Financial Overview", style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Financial Overview", style = MaterialTheme.typography.titleMedium)
+        }
 
         if (incomeExpenseData.any { it.value > 0.0 } || budgetChartData.isNotEmpty()) {
             Surface(
