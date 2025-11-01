@@ -146,6 +146,8 @@ fun CategoryOverview(
             thickness = 2.dp
         )
 
+        Spacer(modifier = Modifier.height(4.dp))
+
         Button(
             onClick = { handleOpen("addCategory") },
             modifier = Modifier.fillMaxWidth()
@@ -153,7 +155,7 @@ fun CategoryOverview(
             Text("Add Category")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
@@ -164,19 +166,19 @@ fun CategoryOverview(
         if (categoryData.isNotEmpty()) {
             CategoryCardList(
                 categories = categoryData,
-                onViewHistory = { id -> handleOpen("viewHistory", id.toInt()) }
+                onViewHistory = { id -> handleOpen("viewHistory", id) }
             )
         } else {
             Text("No category data found.")
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary,
             thickness = 2.dp
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (categoryHistory.isNotEmpty()) {
             CategoryLineChart(
