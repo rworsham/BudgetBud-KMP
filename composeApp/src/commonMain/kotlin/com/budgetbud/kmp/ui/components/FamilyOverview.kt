@@ -141,6 +141,8 @@ fun FamilyOverview(
                 thickness = 2.dp
             )
 
+            Spacer(Modifier.height(4.dp))
+
             if (familyData.isNotEmpty()) {
                 Button(
                     onClick = { handleOpen("addAccount") },
@@ -157,7 +159,13 @@ fun FamilyOverview(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(4.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                thickness = 2.dp
+            )
 
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.padding(16.dp))
@@ -167,15 +175,29 @@ fun FamilyOverview(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 300.dp, start = 10.dp, end = 10.dp)
+                .padding(top = 230.dp, start = 10.dp, end = 10.dp)
         ) {
             if (familyData.isNotEmpty()) {
                 items(familyData) { user ->
-                    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 30.dp)) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(user.username, style = MaterialTheme.typography.titleMedium)
+                    Card(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp, horizontal = 30.dp)) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                user.username,
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
                             Spacer(Modifier.height(8.dp))
-                            Button(onClick = { handleOpen("viewHistory", user.id) }) {
+                            Button(
+                                onClick = { handleOpen("viewHistory", user.id) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
                                 Text("View User History")
                             }
                         }
