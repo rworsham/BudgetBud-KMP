@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.budgetbud.kmp.auth.ApiClient
@@ -103,35 +104,50 @@ fun ReportDashboard(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
+        Spacer(Modifier.height(16.dp))
+
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary,
             thickness = 2.dp
         )
 
+        Spacer(Modifier.height(16.dp))
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            OutlinedCard(onClick = { handleOpen("addReport") }) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Icon(Icons.Default.AddBox, contentDescription = "Add", tint = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Add Report")
-                }
+            Button(
+                onClick = { handleOpen("addReport") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "Add Report",
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
-            OutlinedCard(onClick = { handleOpen("editReport") }) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Edit Reports")
-                }
+
+            Button(
+                onClick = { handleOpen("editReport") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "Edit Report",
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
 
@@ -220,7 +236,7 @@ fun ReportDashboard(
                 }
             }
         } else {
-            Text("No reports available.")
+            ChartDataError("No Reports Added / Available")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -247,7 +263,15 @@ fun ReportDashboard(
         }
 
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator(modifier = Modifier
+                    .padding(16.dp)
+                    .size(72.dp))
+            }
         }
 
         errorMessage?.let {

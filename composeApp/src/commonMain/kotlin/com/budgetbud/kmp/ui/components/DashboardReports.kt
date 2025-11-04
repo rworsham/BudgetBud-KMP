@@ -113,7 +113,7 @@ fun DashboardReports(
             modifier = Modifier
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
@@ -190,7 +190,15 @@ fun DashboardReports(
     }
 
     if (isLoading) {
-        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+        ) {
+            CircularProgressIndicator(modifier = Modifier
+                .padding(16.dp)
+                .size(144.dp))
+        }
     }
 
     errorMessage?.let {

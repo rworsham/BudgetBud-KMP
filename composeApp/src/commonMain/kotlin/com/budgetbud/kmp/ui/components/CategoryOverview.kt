@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -228,7 +229,15 @@ fun CategoryOverview(
     }
 
     if (isLoading) {
-        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+        ) {
+            CircularProgressIndicator(modifier = Modifier
+                .padding(16.dp)
+                .size(144.dp))
+        }
     }
 
     errorMessage?.let {

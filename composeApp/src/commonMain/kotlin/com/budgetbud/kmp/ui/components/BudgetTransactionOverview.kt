@@ -414,7 +414,15 @@ fun BudgetTransactionOverview(
     }
 
     if (isLoading) {
-        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+        ) {
+            CircularProgressIndicator(modifier = Modifier
+                .padding(16.dp)
+                .size(144.dp))
+        }
     }
 
     errorMessage?.let {
