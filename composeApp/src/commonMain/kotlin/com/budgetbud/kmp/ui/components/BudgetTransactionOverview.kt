@@ -320,10 +320,12 @@ fun BudgetTransactionOverview(
                     modifier = Modifier
                         .padding(24.dp)
                         .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Financial Overview",
                         style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.primary
                         )
                     )
 
@@ -344,6 +346,9 @@ fun BudgetTransactionOverview(
 
                     Text(
                         text = "Remaining Budget: $${"%.2f".format(budgetChartData.sumOf { it.remaining_budget })}",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     )
                 }
             }
