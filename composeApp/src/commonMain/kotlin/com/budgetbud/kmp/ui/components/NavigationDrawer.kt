@@ -22,13 +22,13 @@ fun MiniDrawer(
 ) {
     val drawerItems = listOf(
         DrawerItem.Segment("dashboard", "Dashboard", Icons.Default.Dashboard),
-        DrawerItem.Segment("budget", "Budget", Icons.Default.AccountBalance),
-        DrawerItem.Segment("transactions", "Transactions", Icons.Default.Receipt),
-        DrawerItem.Divider,
+        DrawerItem.Segment("budget", "Budget", Icons.Default.ShoppingCart),
         DrawerItem.Segment("category", "Categories", Icons.Default.Category),
-        DrawerItem.Segment("accounts", "Accounts", Icons.Default.AccountBox),
-        DrawerItem.Segment("family", "Family", Icons.Default.Group),
-        DrawerItem.Segment("reports", "Reports", Icons.Default.BarChart)
+        DrawerItem.Divider,
+        DrawerItem.Segment("reports", "Reports", Icons.Default.BarChart),
+        DrawerItem.Segment("transactions", "Transactions", Icons.Default.Receipt),
+        DrawerItem.Segment("accounts", "Accounts", Icons.Default.AccountBalance),
+        DrawerItem.Segment("family", "Family", Icons.Default.Group)
     )
 
     val drawerWidth = if (expanded) 160.dp else 55.dp
