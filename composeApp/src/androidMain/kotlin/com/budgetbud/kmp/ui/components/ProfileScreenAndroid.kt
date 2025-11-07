@@ -34,14 +34,14 @@ actual fun ProfileScreen(
         isLoading = true
         try {
             val tokens = apiClient.getTokens()
-            val details: HttpResponse = apiClient.client.get("/user/") {
+            val details: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/user/") {
                 headers {
                     tokens?.let {
                         append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
                     }
                 }
             }
-            val stats: HttpResponse = apiClient.client.get("/profile/stats/") {
+            val stats: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/profile/stats/") {
                 headers {
                     tokens?.let {
                         append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
@@ -107,9 +107,9 @@ actual fun ProfileScreen(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    StatItem("Transactions", userStats?.totalTransactions)
-                    StatItem("Joined", userStats?.joinedDate)
-                    StatItem("Goals Met", userStats?.savingsGoalsMet)
+                    StatItem("Transactions", userStats?.total_transactions)
+                    StatItem("Joined", userStats?.joined_date)
+                    StatItem("Goals Met", userStats?.savings_goals_met)
                 }
             }
         }
@@ -120,9 +120,9 @@ actual fun ProfileScreen(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    StatItem("Income", "$${userStats?.netIncome}")
-                    StatItem("Expense", "$${userStats?.netExpense}")
-                    StatItem("Balance", "$${userStats?.netBalance}")
+                    StatItem("Income", "$${userStats?.net_income}")
+                    StatItem("Expense", "$${userStats?.net_expense}")
+                    StatItem("Balance", "$${userStats?.net_balance}")
                 }
             }
         }
