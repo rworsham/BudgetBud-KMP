@@ -1,9 +1,10 @@
 package com.budgetbud.kmp.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.UserStatsData
 import com.budgetbud.kmp.models.UserDetailsData
@@ -75,12 +75,13 @@ actual fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Image(
-                painter = rememberAsyncImagePainter("https://via.placeholder.com/80"),
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
                 contentDescription = "User Avatar",
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
+                    .size(70.dp)
+                    .clip(CircleShape),
             )
             Column {
                 Text(
