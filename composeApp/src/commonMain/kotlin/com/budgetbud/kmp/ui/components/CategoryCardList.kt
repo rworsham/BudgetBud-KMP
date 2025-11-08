@@ -32,7 +32,7 @@ fun CategoryCardList(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Balance: ${category.balance}",
+                        text = "Balance: $${"%.2f".format(category.balance)}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
