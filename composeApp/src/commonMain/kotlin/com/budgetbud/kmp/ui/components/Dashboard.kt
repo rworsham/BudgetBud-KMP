@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Brush
@@ -71,11 +72,27 @@ fun Dashboard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Switch(
-                            checked = familyView.value,
-                            onCheckedChange = { familyView.value = it },
-                            modifier = Modifier.scale(0.7f)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(0.dp),
+                            modifier = Modifier.padding(0.dp)
+                        ) {
+                            Text(
+                                text = "Family View",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 11.sp
+                                ),
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.offset(y = 10.dp)
+                            )
+                            Switch(
+                                checked = familyView.value,
+                                onCheckedChange = { familyView.value = it },
+                                modifier = Modifier
+                                    .scale(0.7f)
+                            )
+                        }
                         IconButton(onClick = { openDialog("Profile") }) {
                             Icon(
                                 Icons.Default.AccountCircle,
