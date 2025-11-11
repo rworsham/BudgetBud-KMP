@@ -261,9 +261,9 @@ fun BudgetTransactionOverview(
             Text("Budget Charts", style = MaterialTheme.typography.titleMedium)
         }
 
-        Row(
+        Column(
             modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (pieChartData.isNotEmpty()) {
                 ExpenseCategoriesBudgetPieChart(
