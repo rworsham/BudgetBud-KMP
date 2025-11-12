@@ -268,27 +268,34 @@ fun BudgetTransactionOverview(
             if (pieChartData.isNotEmpty()) {
                 ExpenseCategoriesBudgetPieChart(
                     data = pieChartData,
-                    modifier = Modifier.weight(1f)
                 )
             } else {
                 ChartDataError()
             }
 
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                thickness = 2.dp
+            )
 
             if (incomeExpenseData.any { it.value > 0 }) {
                 IncomeExpenseBudgetBarChart(
                     data = incomeExpenseData,
-                    modifier = Modifier.weight(1f)
                 )
             } else {
                 ChartDataError()
             }
 
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                thickness = 2.dp
+            )
 
             if (budgetChartData.isNotEmpty()) {
                 BudgetRemainingBarChart(
                     data = budgetChartData,
-                    modifier = Modifier.weight(1f)
                 )
             } else {
                 ChartDataError()
