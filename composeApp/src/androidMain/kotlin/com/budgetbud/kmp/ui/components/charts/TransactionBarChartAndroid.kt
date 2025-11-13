@@ -1,16 +1,23 @@
 package com.budgetbud.kmp.ui.components.charts
 
+import android.annotation.SuppressLint
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.TransactionBarChartData
 import kotlin.math.ceil
 
+@SuppressLint("DefaultLocale")
 @Composable
 actual fun TransactionBarChart(
     data: List<TransactionBarChartData>,
@@ -30,39 +37,78 @@ actual fun TransactionBarChart(
         Canvas(modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 4.dp)
         ) {
-            val barWidth = size.width / parsedData.size
+            val barWidth = (size.width / parsedData.size * 0.6f)
+            val spaceBetween = (size.width / parsedData.size)
             val heightScale = size.height / roundedMax
+            val labelXOffset = 4.dp.toPx()
+
+            val textPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 20f
+                textAlign = Paint.Align.LEFT
+                typeface = Typeface.DEFAULT_BOLD
+            }
+
+            val numberOfGridLines = 5
+            for (i in 1 until numberOfGridLines) {
+                val y = size.height - (i * size.height / numberOfGridLines)
+
+                drawLine(
+                    color = Color.Gray.copy(alpha = 0.3f),
+                    start = Offset(0f, y),
+                    end = Offset(size.width, y),
+                    strokeWidth = 1f
+                )
+
+                val value = roundedMax * (i / numberOfGridLines.toFloat())
+
+                drawContext.canvas.nativeCanvas.drawText(
+                    String.format("%,.0f", value),
+                    labelXOffset,
+                    y - textPaint.descent(),
+                    textPaint
+                )
+            }
+
+            for (i in 1 until parsedData.size) {
+                val x = (i * spaceBetween)
+                drawLine(
+                    color = Color.Gray.copy(alpha = 0.3f),
+                    start = Offset(x, 0f),
+                    end = Offset(x, size.height),
+                    strokeWidth = 1f
+                )
+            }
+
+            val xAxisPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 30f
+                textAlign = Paint.Align.CENTER
+            }
 
             parsedData.forEachIndexed { index, (item, amount) ->
                 val barHeight = amount * heightScale
+                val xOffset = index * spaceBetween + (spaceBetween - barWidth) / 2
+
                 drawRect(
                     color = Color(0xFF1DB954),
-                    topLeft = androidx.compose.ui.geometry.Offset(
-                        x = index * barWidth + barWidth * 0.1f,
+                    topLeft = Offset(
+                        x = xOffset,
                         y = size.height - barHeight
                     ),
-                    size = androidx.compose.ui.geometry.Size(
-                        width = barWidth * 0.8f,
+                    size = Size(
+                        width = barWidth,
                         height = barHeight
                     )
                 )
-            }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            parsedData.forEach { (item, _) ->
-                Text(
-                    text = item.category,
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
+                drawContext.canvas.nativeCanvas.drawText(
+                    item.category,
+                    xOffset + (barWidth / 2),
+                    size.height + 24f,
+                    xAxisPaint
                 )
             }
         }
