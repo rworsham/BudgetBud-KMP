@@ -93,7 +93,7 @@ actual fun IncomeExpenseBudgetBarChart(
                 val xOffset = index * spaceBetween + (spaceBetween - barWidth) / 2
 
                 drawRect(
-                    color = if (item.name == "Income") Color.Green else Color.Red,
+                    color = if (item.name == "Income") Color.Green else Color(0xFF8884d8),
                     topLeft = Offset(xOffset.toFloat(), (size.height - barHeight).toFloat()),
                     size = Size(barWidth.toFloat(), barHeight.toFloat())
                 )
