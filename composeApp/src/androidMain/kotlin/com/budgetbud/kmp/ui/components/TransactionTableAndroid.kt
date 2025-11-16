@@ -157,6 +157,7 @@ actual fun TransactionTable(
                                 ) {
                                     Text(
                                         text = tx.date,
+                                        color = MaterialTheme.colorScheme.primary,
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 14.sp
@@ -186,11 +187,11 @@ actual fun TransactionTable(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Column(Modifier.weight(1f)) {
-                                        Text("Category", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("Category", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                         Text(tx.category, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                                     }
                                     Column(Modifier.weight(1f)) {
-                                        Text("Budget", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("Budget", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                         Text(tx.budget, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                                     }
                                 }
@@ -202,11 +203,11 @@ actual fun TransactionTable(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Column(Modifier.weight(1f)) {
-                                        Text("Account", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("Account", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                         Text(tx.account, fontSize = 13.sp)
                                     }
                                     Column(Modifier.weight(1f)) {
-                                        Text("Recurring", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("Recurring", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                         Text(
                                             if (tx.is_recurring) "Yes" else "No",
                                             fontSize = 13.sp,
