@@ -130,8 +130,6 @@ actual fun TransactionTable(
         }
 
         when {
-            isLoading -> CircularProgressIndicator()
-
             errorMessage != null -> Text(
                 "Error: $errorMessage",
                 color = MaterialTheme.colorScheme.error,
