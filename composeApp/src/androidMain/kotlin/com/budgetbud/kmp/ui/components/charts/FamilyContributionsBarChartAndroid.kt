@@ -1,5 +1,7 @@
 package com.budgetbud.kmp.ui.components.charts
 
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,7 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyTransactionOverviewData
@@ -85,43 +88,76 @@ private fun FamilyContributionChart(data: List<FamilyTransactionOverviewData>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 4.dp)
         ) {
             val barWidth = size.width / data.size * 0.6f
             val spaceBetween = size.width / data.size
             val heightScale = size.height / roundedMax
+            val labelXOffset = 4.dp.toPx()
+
+            val yAxisTextPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 20f
+                textAlign = Paint.Align.LEFT
+                typeface = Typeface.DEFAULT_BOLD
+            }
+
+            val xAxisPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 20f
+                textAlign = Paint.Align.CENTER
+            }
+
+            val numberOfGridLines = 5
+            for (i in 1 until numberOfGridLines) {
+                val y = size.height - (i * size.height / numberOfGridLines)
+
+                drawLine(
+                    color = Color.Gray.copy(alpha = 0.3f),
+                    start = Offset(0f, y),
+                    end = Offset(size.width, y),
+                    strokeWidth = 1f
+                )
+
+                val value = roundedMax * (i / numberOfGridLines.toFloat())
+
+                drawContext.canvas.nativeCanvas.drawText(
+                    String.format("%,.0f", value),
+                    labelXOffset,
+                    y - yAxisTextPaint.descent(),
+                    yAxisTextPaint
+                )
+            }
+
+            for (i in 1 until data.size) {
+                val x = (i * spaceBetween)
+                drawLine(
+                    color = Color.Gray.copy(alpha = 0.3f),
+                    start = Offset(x, 0f),
+                    end = Offset(x, size.height),
+                    strokeWidth = 1f
+                )
+            }
 
             data.forEachIndexed { index, item ->
                 val barHeight = item.transaction_count * heightScale
                 val xOffset = index * spaceBetween + (spaceBetween - barWidth) / 2
 
                 drawRect(
-                    color = Color(0xFF8884D8),
+                    color = Color(0xFF1DB954),
                     topLeft = Offset(xOffset, size.height - barHeight),
                     size = Size(barWidth, barHeight)
                 )
-            }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-        ) {
-            data.forEach {
-                Text(
-                    text = it.name,
-                    style = MaterialTheme.typography.labelSmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp),
-                    maxLines = 1
+                drawContext.canvas.nativeCanvas.drawText(
+                    item.name,
+                    xOffset + (barWidth / 2),
+                    size.height + 24f,
+                    xAxisPaint
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }

@@ -172,7 +172,8 @@ fun FamilyOverview(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 230.dp, start = 10.dp, end = 10.dp)
+                .padding(top = 230.dp, start = 10.dp, end = 10.dp),
+            contentPadding = PaddingValues(bottom = 150.dp)
         ) {
             if (familyData.isNotEmpty()) {
                 items(familyData) { user ->
