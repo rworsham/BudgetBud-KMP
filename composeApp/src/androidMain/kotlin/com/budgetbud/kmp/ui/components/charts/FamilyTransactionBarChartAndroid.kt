@@ -1,5 +1,7 @@
 package com.budgetbud.kmp.ui.components.charts
 
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -11,8 +13,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlin.math.ceil
 import com.budgetbud.kmp.models.FamilyTransactionOverviewData
+import kotlin.math.ceil
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 
 @Composable
 actual fun FamilyTransactionBarChart(
@@ -20,29 +24,97 @@ actual fun FamilyTransactionBarChart(
     modifier: Modifier
 ) {
     val maxCount = data.maxOfOrNull { it.transaction_count } ?: 1f
-    val roundedMax = ceil(maxCount / 10f) * 10f
+    val roundedMax = ceil(maxCount / 5f) * 5f
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
 
     Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = "Total Transactions per User",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            textAlign = TextAlign.Center
+        )
+
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
-                .padding(horizontal = 16.dp)
+                .padding(start = 40.dp, end = 16.dp, top = 8.dp)
         ) {
-            val barWidth = size.width / data.size * 0.6f
-            val spaceBetween = size.width / data.size
-            val heightScale = size.height / roundedMax
+            val canvasWidth = size.width
+            val canvasHeight = size.height
+            val barCount = data.size
+            val barSpacing = 0.6f
+            val barWidth = (canvasWidth / barCount) * barSpacing
+            val spaceBetweenBars = (canvasWidth / barCount) * (1 - barSpacing)
+            val heightScale = canvasHeight / roundedMax
+            val axisStrokeWidth = 1.dp.toPx()
+
+            val yAxisTextPaint = Paint().apply {
+                color = onSurfaceColor.toArgb()
+                textSize = 20f
+                textAlign = Paint.Align.RIGHT
+                typeface = Typeface.DEFAULT
+            }
+
+            val barValueTextPaint = Paint().apply {
+                color = onSurfaceColor.toArgb()
+                textSize = 25f
+                textAlign = Paint.Align.CENTER
+                typeface = Typeface.DEFAULT_BOLD
+            }
+
+            val numLines = 5
+            for (i in 0..numLines) {
+                val value = (roundedMax * i) / numLines
+                val y = canvasHeight - (value * heightScale)
+
+                drawLine(
+                    color = Color.Gray.copy(alpha = 0.5f),
+                    start = Offset(0f, y),
+                    end = Offset(canvasWidth, y),
+                    strokeWidth = 1f
+                )
+
+                drawContext.canvas.nativeCanvas.drawText(
+                    value.toInt().toString(),
+                    -4.dp.toPx(),
+                    y + (yAxisTextPaint.textSize / 3),
+                    yAxisTextPaint
+                )
+            }
 
             data.forEachIndexed { index, item ->
                 val barHeight = item.transaction_count * heightScale
-                val xOffset = index * spaceBetween + (spaceBetween - barWidth) / 2
+                val xStart = (index * (barWidth + spaceBetweenBars)) + (spaceBetweenBars / 2)
 
                 drawRect(
-                    color = Color(0xFF8884D8),
-                    topLeft = Offset(xOffset, size.height - barHeight),
+                    color = primaryColor,
+                    topLeft = Offset(xStart, canvasHeight - barHeight),
                     size = Size(barWidth, barHeight)
                 )
+
+                val countText = item.transaction_count.toInt().toString()
+                val textX = xStart + (barWidth / 2)
+                val textY = canvasHeight - barHeight - 8.dp.toPx()
+
+                drawContext.canvas.nativeCanvas.drawText(
+                    countText,
+                    textX,
+                    textY,
+                    barValueTextPaint
+                )
             }
+
+            drawLine(
+                color = onSurfaceColor,
+                start = Offset(0f, canvasHeight),
+                end = Offset(canvasWidth, canvasHeight),
+                strokeWidth = axisStrokeWidth
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -53,16 +125,22 @@ actual fun FamilyTransactionBarChart(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
         ) {
-            data.forEach {
+            data.forEach { item ->
+                val totalSpace = 1f / data.size.toFloat()
+                val barSpaceWeight = totalSpace * 0.6f
+                val paddingWeight = totalSpace * 0.4f
+
+                Spacer(modifier = Modifier.weight(paddingWeight / 2))
                 Text(
-                    text = it.name,
+                    text = item.name,
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp),
+                        .weight(barSpaceWeight)
+                        .padding(horizontal = 2.dp),
                     maxLines = 1
                 )
+                Spacer(modifier = Modifier.weight(paddingWeight / 2))
             }
         }
     }

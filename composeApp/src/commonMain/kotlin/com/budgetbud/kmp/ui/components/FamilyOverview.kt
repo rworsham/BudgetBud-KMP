@@ -215,13 +215,11 @@ fun FamilyOverview(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Contributions Per User", style = MaterialTheme.typography.titleMedium)
-                    }
-
-                    if (transactionOverview.isNotEmpty()) {
-                        FamilyTransactionBarChart(data = transactionOverview)
-                    } else {
-                        ChartDataError()
+                        if (transactionOverview.isNotEmpty()) {
+                            FamilyTransactionBarChart(data = transactionOverview)
+                        } else {
+                            ChartDataError()
+                        }
                     }
                 }
 
@@ -238,12 +236,11 @@ fun FamilyOverview(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Category Usage Per User", style = MaterialTheme.typography.titleMedium)
-                    }
-                    if (categoryOverview.isNotEmpty()) {
-                        FamilyCategoryBarChart(data = categoryOverview)
-                    } else {
-                        ChartDataError()
+                        if (categoryOverview.isNotEmpty()) {
+                            FamilyCategoryBarChart(data = categoryOverview)
+                        } else {
+                            ChartDataError()
+                        }
                     }
                 }
             }
