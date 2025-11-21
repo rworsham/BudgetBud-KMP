@@ -34,10 +34,10 @@ fun ReportDashboardSelectionForm(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response: HttpResponse = apiClient.client.get("/user/dashboard-report-options/")
+            val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/user/dashboard-report-options/")
             reports = response.body()
         } catch (e: Exception) {
-            error = "Failed to fetch reports"
+            error = e.message ?: "Failed to fetch reports"
         } finally {
             isLoading = false
         }
@@ -62,7 +62,7 @@ fun ReportDashboardSelectionForm(
             try {
                 val tokens = apiClient.getTokens()
 
-                apiClient.client.post("/user/reports/") {
+                apiClient.client.post("https://api.budgetingbud.com/api/user/reports/") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         mapOf(
@@ -79,7 +79,7 @@ fun ReportDashboardSelectionForm(
                 }
                 onSuccess()
             } catch (e: Exception) {
-                error = "Failed to add Report to Dashboard. Please try again."
+                error = e.message ?: "Failed to add Report to Dashboard. Please try again."
             } finally {
                 isSubmitting = false
             }
@@ -94,7 +94,9 @@ fun ReportDashboardSelectionForm(
     ) {
         DropdownSelector(
             label = "Select Report",
-            options = reports.map { it.id to it.display_name },
+            options = reports
+                .filter { it.id != null }
+                .map { it.id!! to (it.display_name ?: "Valid Report") },
             selectedOption = selectedReportId,
             onOptionSelected = { selectedReportId = it }
         )

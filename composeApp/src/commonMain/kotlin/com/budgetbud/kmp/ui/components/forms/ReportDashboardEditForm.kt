@@ -35,7 +35,7 @@ fun ReportDashboardEditForm(
     LaunchedEffect(Unit) {
         isLoading = true
         try {
-            val response: HttpResponse = apiClient.client.get("/user/reports/")
+            val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/user/reports/")
             reports = response.body()
         } catch (e: Exception) {
             error = "Failed to fetch reports"
@@ -47,8 +47,8 @@ fun ReportDashboardEditForm(
     LaunchedEffect(selectedReportId) {
         val selected = reports.find { it.id == selectedReportId }
         if (selected != null) {
-            xSize = selected.x_size
-            ySize = selected.y_size
+            xSize = selected.x_size ?: 1
+            ySize = selected.y_size ?: 1
         }
     }
 
@@ -71,7 +71,7 @@ fun ReportDashboardEditForm(
             try {
                 val tokens = apiClient.getTokens()
 
-                apiClient.client.patch("/user/reports/") {
+                apiClient.client.patch("https://api.budgetingbud.com/api/user/reports/") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         mapOf(
@@ -103,7 +103,9 @@ fun ReportDashboardEditForm(
     ) {
         DropdownSelector(
             label = "Select Report",
-            options = reports.map { it.id to it.display_name },
+            options = reports
+                .filter { it.id != null }
+                .map { it.id!! to (it.display_name ?: "Valid Report") },
             selectedOption = selectedReportId,
             onOptionSelected = { selectedReportId = it }
         )

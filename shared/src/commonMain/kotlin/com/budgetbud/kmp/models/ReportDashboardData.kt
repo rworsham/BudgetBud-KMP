@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ReportDashboardData(
-    val displayName: String,
-    val xSize: Int,
-    val ySize: Int
+    val display_name: String,
+    val x_size: String,
+    val y_size: String
 )
