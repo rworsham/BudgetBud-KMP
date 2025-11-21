@@ -61,10 +61,6 @@ actual fun AccountBalanceLineChart(
     val colors = listOf(
         Color(0xFF1DB954),
         Color(0xFF6200EE),
-        Color(0xFFFF5722),
-        Color(0xFF03A9F4),
-        Color(0xFFFFC107),
-        Color(0xFF795548),
         Color(0xFF009688)
     )
 
@@ -114,21 +110,23 @@ actual fun AccountBalanceLineChart(
             }
 
             sortedDates.forEachIndexed { i, date ->
-                val x = i * stepX
-                drawContext.canvas.nativeCanvas.apply {
-                    save()
-                    rotate(-45f, x, size.height + 20)
-                    drawText(
-                        displayDateFormat.format(date),
-                        x,
-                        size.height + 20,
-                        android.graphics.Paint().apply {
-                            color = android.graphics.Color.DKGRAY
-                            textSize = 30f
-                            textAlign = android.graphics.Paint.Align.CENTER
-                        }
-                    )
-                    restore()
+                if (i % 2 == 0) {
+                    val x = i * stepX
+                    drawContext.canvas.nativeCanvas.apply {
+                        save()
+                        rotate(-45f, x, size.height + 20)
+                        drawText(
+                            displayDateFormat.format(date),
+                            x,
+                            size.height + 20,
+                            android.graphics.Paint().apply {
+                                color = android.graphics.Color.DKGRAY
+                                textSize = 30f
+                                textAlign = android.graphics.Paint.Align.CENTER
+                            }
+                        )
+                        restore()
+                    }
                 }
             }
 
