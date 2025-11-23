@@ -27,7 +27,7 @@ import java.util.*
 
 
 @Composable
- actual fun AccountBalanceHistoryLineChart(
+actual fun AccountBalanceHistoryLineChart(
     xSizePercent: Int,
     ySizePercent: Int,
     apiClient: ApiClient,
@@ -37,6 +37,11 @@ import java.util.*
     var chartData by remember { mutableStateOf<AccountBalanceChartData?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+
+    val proportionalModifier = modifier
+        .fillMaxWidth(xSizePercent / 100f)
+        .fillMaxHeight(ySizePercent / 100f)
+        .aspectRatio(1f)
 
     LaunchedEffect(familyView) {
         isLoading = true
@@ -73,7 +78,7 @@ import java.util.*
     }
 
     chartData?.let { data ->
-        ChartCanvas(data = data, modifier = modifier)
+        ChartCanvas(data = data, modifier = proportionalModifier)
     }
 
     if (isLoading) {
@@ -134,23 +139,38 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
     Box(modifier = modifier.padding(horizontal = 48.dp, vertical = 32.dp)) {
         Canvas(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
+                .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
-                        val stepX = size.width / (sortedDates.size - 1)
-                        val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
-                        val selectedDate = sortedDates[index]
+                        if (sortedDates.size > 1) {
+                            val stepX = size.width / (sortedDates.size - 1)
+                            val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
+                            val selectedDate = sortedDates[index]
 
-                        val valuesAtDate = dataSeries.mapValues { (_, balances) ->
-                            balances.getOrNull(index) ?: 0f
+                            val valuesAtDate = dataSeries.mapValues { (_, balances) ->
+                                balances.getOrNull(index) ?: 0f
+                            }
+
+                            tooltipData = selectedDate to valuesAtDate
+                            tooltipOffset = offset
                         }
-
-                        tooltipData = selectedDate to valuesAtDate
-                        tooltipOffset = offset
                     }
                 }
         ) {
+            if (sortedDates.size < 2) {
+                drawContext.canvas.nativeCanvas.drawText(
+                    "Insufficient data to display chart",
+                    center.x,
+                    center.y,
+                    android.graphics.Paint().apply {
+                        color = android.graphics.Color.GRAY
+                        textSize = 40f
+                        textAlign = android.graphics.Paint.Align.CENTER
+                    }
+                )
+                return@Canvas
+            }
+
             val stepX = size.width / (sortedDates.size - 1)
             val yScale = size.height / dataMax
 
@@ -187,7 +207,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
                 }
             }
 
-            dataSeries.entries.forEachIndexed { index, (name, balances) ->
+            dataSeries.entries.forEachIndexed { index, (_, balances) ->
                 val color = colors[index % colors.size]
                 if (balances.size < 2) return@forEachIndexed
 
@@ -208,7 +228,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp).align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.Center
         ) {
             accounts.forEachIndexed { index, account ->
