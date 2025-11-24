@@ -167,8 +167,6 @@ fun ReportDashboard(
                         "Expense Categories Pie Chart" -> ExpenseCategoriesPieChart(
                             startDate = startDate,
                             endDate = endDate,
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient
@@ -176,8 +174,6 @@ fun ReportDashboard(
                         "Budget Vs Remaining Budget" -> BudgetRemainingBudgetBarChart(
                             startDate = startDate,
                             endDate = endDate,
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient
@@ -185,15 +181,11 @@ fun ReportDashboard(
                         "Expense Categories Bar Chart" -> ExpenseCategoriesBarChart(
                             startDate = startDate,
                             endDate = endDate,
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient
                         )
                         "Account Balance History Line Chart" -> AccountBalanceHistoryLineChart(
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient
@@ -201,15 +193,11 @@ fun ReportDashboard(
                         "Income vs. Expense Bar Chart" -> IncomeExpenseBarChart(
                             startDate = startDate,
                             endDate = endDate,
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient
                         )
                         "Category Expense Line Chart" -> CategoryExpenseLineChart(
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient
@@ -217,8 +205,6 @@ fun ReportDashboard(
                         "Family Contributions Bar Chart" -> FamilyContributionsBarChart(
                             startDate = startDate,
                             endDate = endDate,
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient
@@ -226,8 +212,6 @@ fun ReportDashboard(
                         "Family Category Usage Bar Chart" -> CategoryUsagePerUserBarChart(
                             startDate = startDate,
                             endDate = endDate,
-                            xSizePercent = report.x_size.toInt(),
-                            ySizePercent = report.y_size.toInt(),
                             familyView = familyView,
                             modifier = Modifier,
                             apiClient = apiClient

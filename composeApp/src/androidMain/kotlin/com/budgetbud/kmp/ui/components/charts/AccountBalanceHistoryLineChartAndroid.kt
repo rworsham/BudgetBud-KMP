@@ -28,8 +28,6 @@ import java.util.*
 
 @Composable
 actual fun AccountBalanceHistoryLineChart(
-    xSizePercent: Int,
-    ySizePercent: Int,
     apiClient: ApiClient,
     familyView: Boolean,
     modifier: Modifier
@@ -38,10 +36,7 @@ actual fun AccountBalanceHistoryLineChart(
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
-    val proportionalModifier = modifier
-        .fillMaxWidth(xSizePercent / 100f)
-        .fillMaxHeight(ySizePercent / 100f)
-        .aspectRatio(1f)
+    val fixedChartHeight = Modifier.height(300.dp)
 
     LaunchedEffect(familyView) {
         isLoading = true
@@ -66,19 +61,27 @@ actual fun AccountBalanceHistoryLineChart(
             }.body<List<AccountOverviewData>>()
 
             val dataMax: Double = history
-                .maxOfOrNull { it.balances["Checking"]?.toDoubleOrNull() ?: 0.0 }
+                .maxOfOrNull { it.balances.values.mapNotNull { it.toDoubleOrNull() }.maxOrNull() ?: 0.0 }
                 ?: 1000.0
 
             chartData = AccountBalanceChartData(accounts, history, dataMax)
         } catch (e: Exception) {
-            error = "Failed to fetch account chart data"
+            error = "Failed to fetch account chart data: ${e.message}"
         } finally {
             isLoading = false
         }
     }
 
     chartData?.let { data ->
-        ChartCanvas(data = data, modifier = proportionalModifier)
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .then(fixedChartHeight)
+                .padding(vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ChartCanvas(data = data, modifier = Modifier.weight(1f))
+        }
     }
 
     if (isLoading) {
@@ -136,14 +139,17 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
     var tooltipData by remember { mutableStateOf<Pair<Date, Map<String, Float>>?>(null) }
     var tooltipOffset by remember { mutableStateOf(Offset.Zero) }
 
-    Box(modifier = modifier.padding(horizontal = 48.dp, vertical = 32.dp)) {
+    Box(modifier = modifier.padding(horizontal = 4.dp).background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium)) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = 16.dp, bottom = 48.dp, start = 48.dp, end = 16.dp)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
                         if (sortedDates.size > 1) {
-                            val stepX = size.width / (sortedDates.size - 1)
+                            val chartWidth = size.width
+                            val stepX = chartWidth / (sortedDates.size - 1)
+
                             val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
                             val selectedDate = sortedDates[index]
 
@@ -173,17 +179,20 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
 
             val stepX = size.width / (sortedDates.size - 1)
             val yScale = size.height / dataMax
+            val labelTextSize = 30f
 
             repeat(5) { i ->
                 val y = i * size.height / 5
                 drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
+
                 drawContext.canvas.nativeCanvas.drawText(
-                    "$${dataMax - i * dataMax / 5}",
-                    0f,
-                    y + 14,
+                    "$${"%.0f".format(dataMax - i * dataMax / 5)}",
+                    -40f,
+                    y + 10,
                     android.graphics.Paint().apply {
                         color = android.graphics.Color.GRAY
-                        textSize = 30f
+                        textSize = labelTextSize
+                        textAlign = android.graphics.Paint.Align.LEFT
                     }
                 )
             }
@@ -199,7 +208,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
                         size.height + 20,
                         android.graphics.Paint().apply {
                             color = android.graphics.Color.DKGRAY
-                            textSize = 30f
+                            textSize = labelTextSize
                             textAlign = android.graphics.Paint.Align.CENTER
                         }
                     )
@@ -228,7 +237,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp).align(Alignment.BottomCenter),
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 4.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             accounts.forEachIndexed { index, account ->
@@ -237,7 +246,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Box(Modifier.size(12.dp).background(color))
+                    Box(Modifier.size(12.dp).background(color, MaterialTheme.shapes.small))
                     Spacer(Modifier.width(4.dp))
                     Text(account.name, style = MaterialTheme.typography.labelMedium)
                 }
@@ -259,7 +268,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
                     values.forEach { (name, amount) ->
                         val color = colors[accounts.indexOfFirst { it.name == name }.coerceAtLeast(0) % colors.size]
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(10.dp).background(color))
+                            Box(Modifier.size(10.dp).background(color, MaterialTheme.shapes.small))
                             Spacer(Modifier.width(6.dp))
                             Text("$name: $${"%.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
                         }
