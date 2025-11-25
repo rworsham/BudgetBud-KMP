@@ -19,8 +19,6 @@ import io.ktor.http.*
 actual fun ExpenseCategoriesPieChart(
     startDate: String,
     endDate: String,
-    xSizePercent: Int,
-    ySizePercent: Int,
     familyView: Boolean,
     modifier: Modifier,
     apiClient: ApiClient

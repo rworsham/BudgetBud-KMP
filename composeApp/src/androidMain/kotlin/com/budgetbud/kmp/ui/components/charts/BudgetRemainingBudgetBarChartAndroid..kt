@@ -21,8 +21,6 @@ import androidx.compose.ui.geometry.Size
 actual fun BudgetRemainingBudgetBarChart(
     startDate: String,
     endDate: String,
-    xSizePercent: Int,
-    ySizePercent: Int,
     familyView: Boolean,
     modifier: Modifier,
     apiClient: ApiClient

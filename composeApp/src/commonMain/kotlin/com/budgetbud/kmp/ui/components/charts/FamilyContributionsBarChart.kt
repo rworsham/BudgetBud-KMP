@@ -8,8 +8,6 @@ import com.budgetbud.kmp.auth.ApiClient
 expect fun FamilyContributionsBarChart(
     startDate: String,
     endDate: String,
-    xSizePercent: Int,
-    ySizePercent: Int,
     familyView: Boolean,
     apiClient: ApiClient,
     modifier: Modifier = Modifier

@@ -21,8 +21,6 @@ import kotlin.math.ceil
 actual fun ExpenseCategoriesBarChart(
     startDate: String,
     endDate: String,
-    xSizePercent: Int,
-    ySizePercent: Int,
     familyView: Boolean,
     modifier: Modifier,
     apiClient: ApiClient

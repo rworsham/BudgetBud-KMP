@@ -26,8 +26,6 @@ import java.util.*
 
 @Composable
 actual fun CategoryExpenseLineChart(
-    xSizePercent: Int,
-    ySizePercent: Int,
     apiClient: ApiClient,
     familyView: Boolean,
     modifier: Modifier

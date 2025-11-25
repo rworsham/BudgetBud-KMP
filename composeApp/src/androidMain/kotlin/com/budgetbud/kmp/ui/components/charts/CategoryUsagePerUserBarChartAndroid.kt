@@ -25,8 +25,6 @@ import kotlin.math.ceil
 actual fun CategoryUsagePerUserBarChart(
     startDate: String,
     endDate: String,
-    xSizePercent: Int,
-    ySizePercent: Int,
     familyView: Boolean,
     apiClient: ApiClient,
     modifier: Modifier
