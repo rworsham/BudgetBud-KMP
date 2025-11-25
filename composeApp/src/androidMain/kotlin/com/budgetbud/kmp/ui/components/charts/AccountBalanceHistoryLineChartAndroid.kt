@@ -61,7 +61,7 @@ actual fun AccountBalanceHistoryLineChart(
             }.body<List<AccountOverviewData>>()
 
             val dataMax: Double = history
-                .maxOfOrNull { it.balances.values.mapNotNull { it.toDoubleOrNull() }.maxOrNull() ?: 0.0 }
+                .maxOfOrNull { it.balances.values.mapNotNull { it?.toDoubleOrNull() }.maxOrNull() ?: 0.0 }
                 ?: 1000.0
 
             chartData = AccountBalanceChartData(accounts, history, dataMax)
