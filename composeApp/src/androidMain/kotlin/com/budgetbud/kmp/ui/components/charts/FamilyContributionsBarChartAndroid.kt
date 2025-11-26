@@ -63,9 +63,7 @@ actual fun FamilyContributionsBarChart(
     }
 
     Box(
-        modifier = modifier
-            .fillMaxWidth(xSizePercent / 100f)
-            .heightIn(min = (ySizePercent * 10).dp)
+
     ) {
         when {
             isLoading -> CircularProgressIndicator()
