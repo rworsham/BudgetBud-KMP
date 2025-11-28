@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -33,7 +34,10 @@ actual fun TransactionPieChart(
         Color(0xFFCCE5CC)
     )
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Canvas(
             modifier = Modifier
                 .size(250.dp)
@@ -55,17 +59,22 @@ actual fun TransactionPieChart(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .wrapContentWidth()
+        ) {
             parsedData.forEachIndexed { index, (item, amount) ->
                 val percent = (amount / totalAmount) * 100
                 Row(
                     modifier = Modifier.padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
                             .size(16.dp)
-                            .background(colors[index % colors.size])
+                            .background(colors[index % colors.size], shape = MaterialTheme.shapes.small)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
