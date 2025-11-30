@@ -24,6 +24,7 @@ import io.ktor.client.request.*
 import io.ktor.http.HttpHeaders
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.ceil
 
 
 @Composable
@@ -104,7 +105,10 @@ actual fun AccountBalanceHistoryLineChart(
 fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
     val accounts = data.accounts
     val history = data.history
-    val dataMax = data.dataMax
+
+    val maxDataValue = data.dataMax
+    val calculatedRoundedMax = ceil(maxDataValue / 1000.0) * 1000.0
+    val roundedMax = if (calculatedRoundedMax == 0.0) 1000.0 else calculatedRoundedMax
 
     val inputDateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     val displayDateFormat = remember { SimpleDateFormat("MMM dd", Locale.getDefault()) }
@@ -139,11 +143,11 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
     var tooltipData by remember { mutableStateOf<Pair<Date, Map<String, Float>>?>(null) }
     var tooltipOffset by remember { mutableStateOf(Offset.Zero) }
 
-    Box(modifier = modifier.padding(horizontal = 4.dp).background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium)) {
+    Box(modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium)) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp, bottom = 48.dp, start = 48.dp, end = 16.dp)
+                .padding(top = 16.dp, bottom = 72.dp, start = 80.dp, end = 32.dp)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
                         if (sortedDates.size > 1) {
@@ -178,16 +182,21 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
             }
 
             val stepX = size.width / (sortedDates.size - 1)
-            val yScale = size.height / dataMax
+            val yScale = size.height / roundedMax
             val labelTextSize = 30f
 
-            repeat(5) { i ->
-                val y = i * size.height / 5
+            val numDivisions = 5
+            val numGridLines = numDivisions + 1
+
+            repeat(numGridLines) { i ->
+                val y = i * size.height / numDivisions
                 drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
 
+                val labelValue = roundedMax - (i * roundedMax / numDivisions)
+
                 drawContext.canvas.nativeCanvas.drawText(
-                    "$${"%.0f".format(dataMax - i * dataMax / 5)}",
-                    -40f,
+                    "$${"%.0f".format(labelValue)}",
+                    -90f,
                     y + 10,
                     android.graphics.Paint().apply {
                         color = android.graphics.Color.GRAY
@@ -198,21 +207,23 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
             }
 
             sortedDates.forEachIndexed { i, date ->
-                val x = i * stepX
-                drawContext.canvas.nativeCanvas.apply {
-                    save()
-                    rotate(-45f, x, size.height + 20)
-                    drawText(
-                        displayDateFormat.format(date),
-                        x,
-                        size.height + 20,
-                        android.graphics.Paint().apply {
-                            color = android.graphics.Color.DKGRAY
-                            textSize = labelTextSize
-                            textAlign = android.graphics.Paint.Align.CENTER
-                        }
-                    )
-                    restore()
+                if (i % 2 == 0) {
+                    val x = i * stepX
+                    drawContext.canvas.nativeCanvas.apply {
+                        save()
+                        rotate(-45f, x, size.height + 65)
+                        drawText(
+                            displayDateFormat.format(date),
+                            x,
+                            size.height + 65,
+                            android.graphics.Paint().apply {
+                                color = android.graphics.Color.DKGRAY
+                                textSize = labelTextSize
+                                textAlign = android.graphics.Paint.Align.CENTER
+                            }
+                        )
+                        restore()
+                    }
                 }
             }
 
