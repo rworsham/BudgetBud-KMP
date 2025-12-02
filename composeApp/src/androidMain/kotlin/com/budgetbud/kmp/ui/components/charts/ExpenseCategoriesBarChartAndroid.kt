@@ -1,5 +1,8 @@
 package com.budgetbud.kmp.ui.components.charts
 
+import android.annotation.SuppressLint
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.ExpenseCategoryBarChartData
@@ -29,7 +34,6 @@ actual fun ExpenseCategoriesBarChart(
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(startDate, endDate, familyView) {
         isLoading = true
@@ -69,6 +73,7 @@ actual fun ExpenseCategoriesBarChart(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun DrawExpenseChart(data: List<ExpenseCategoryBarChartData>, modifier: Modifier) {
     val maxAmount = data.maxOfOrNull { it.total_amount } ?: 1f
@@ -79,11 +84,47 @@ private fun DrawExpenseChart(data: List<ExpenseCategoryBarChartData>, modifier: 
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
-                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = 48.dp, start = 64.dp, end = 16.dp)
         ) {
             val barWidth = size.width / data.size * 0.6f
             val spaceBetween = size.width / data.size
-            val heightScale = size.height / roundedMax
+            val heightScale = if (roundedMax == 0f) 0f else size.height / roundedMax
+
+            val yAxisTextPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 24f
+                textAlign = Paint.Align.RIGHT
+                typeface = Typeface.DEFAULT_BOLD
+            }
+
+            val numberOfGridLines = 5
+            for (i in 0..numberOfGridLines) {
+                val y = i * size.height / numberOfGridLines
+
+                if (i < numberOfGridLines) {
+                    drawLine(
+                        color = Color.Gray.copy(alpha = 0.3f),
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = 1f
+                    )
+                }
+
+                val labelValue = roundedMax * (numberOfGridLines - i) / numberOfGridLines.toFloat()
+
+                drawContext.canvas.nativeCanvas.drawText(
+                    "$${String.format("%.0f", labelValue)}",
+                    -10f,
+                    y + yAxisTextPaint.textSize / 3,
+                    yAxisTextPaint
+                )
+            }
+
+            val xAxisPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 24f
+                textAlign = Paint.Align.CENTER
+            }
 
             data.forEachIndexed { index, item ->
                 val barHeight = item.total_amount * heightScale
@@ -94,21 +135,12 @@ private fun DrawExpenseChart(data: List<ExpenseCategoryBarChartData>, modifier: 
                     topLeft = Offset(xOffset, size.height - barHeight),
                     size = Size(barWidth, barHeight)
                 )
-            }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            data.forEach {
-                Text(
-                    text = it.category,
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
+                drawContext.canvas.nativeCanvas.drawText(
+                    item.category,
+                    xOffset + (barWidth / 2),
+                    size.height + 24f,
+                    xAxisPaint
                 )
             }
         }
