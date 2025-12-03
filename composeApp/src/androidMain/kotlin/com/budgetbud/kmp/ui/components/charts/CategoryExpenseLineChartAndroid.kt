@@ -23,6 +23,7 @@ import io.ktor.client.request.*
 import io.ktor.http.HttpHeaders
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.ceil
 
 @Composable
 actual fun CategoryExpenseLineChart(
@@ -34,6 +35,8 @@ actual fun CategoryExpenseLineChart(
     var error by remember { mutableStateOf<String?>(null) }
     var categoryData by remember { mutableStateOf<List<CategoryOverviewData>>(emptyList()) }
     var historyData by remember { mutableStateOf<List<CategoryHistoryLineChartData>>(emptyList()) }
+
+    val fixedChartHeight = Modifier.height(300.dp)
 
     LaunchedEffect(familyView) {
         isLoading = true
@@ -86,7 +89,7 @@ actual fun CategoryExpenseLineChart(
             CategoryExpenseChartCanvas(
                 categoryData = categoryData,
                 historyData = historyData,
-                modifier = modifier
+                modifier = modifier.then(fixedChartHeight)
             )
         }
 
@@ -133,87 +136,115 @@ private fun CategoryExpenseChartCanvas(
     }
 
     val allYValues = dataSeries.values.flatten().map { it.second }
-    val minY = allYValues.minOrNull() ?: 0f
-    val maxY = allYValues.maxOrNull() ?: 1f
-    val yRange = if ((maxY - minY) == 0f) 1f else maxY - minY
+    val maxDataValue = allYValues.maxOrNull()?.toDouble() ?: 1000.0
+    val calculatedRoundedMax = ceil(maxDataValue / 1000.0) * 1000.0
+
+    val roundedMax = if (calculatedRoundedMax == 0.0) 1000.0f else calculatedRoundedMax.toFloat()
 
     val colors = listOf(
-        Color(0xFF1DB954),
-        Color(0xFF6200EE),
-        Color(0xFFFF5722),
-        Color(0xFF03A9F4),
-        Color(0xFFFFC107),
-        Color(0xFF795548),
-        Color(0xFF009688)
+        Color(0xFF1DB954), Color(0xFF6200EE), Color(0xFFFF5722),
+        Color(0xFF03A9F4), Color(0xFFFFC107), Color(0xFF795548), Color(0xFF009688)
     )
 
     var tooltipData by remember { mutableStateOf<Pair<Date, Map<String, Float>>?>(null) }
     var tooltipOffset by remember { mutableStateOf(Offset.Zero) }
 
-    Box(modifier = modifier.padding(horizontal = 48.dp, vertical = 32.dp)) {
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium)
+    ) {
         Canvas(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
+                .fillMaxSize()
+                .padding(top = 16.dp, bottom = 72.dp, start = 80.dp, end = 32.dp)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
-                        val stepX = size.width / (sortedDates.size - 1)
-                        val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
-                        val selectedDate = sortedDates[index]
+                        if (sortedDates.size > 1) {
+                            val stepX = size.width / (sortedDates.size - 1)
+                            val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
+                            val selectedDate = sortedDates[index]
 
-                        val valuesAtDate = categoryNames.associateWithNotNull { category ->
-                            dataSeries[category]?.find { it.first == selectedDate }?.second
+                            val valuesAtDate = categoryNames.associateWithNotNull { category ->
+                                dataSeries[category]?.find { it.first == selectedDate }?.second
+                            }
+
+                            tooltipData = selectedDate to valuesAtDate
+                            tooltipOffset = offset
                         }
-
-                        tooltipData = selectedDate to valuesAtDate
-                        tooltipOffset = offset
                     }
                 }
         ) {
-            val stepX = size.width / (sortedDates.size - 1)
-            val yScale = size.height / yRange
-
-            repeat(5) { i ->
-                val y = i * size.height / 5
-                drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
+            if (sortedDates.size < 2) {
                 drawContext.canvas.nativeCanvas.drawText(
-                    "$${"%.2f".format(maxY - i * yRange / 5)}",
-                    0f,
-                    y + 14,
+                    "Insufficient data to display chart",
+                    center.x,
+                    center.y,
                     android.graphics.Paint().apply {
                         color = android.graphics.Color.GRAY
-                        textSize = 30f
+                        textSize = 40f
+                        textAlign = android.graphics.Paint.Align.CENTER
+                    }
+                )
+                return@Canvas
+            }
+
+            val stepX = size.width / (sortedDates.size - 1)
+            val yScale = size.height / roundedMax
+            val labelTextSize = 30f
+            val numDivisions = 5
+            val numGridLines = numDivisions + 1
+
+            repeat(numGridLines) { i ->
+                val y = i * size.height / numDivisions
+                drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
+
+                if (i < numGridLines - 1) {
+                    drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
+                }
+
+                val labelValue = roundedMax - (i * roundedMax / numDivisions)
+
+                drawContext.canvas.nativeCanvas.drawText(
+                    "$${"%.0f".format(labelValue)}",
+                    -90f,
+                    y + 10,
+                    android.graphics.Paint().apply {
+                        color = android.graphics.Color.GRAY
+                        textSize = labelTextSize
+                        textAlign = android.graphics.Paint.Align.LEFT
                     }
                 )
             }
 
             sortedDates.forEachIndexed { i, date ->
-                val x = i * stepX
-                drawContext.canvas.nativeCanvas.apply {
-                    save()
-                    rotate(-45f, x, size.height + 20)
-                    drawText(
-                        displayDateFormat.format(date),
-                        x,
-                        size.height + 20,
-                        android.graphics.Paint().apply {
-                            color = android.graphics.Color.DKGRAY
-                            textSize = 30f
-                            textAlign = android.graphics.Paint.Align.CENTER
-                        }
-                    )
-                    restore()
+                if (i % 2 == 0) {
+                    val x = i * stepX
+                    drawContext.canvas.nativeCanvas.apply {
+                        save()
+                        rotate(-45f, x, size.height + 65)
+                        drawText(
+                            displayDateFormat.format(date),
+                            x,
+                            size.height + 65,
+                            android.graphics.Paint().apply {
+                                color = android.graphics.Color.DKGRAY
+                                textSize = labelTextSize
+                                textAlign = android.graphics.Paint.Align.CENTER
+                            }
+                        )
+                        restore()
+                    }
                 }
             }
 
-            dataSeries.entries.forEachIndexed { index, (category, points) ->
+            dataSeries.entries.forEachIndexed { index, (_, points) ->
                 val color = colors[index % colors.size]
                 if (points.size < 2) return@forEachIndexed
 
                 val path = Path()
                 val offsets = points.map { (date, value) ->
                     val x = sortedDates.indexOf(date) * stepX
-                    val y = size.height - ((value - minY) * yScale)
+                    val y = size.height - (value * yScale)
                     Offset(x, y)
                 }
 
@@ -221,12 +252,12 @@ private fun CategoryExpenseChartCanvas(
                 offsets.drop(1).forEach { path.lineTo(it.x, it.y) }
 
                 drawPath(path, color = color, style = Stroke(width = 4f))
-                offsets.forEach { drawCircle(color = color, radius = 6f, center = it) }
+                offsets.forEach { drawCircle(color = color, radius = 8f, center = it) }
             }
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 4.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             categoryNames.forEachIndexed { index, name ->
@@ -235,7 +266,7 @@ private fun CategoryExpenseChartCanvas(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Box(modifier = Modifier.size(12.dp).background(color))
+                    Box(Modifier.size(12.dp).background(color, MaterialTheme.shapes.small))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(name, style = MaterialTheme.typography.labelMedium)
                 }
@@ -257,7 +288,7 @@ private fun CategoryExpenseChartCanvas(
                     values.forEach { (category, amount) ->
                         val color = colors[categoryNames.indexOf(category) % colors.size]
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(10.dp).background(color))
+                            Box(modifier = Modifier.size(10.dp).background(color, MaterialTheme.shapes.small))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("$category: $${"%.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
                         }
