@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -47,14 +48,8 @@ actual fun FamilyContributionsBarChart(
                 }
             }
 
-            val rawData = response.body<List<Map<String, Any>>>()
+            data = response.body<List<FamilyTransactionOverviewData>>()
 
-            data = rawData.map {
-                FamilyTransactionOverviewData(
-                    name = it["name"]?.toString() ?: "Unknown",
-                    transaction_count = (it["transaction_count"] as? Number)?.toFloat() ?: 0f
-                )
-            }
         } catch (e: Exception) {
             error = "Failed to fetch account data"
         } finally {
@@ -63,97 +58,94 @@ actual fun FamilyContributionsBarChart(
     }
 
     Box(
-
+        modifier = modifier.fillMaxSize()
     ) {
         when {
-            isLoading -> CircularProgressIndicator()
-            error != null -> Text(error ?: "Error", color = Color.Red)
-            data.isEmpty() -> Text("No data available")
-            else -> FamilyContributionChart(data)
+            isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+            error != null -> Text(error ?: "Error", color = Color.Red, modifier = Modifier.padding(16.dp))
+            data.isEmpty() -> Text("No data available", modifier = Modifier.padding(16.dp))
+            else -> FamilyContributionChart(data, modifier = Modifier.fillMaxSize())
         }
     }
 }
 
 @Composable
-private fun FamilyContributionChart(data: List<FamilyTransactionOverviewData>) {
+private fun FamilyContributionChart(data: List<FamilyTransactionOverviewData>, modifier: Modifier) {
     val maxCount = data.maxOfOrNull { it.transaction_count } ?: 1f
     val roundedMax = ceil(maxCount / 10f) * 10f
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
-                .padding(horizontal = 4.dp)
+                .padding(top = 16.dp, bottom = 48.dp, start = 64.dp, end = 16.dp)
         ) {
-            val barWidth = size.width / data.size * 0.6f
-            val spaceBetween = size.width / data.size
-            val heightScale = size.height / roundedMax
-            val labelXOffset = 4.dp.toPx()
+            val chartAreaWidth = size.width
+            val chartAreaHeight = size.height
+
+            val barWidthRatio = 0.6f
+            val spacePerItem = chartAreaWidth / data.size
+            val barWidth = spacePerItem * barWidthRatio
+
+            val heightScale = chartAreaHeight / roundedMax
+
+            val yAxisLabelXOffset = -70f
 
             val yAxisTextPaint = Paint().apply {
                 color = Color.Gray.toArgb()
-                textSize = 20f
+                textSize = 24f
                 textAlign = Paint.Align.LEFT
                 typeface = Typeface.DEFAULT_BOLD
             }
 
             val xAxisPaint = Paint().apply {
                 color = Color.Gray.toArgb()
-                textSize = 20f
+                textSize = 24f
                 textAlign = Paint.Align.CENTER
             }
 
             val numberOfGridLines = 5
-            for (i in 1 until numberOfGridLines) {
-                val y = size.height - (i * size.height / numberOfGridLines)
+            for (i in 0..numberOfGridLines) {
+                val y = chartAreaHeight - (i * chartAreaHeight / numberOfGridLines)
 
-                drawLine(
-                    color = Color.Gray.copy(alpha = 0.3f),
-                    start = Offset(0f, y),
-                    end = Offset(size.width, y),
-                    strokeWidth = 1f
-                )
+                if (i > 0) {
+                    drawLine(
+                        color = Color.Gray.copy(alpha = 0.3f),
+                        start = Offset(0f, y),
+                        end = Offset(chartAreaWidth, y),
+                        strokeWidth = 1f
+                    )
+                }
 
                 val value = roundedMax * (i / numberOfGridLines.toFloat())
 
                 drawContext.canvas.nativeCanvas.drawText(
                     String.format("%,.0f", value),
-                    labelXOffset,
-                    y - yAxisTextPaint.descent(),
+                    yAxisLabelXOffset,
+                    y + yAxisTextPaint.descent() - 2f,
                     yAxisTextPaint
-                )
-            }
-
-            for (i in 1 until data.size) {
-                val x = (i * spaceBetween)
-                drawLine(
-                    color = Color.Gray.copy(alpha = 0.3f),
-                    start = Offset(x, 0f),
-                    end = Offset(x, size.height),
-                    strokeWidth = 1f
                 )
             }
 
             data.forEachIndexed { index, item ->
                 val barHeight = item.transaction_count * heightScale
-                val xOffset = index * spaceBetween + (spaceBetween - barWidth) / 2
+                val xStart = index * spacePerItem + (spacePerItem - barWidth) / 2
+                val xCenter = xStart + (barWidth / 2)
 
                 drawRect(
                     color = Color(0xFF1DB954),
-                    topLeft = Offset(xOffset, size.height - barHeight),
+                    topLeft = Offset(xStart, chartAreaHeight - barHeight),
                     size = Size(barWidth, barHeight)
                 )
 
                 drawContext.canvas.nativeCanvas.drawText(
                     item.name,
-                    xOffset + (barWidth / 2),
-                    size.height + 24f,
+                    xCenter,
+                    chartAreaHeight + 24f,
                     xAxisPaint
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
     }
 }
