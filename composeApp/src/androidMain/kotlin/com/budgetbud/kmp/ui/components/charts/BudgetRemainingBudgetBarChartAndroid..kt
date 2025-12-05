@@ -1,21 +1,27 @@
 package com.budgetbud.kmp.ui.components.charts
 
+import android.annotation.SuppressLint
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
+import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlin.math.ceil
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 
 @Composable
 actual fun BudgetRemainingBudgetBarChart(
@@ -28,8 +34,6 @@ actual fun BudgetRemainingBudgetBarChart(
     var chartItems by remember { mutableStateOf<List<BudgetRemainingBudgetBarChartData>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(startDate, endDate, familyView) {
         isLoading = true
@@ -55,7 +59,7 @@ actual fun BudgetRemainingBudgetBarChart(
                 )
             }
         } catch (e: Exception) {
-            error = "Error fetching chart data"
+            error = "Error fetching chart data: ${e.message}"
         } finally {
             isLoading = false
         }
@@ -63,13 +67,13 @@ actual fun BudgetRemainingBudgetBarChart(
 
     when {
         isLoading -> {
-            CircularProgressIndicator()
+            CircularProgressIndicator(modifier = modifier)
         }
         error != null -> {
-            Text(text = error!!, color = Color.Red)
+            Text(text = error!!, color = Color.Red, modifier = modifier)
         }
         chartItems.isEmpty() -> {
-            Text("No data available")
+            Text("No data available", modifier = modifier)
         }
         else -> {
             DrawChart(chartItems, modifier)
@@ -77,52 +81,91 @@ actual fun BudgetRemainingBudgetBarChart(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun DrawChart(data: List<BudgetRemainingBudgetBarChartData>, modifier: Modifier) {
     val maxBudget = data.flatMap { listOf(it.starting_budget, it.remaining_budget) }.maxOrNull() ?: 1.0
     val roundedMax = ceil(maxBudget / 1000.0) * 1000.0
 
     Column(modifier = modifier.fillMaxWidth()) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .padding(horizontal = 16.dp)
+        Canvas(modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp)
+            .padding(top = 16.dp, bottom = 48.dp, start = 64.dp, end = 16.dp)
         ) {
-            val barGroupWidth = size.width / data.size
-            val heightScale = size.height / roundedMax
+            val chartAreaWidth = size.width
+            val chartAreaHeight = size.height
+            val barGroupWidth = chartAreaWidth / data.size
+            val heightScale = chartAreaHeight / roundedMax.toFloat()
+            val singleBarWidth = barGroupWidth / 3.0f
+
+            val yAxisLabelXOffset = -70f
+
+            val yAxisTextPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 24f
+                textAlign = Paint.Align.LEFT
+                typeface = Typeface.DEFAULT_BOLD
+            }
+
+            val xAxisPaint = Paint().apply {
+                color = Color.Gray.toArgb()
+                textSize = 24f
+                textAlign = Paint.Align.CENTER
+            }
+
+
+            val numberOfGridLines = 5
+            for (i in 0..numberOfGridLines) {
+                val y = chartAreaHeight - (i * chartAreaHeight / numberOfGridLines)
+
+                if (i > 0) {
+                    drawLine(
+                        color = Color.Gray.copy(alpha = 0.3f),
+                        start = Offset(0f, y),
+                        end = Offset(chartAreaWidth, y),
+                        strokeWidth = 1f
+                    )
+                }
+
+                val value = roundedMax * (i / numberOfGridLines.toFloat())
+
+                drawContext.canvas.nativeCanvas.drawText(
+                    String.format("%,.0f", value),
+                    yAxisLabelXOffset,
+                    y + yAxisTextPaint.descent() - 2f,
+                    yAxisTextPaint
+                )
+            }
 
             data.forEachIndexed { index, item ->
                 val startHeight = (item.starting_budget * heightScale).toFloat()
-                val remainHeight = (item.remaining_budget * heightScale).toFloat()
+                val remainingHeight = (item.remaining_budget * heightScale).toFloat()
+
                 val barX = index * barGroupWidth
-                val barWidth = barGroupWidth / 2.5f
+
+                val totalBarPairWidth = 2 * singleBarWidth
+                val centeringSpace = (barGroupWidth - totalBarPairWidth) / 2
+
+                val startX = barX + centeringSpace
 
                 drawRect(
                     color = Color(0xFF8884d8),
-                    topLeft = Offset(barX + barWidth * 0.25f, size.height - startHeight),
-                    size = Size(barWidth, startHeight)
+                    topLeft = Offset(startX, chartAreaHeight - startHeight),
+                    size = Size(singleBarWidth, startHeight)
                 )
+
                 drawRect(
                     color = Color(0xFF82ca9d),
-                    topLeft = Offset(barX + barWidth * 1.25f, size.height - remainHeight),
-                    size = Size(barWidth, remainHeight)
+                    topLeft = Offset(startX + singleBarWidth, chartAreaHeight - remainingHeight),
+                    size = Size(singleBarWidth, remainingHeight)
                 )
-            }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            data.forEach {
-                Text(
-                    text = it.name,
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
+                drawContext.canvas.nativeCanvas.drawText(
+                    item.name,
+                    (barX + barGroupWidth / 2),
+                    chartAreaHeight + 24f,
+                    xAxisPaint
                 )
             }
         }
