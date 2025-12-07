@@ -1,5 +1,6 @@
 package com.budgetbud.kmp.ui.components.charts
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
@@ -33,13 +34,24 @@ actual fun CategoryUsagePerUserBarChart(
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(familyView) {
+    LaunchedEffect(startDate, endDate, familyView) {
         isLoading = true
+        error = null
         try {
             val tokens = apiClient.getTokens()
-            val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/family/overview/") {
-                parameter("Category", true)
+
+            val datePayload = mapOf(
+                "start_date" to startDate,
+                "end_date" to endDate
+            )
+
+            val response: HttpResponse = apiClient.client.post("https://api.budgetingbud.com/api/family/overview/") {
                 contentType(ContentType.Application.Json)
+                setBody(datePayload)
+                url {
+                    parameters.append("Category", "true")
+                    parameters.append("familyView", familyView.toString())
+                }
                 headers {
                     tokens?.let {
                         append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
@@ -47,33 +59,26 @@ actual fun CategoryUsagePerUserBarChart(
                 }
             }
 
-            val rawData = response.body<List<Map<String, Any>>>()
+            data = response.body<List<FamilyCategoryOverviewData>>()
 
-            data = rawData.map {
-                FamilyCategoryOverviewData(
-                    name = it["name"]?.toString() ?: "Unknown",
-                    category = it["category"]?.toString() ?: "",
-                    category_count = (it["category_count"] as? Number)?.toFloat() ?: 0f
-                )
-            }
         } catch (e: Exception) {
-            error = "Failed to fetch account data"
+            error = "Failed to fetch chart data: ${e.message}"
         } finally {
             isLoading = false
         }
     }
 
-    Box(
-    ) {
+    Box(modifier = modifier.fillMaxWidth()) {
         when {
-            isLoading -> CircularProgressIndicator()
-            error != null -> Text(error ?: "Error", color = Color.Red)
-            data.isEmpty() -> Text("No data available")
+            isLoading -> CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+            error != null -> Text(error ?: "Error", color = Color.Red, modifier = Modifier.padding(16.dp))
+            data.isEmpty() && !isLoading -> Text("No data available for this period.", modifier = Modifier.padding(16.dp))
             else -> FamilyBarChart(data)
         }
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun FamilyBarChart(data: List<FamilyCategoryOverviewData>) {
     val maxCount = data.maxOfOrNull { it.category_count } ?: 1f
@@ -84,54 +89,47 @@ private fun FamilyBarChart(data: List<FamilyCategoryOverviewData>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
-                .padding(horizontal = 4.dp)
+                .padding(top = 16.dp, bottom = 48.dp, start = 64.dp, end = 16.dp)
         ) {
-            val barWidth = size.width / data.size * 0.6f
-            val spaceBetween = size.width / data.size
-            val heightScale = size.height / roundedMax
-            val labelXOffset = 4.dp.toPx()
+            val chartAreaWidth = size.width
+            val chartAreaHeight = size.height
+            val barWidth = (chartAreaWidth / data.size * 0.6f)
+            val spaceBetween = (chartAreaWidth / data.size)
+            val heightScale = chartAreaHeight / roundedMax
 
             val yAxisTextPaint = Paint().apply {
                 color = Color.Gray.toArgb()
-                textSize = 20f
-                textAlign = Paint.Align.LEFT
+                textSize = 24f
+                textAlign = Paint.Align.RIGHT
                 typeface = Typeface.DEFAULT_BOLD
             }
 
             val xAxisPaint = Paint().apply {
                 color = Color.Gray.toArgb()
-                textSize = 20f
+                textSize = 24f
                 textAlign = Paint.Align.CENTER
             }
 
             val numberOfGridLines = 5
-            for (i in 1 until numberOfGridLines) {
-                val y = size.height - (i * size.height / numberOfGridLines)
+            for (i in 0..numberOfGridLines) {
+                val y = chartAreaHeight - (i * chartAreaHeight / numberOfGridLines)
 
-                drawLine(
-                    color = Color.Gray.copy(alpha = 0.3f),
-                    start = Offset(0f, y),
-                    end = Offset(size.width, y),
-                    strokeWidth = 1f
-                )
+                if (i > 0) {
+                    drawLine(
+                        color = Color.Gray.copy(alpha = 0.3f),
+                        start = Offset(0f, y),
+                        end = Offset(chartAreaWidth, y),
+                        strokeWidth = 1f
+                    )
+                }
 
                 val value = roundedMax * (i / numberOfGridLines.toFloat())
 
                 drawContext.canvas.nativeCanvas.drawText(
                     String.format("%,.0f", value),
-                    labelXOffset,
-                    y - yAxisTextPaint.descent(),
+                    -8.dp.toPx(),
+                    y + yAxisTextPaint.descent() - 2f,
                     yAxisTextPaint
-                )
-            }
-
-            for (i in 1 until data.size) {
-                val x = (i * spaceBetween)
-                drawLine(
-                    color = Color.Gray.copy(alpha = 0.3f),
-                    start = Offset(x, 0f),
-                    end = Offset(x, size.height),
-                    strokeWidth = 1f
                 )
             }
 
@@ -141,19 +139,17 @@ private fun FamilyBarChart(data: List<FamilyCategoryOverviewData>) {
 
                 drawRect(
                     color = Color(0xFF1DB954),
-                    topLeft = Offset(xOffset, size.height - barHeight),
+                    topLeft = Offset(xOffset, chartAreaHeight - barHeight),
                     size = Size(barWidth, barHeight)
                 )
 
                 drawContext.canvas.nativeCanvas.drawText(
                     item.name,
                     xOffset + (barWidth / 2),
-                    size.height + 24f,
+                    chartAreaHeight + 20f,
                     xAxisPaint
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
     }
 }
