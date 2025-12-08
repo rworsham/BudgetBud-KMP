@@ -28,14 +28,15 @@ actual fun FamilyContributionsBarChart(
     endDate: String,
     familyView: Boolean,
     apiClient: ApiClient,
-    modifier: Modifier
+    modifier: Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit,
 ) {
     var data by remember { mutableStateOf<List<FamilyTransactionOverviewData>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(familyView) {
-        isLoading = true
+        onLoadingStatusChange(true)
+        error = null
         try {
             val tokens = apiClient.getTokens()
             val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/family/overview/") {
@@ -51,9 +52,9 @@ actual fun FamilyContributionsBarChart(
             data = response.body<List<FamilyTransactionOverviewData>>()
 
         } catch (e: Exception) {
-            error = "Failed to fetch account data"
+            error = "Failed to fetch contribution data: ${e.message}"
         } finally {
-            isLoading = false
+            onLoadingStatusChange(false)
         }
     }
 
@@ -61,7 +62,6 @@ actual fun FamilyContributionsBarChart(
         modifier = modifier.fillMaxSize()
     ) {
         when {
-            isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             error != null -> Text(error ?: "Error", color = Color.Red, modifier = Modifier.padding(16.dp))
             data.isEmpty() -> Text("No data available", modifier = Modifier.padding(16.dp))
             else -> FamilyContributionChart(data, modifier = Modifier.fillMaxSize())

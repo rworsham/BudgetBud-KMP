@@ -3,9 +3,6 @@ package com.budgetbud.kmp.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddBox
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,8 +31,18 @@ fun ReportDashboard(
     val coroutineScope = rememberCoroutineScope()
 
     var userReports by remember { mutableStateOf<List<ReportDashboardData>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoadingReports by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    var chartLoadingStates by remember { mutableStateOf(mapOf<String, Boolean>()) }
+
+    val allChartsLoading = chartLoadingStates.any { it.value }
+    val isOverallLoading = isLoadingReports || allChartsLoading
+
+    fun updateChartLoadingStatus(chartName: String, isLoading: Boolean) {
+        chartLoadingStates = chartLoadingStates + (chartName to isLoading)
+    }
+
 
     var openDialog by remember { mutableStateOf(false) }
     var modalType by remember { mutableStateOf("") }
@@ -43,8 +50,10 @@ fun ReportDashboard(
 
     fun fetchReports(isRetry: Boolean = false) {
         coroutineScope.launch {
-            isLoading = true
+            isLoadingReports = true
             try {
+                chartLoadingStates = emptyMap()
+
                 val queryParams = listOf("familyView" to familyView.toString())
                 val tokens = apiClient.getTokens()
 
@@ -64,7 +73,7 @@ fun ReportDashboard(
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Failed to fetch user reports"
             } finally {
-                isLoading = false
+                isLoadingReports = false
             }
         }
     }
@@ -163,58 +172,71 @@ fun ReportDashboard(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 userReports.forEach { report ->
-                    when (report.display_name) {
+                    val chartName = report.display_name
+                    val onLoadingStatusChange: (Boolean) -> Unit = { isLoading ->
+                        updateChartLoadingStatus(chartName, isLoading)
+                    }
+
+                    when (chartName) {
                         "Expense Categories Pie Chart" -> ExpenseCategoriesPieChart(
                             startDate = startDate,
                             endDate = endDate,
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                         "Budget Vs Remaining Budget" -> BudgetRemainingBudgetBarChart(
                             startDate = startDate,
                             endDate = endDate,
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                         "Expense Categories Bar Chart" -> ExpenseCategoriesBarChart(
                             startDate = startDate,
                             endDate = endDate,
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                         "Account Balance History Line Chart" -> AccountBalanceHistoryLineChart(
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                         "Income vs. Expense Bar Chart" -> IncomeExpenseBarChart(
                             startDate = startDate,
                             endDate = endDate,
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                         "Category Expense Line Chart" -> CategoryExpenseLineChart(
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                         "Family Contributions Bar Chart" -> FamilyContributionsBarChart(
                             startDate = startDate,
                             endDate = endDate,
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                         "Family Category Usage Bar Chart" -> CategoryUsagePerUserBarChart(
                             startDate = startDate,
                             endDate = endDate,
                             familyView = familyView,
                             modifier = Modifier,
-                            apiClient = apiClient
+                            apiClient = apiClient,
+                            onLoadingStatusChange = onLoadingStatusChange
                         )
                     }
                 }
@@ -246,7 +268,7 @@ fun ReportDashboard(
             SuccessDialog(onDismiss = { showSuccessDialog = false })
         }
 
-        if (isLoading) {
+        if (isOverallLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

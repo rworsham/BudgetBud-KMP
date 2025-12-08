@@ -28,14 +28,14 @@ actual fun CategoryUsagePerUserBarChart(
     endDate: String,
     familyView: Boolean,
     apiClient: ApiClient,
-    modifier: Modifier
+    modifier: Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 ) {
     var data by remember { mutableStateOf<List<FamilyCategoryOverviewData>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(startDate, endDate, familyView) {
-        isLoading = true
+        onLoadingStatusChange(true)
         error = null
         try {
             val tokens = apiClient.getTokens()
@@ -64,15 +64,14 @@ actual fun CategoryUsagePerUserBarChart(
         } catch (e: Exception) {
             error = "Failed to fetch chart data: ${e.message}"
         } finally {
-            isLoading = false
+            onLoadingStatusChange(false)
         }
     }
 
     Box(modifier = modifier.fillMaxWidth()) {
         when {
-            isLoading -> CircularProgressIndicator(modifier = Modifier.padding(16.dp))
             error != null -> Text(error ?: "Error", color = Color.Red, modifier = Modifier.padding(16.dp))
-            data.isEmpty() && !isLoading -> Text("No data available for this period.", modifier = Modifier.padding(16.dp))
+            data.isEmpty() -> Text("No data available for this period.", modifier = Modifier.padding(16.dp))
             else -> FamilyBarChart(data)
         }
     }

@@ -10,5 +10,6 @@ expect fun FamilyContributionsBarChart(
     endDate: String,
     familyView: Boolean,
     apiClient: ApiClient,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 )

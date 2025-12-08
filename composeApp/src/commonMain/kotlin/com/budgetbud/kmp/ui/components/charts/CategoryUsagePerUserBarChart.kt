@@ -10,5 +10,6 @@ expect fun CategoryUsagePerUserBarChart(
     endDate: String,
     familyView: Boolean,
     apiClient: ApiClient,
-    modifier: Modifier
+    modifier: Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit,
 )
