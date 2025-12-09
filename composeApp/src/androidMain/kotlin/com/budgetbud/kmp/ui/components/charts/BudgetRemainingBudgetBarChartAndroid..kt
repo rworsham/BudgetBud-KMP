@@ -29,14 +29,14 @@ actual fun BudgetRemainingBudgetBarChart(
     endDate: String,
     familyView: Boolean,
     modifier: Modifier,
-    apiClient: ApiClient
+    apiClient: ApiClient,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 ) {
     var chartItems by remember { mutableStateOf<List<BudgetRemainingBudgetBarChartData>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(startDate, endDate, familyView) {
-        isLoading = true
+        onLoadingStatusChange(true)
         try {
             val tokens = apiClient.getTokens()
             val response: HttpResponse = apiClient.client.post("https://api.budgetingbud.com/api/budget-transaction-overview/") {
@@ -61,19 +61,13 @@ actual fun BudgetRemainingBudgetBarChart(
         } catch (e: Exception) {
             error = "Error fetching chart data: ${e.message}"
         } finally {
-            isLoading = false
+            onLoadingStatusChange(false)
         }
     }
 
     when {
-        isLoading -> {
-            CircularProgressIndicator(modifier = modifier)
-        }
         error != null -> {
             Text(text = error!!, color = Color.Red, modifier = modifier)
-        }
-        chartItems.isEmpty() -> {
-            Text("No data available", modifier = modifier)
         }
         else -> {
             DrawChart(chartItems, modifier)

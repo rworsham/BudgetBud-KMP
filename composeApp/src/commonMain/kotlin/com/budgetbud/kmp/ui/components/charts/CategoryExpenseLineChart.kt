@@ -8,5 +8,6 @@ import com.budgetbud.kmp.auth.ApiClient
 expect fun CategoryExpenseLineChart(
     apiClient: ApiClient,
     familyView: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 )

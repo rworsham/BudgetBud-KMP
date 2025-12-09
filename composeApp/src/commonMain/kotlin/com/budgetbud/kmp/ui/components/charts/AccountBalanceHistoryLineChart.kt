@@ -10,4 +10,5 @@ expect fun AccountBalanceHistoryLineChart(
     apiClient: ApiClient,
     familyView: Boolean,
     modifier: Modifier = Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 )

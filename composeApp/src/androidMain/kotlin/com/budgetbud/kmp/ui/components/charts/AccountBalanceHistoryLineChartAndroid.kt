@@ -31,16 +31,15 @@ import kotlin.math.ceil
 actual fun AccountBalanceHistoryLineChart(
     apiClient: ApiClient,
     familyView: Boolean,
-    modifier: Modifier
+    modifier: Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 ) {
     var chartData by remember { mutableStateOf<AccountBalanceChartData?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-
     val fixedChartHeight = Modifier.height(300.dp)
 
     LaunchedEffect(familyView) {
-        isLoading = true
+        onLoadingStatusChange(true)
         try {
             val tokens = apiClient.getTokens()
             val accounts = apiClient.client.get("https://api.budgetingbud.com/api/accounts/") {
@@ -69,7 +68,7 @@ actual fun AccountBalanceHistoryLineChart(
         } catch (e: Exception) {
             error = "Failed to fetch account chart data: ${e.message}"
         } finally {
-            isLoading = false
+            onLoadingStatusChange(false)
         }
     }
 
@@ -82,12 +81,6 @@ actual fun AccountBalanceHistoryLineChart(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ChartCanvas(data = data, modifier = Modifier.weight(1f))
-        }
-    }
-
-    if (isLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     }
 

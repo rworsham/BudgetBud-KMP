@@ -10,5 +10,6 @@ expect fun ExpenseCategoriesPieChart(
     endDate: String,
     familyView: Boolean,
     modifier: Modifier = Modifier,
-    apiClient: ApiClient
+    apiClient: ApiClient,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 )

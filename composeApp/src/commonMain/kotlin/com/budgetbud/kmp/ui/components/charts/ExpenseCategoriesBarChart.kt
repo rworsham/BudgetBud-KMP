@@ -10,5 +10,6 @@ expect fun ExpenseCategoriesBarChart(
     endDate: String,
     familyView: Boolean,
     modifier: Modifier,
-    apiClient: ApiClient
+    apiClient: ApiClient,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 )

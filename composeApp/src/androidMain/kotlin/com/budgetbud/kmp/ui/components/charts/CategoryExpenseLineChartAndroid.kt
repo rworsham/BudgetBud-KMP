@@ -29,9 +29,9 @@ import kotlin.math.ceil
 actual fun CategoryExpenseLineChart(
     apiClient: ApiClient,
     familyView: Boolean,
-    modifier: Modifier
+    modifier: Modifier,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 ) {
-    var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var categoryData by remember { mutableStateOf<List<CategoryOverviewData>>(emptyList()) }
     var historyData by remember { mutableStateOf<List<CategoryHistoryLineChartData>>(emptyList()) }
@@ -39,7 +39,7 @@ actual fun CategoryExpenseLineChart(
     val fixedChartHeight = Modifier.height(300.dp)
 
     LaunchedEffect(familyView) {
-        isLoading = true
+        onLoadingStatusChange(true)
         try {
             val tokens = apiClient.getTokens()
             val categories = apiClient.client.get("https://api.budgetingbud.com/api/category/data/") {
@@ -65,17 +65,11 @@ actual fun CategoryExpenseLineChart(
         } catch (e: Exception) {
             error = "Failed to fetch category chart data"
         } finally {
-            isLoading = false
+            onLoadingStatusChange(false)
         }
     }
 
     when {
-        isLoading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            }
-        }
-
         error != null -> {
             Text(
                 text = error ?: "Unknown error",
@@ -90,14 +84,6 @@ actual fun CategoryExpenseLineChart(
                 categoryData = categoryData,
                 historyData = historyData,
                 modifier = modifier.then(fixedChartHeight)
-            )
-        }
-
-        else -> {
-            Text(
-                "No chart data available",
-                modifier = modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

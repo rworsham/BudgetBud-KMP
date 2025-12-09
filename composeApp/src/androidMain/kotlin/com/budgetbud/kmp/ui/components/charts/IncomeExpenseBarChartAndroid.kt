@@ -31,14 +31,14 @@ actual fun IncomeExpenseBarChart(
     endDate: String,
     familyView: Boolean,
     modifier: Modifier,
-    apiClient: ApiClient
+    apiClient: ApiClient,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit,
 ) {
     var incomeExpenseData by remember { mutableStateOf<List<IncomeExpenseBarChartData>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(startDate, endDate, familyView) {
-        isLoading = true
+        onLoadingStatusChange(true)
         try {
             val tokens = apiClient.getTokens()
             val response: HttpResponse = apiClient.client.post("https://api.budgetingbud.com/api/budget-transaction-overview/") {
@@ -71,15 +71,13 @@ actual fun IncomeExpenseBarChart(
             error = "Failed to fetch data: ${e.message}"
             Log.e("IncExpBarChart", "Data fetch error", e)
         } finally {
-            isLoading = false
+            onLoadingStatusChange(false)
         }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
-            isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             error != null -> Text(error ?: "Error", color = Color.Red, modifier = Modifier.padding(16.dp))
-            incomeExpenseData.isEmpty() -> Text("No data available", modifier = Modifier.padding(16.dp))
             else -> DrawIncomeExpenseChart(incomeExpenseData, Modifier.fillMaxSize())
         }
     }

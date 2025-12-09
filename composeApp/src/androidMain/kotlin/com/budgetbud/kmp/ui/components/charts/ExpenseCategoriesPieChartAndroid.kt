@@ -22,16 +22,14 @@ actual fun ExpenseCategoriesPieChart(
     endDate: String,
     familyView: Boolean,
     modifier: Modifier,
-    apiClient: ApiClient
+    apiClient: ApiClient,
+    onLoadingStatusChange: (isLoading: Boolean) -> Unit
 ) {
     var chartData by remember { mutableStateOf<List< ExpenseCategoriesPieChartData>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(startDate, endDate, familyView) {
-        isLoading = true
+        onLoadingStatusChange(true)
         error = null
 
         try {
@@ -59,14 +57,12 @@ actual fun ExpenseCategoriesPieChart(
         } catch (e: Exception) {
             error = "Failed to fetch data"
         } finally {
-            isLoading = false
+            onLoadingStatusChange(false)
         }
     }
 
     when {
-        isLoading -> CircularProgressIndicator()
         error != null -> Text(error ?: "", color = Color.Red)
-        chartData.isEmpty() -> Text("No data available")
         else -> DrawTransactionPieChart(chartData, modifier)
     }
 }
