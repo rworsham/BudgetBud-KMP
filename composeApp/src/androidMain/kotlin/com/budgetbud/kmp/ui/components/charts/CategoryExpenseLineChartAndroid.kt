@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.CategoryHistoryLineChartData
@@ -80,6 +81,14 @@ actual fun CategoryExpenseLineChart(
         }
 
         categoryData.isNotEmpty() && historyData.isNotEmpty() -> {
+
+            Text(
+                text = "Category Expense Line Chart",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             CategoryExpenseChartCanvas(
                 categoryData = categoryData,
                 historyData = historyData,

@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.ExpenseCategoryBarChartData
@@ -77,6 +78,14 @@ private fun DrawExpenseChart(data: List<ExpenseCategoryBarChartData>, modifier: 
     val roundedMax = ceil(maxAmount / 1000f) * 1000f
 
     Column(modifier = modifier.fillMaxWidth()) {
+
+        Text(
+            text = "Expense Categories Bar Chart",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()

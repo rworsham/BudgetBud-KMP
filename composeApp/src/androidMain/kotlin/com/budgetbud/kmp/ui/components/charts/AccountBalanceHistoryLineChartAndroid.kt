@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.text.font.FontWeight
 import com.budgetbud.kmp.models.AccountBalanceChartData
 import com.budgetbud.kmp.models.AccountData
 import com.budgetbud.kmp.models.AccountOverviewData
@@ -80,6 +81,14 @@ actual fun AccountBalanceHistoryLineChart(
                 .padding(vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Text(
+                text = "Account Balance History Line Chart",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             ChartCanvas(data = data, modifier = Modifier.weight(1f))
         }
     }

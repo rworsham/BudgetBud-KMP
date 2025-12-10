@@ -24,6 +24,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlin.math.ceil
 import android.util.Log
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 actual fun IncomeExpenseBarChart(
@@ -90,6 +91,14 @@ private fun DrawIncomeExpenseChart(data: List<IncomeExpenseBarChartData>, modifi
     val roundedMax = ceil(maxValue / 1000.0) * 1000.0
 
     Column(modifier = modifier.fillMaxWidth()) {
+
+        Text(
+            text = "Income Vs Expense Bar Chart",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()

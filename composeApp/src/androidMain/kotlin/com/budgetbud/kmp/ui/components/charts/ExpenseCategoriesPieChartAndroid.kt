@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.ExpenseCategoriesPieChartData
 import io.ktor.client.call.*
@@ -91,6 +92,14 @@ private fun DrawTransactionPieChart(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Text(
+            text = "Expense Category Pie Chart",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         Canvas(
             modifier = Modifier
                 .size(250.dp)

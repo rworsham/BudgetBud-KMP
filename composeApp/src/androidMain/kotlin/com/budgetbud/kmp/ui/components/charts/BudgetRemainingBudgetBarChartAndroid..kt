@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,6 +15,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
@@ -82,6 +84,14 @@ private fun DrawChart(data: List<BudgetRemainingBudgetBarChartData>, modifier: M
     val roundedMax = ceil(maxBudget / 1000.0) * 1000.0
 
     Column(modifier = modifier.fillMaxWidth()) {
+
+        Text(
+            text = "Budget Vs Remaining Budget",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         Canvas(modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)

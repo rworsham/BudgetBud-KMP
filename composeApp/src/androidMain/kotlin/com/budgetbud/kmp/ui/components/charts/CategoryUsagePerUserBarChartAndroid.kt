@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyCategoryOverviewData
@@ -84,6 +85,14 @@ private fun FamilyBarChart(data: List<FamilyCategoryOverviewData>) {
     val roundedMax = ceil(maxCount / 10f) * 10f
 
     Column(modifier = Modifier.fillMaxWidth()) {
+
+        Text(
+            text = "Family Category Usage Bar Chart",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
