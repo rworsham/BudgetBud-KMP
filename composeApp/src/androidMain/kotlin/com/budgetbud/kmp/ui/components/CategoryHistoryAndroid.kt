@@ -1,16 +1,18 @@
 package com.budgetbud.kmp.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.budgetbud.kmp.auth.ApiClient
-import com.budgetbud.kmp.models.TransactionHistoryTableData
+import com.budgetbud.kmp.models.CategoryHistoryData
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.utils.DateUtils
 import io.ktor.client.request.*
@@ -30,7 +32,7 @@ actual fun CategoryHistory(
 
     var startDate by remember { mutableStateOf(DateUtils.firstDayOfCurrentMonth()) }
     var endDate by remember { mutableStateOf(DateUtils.lastDayOfCurrentMonth()) }
-    var transactions by remember { mutableStateOf<List<TransactionHistoryTableData>>(emptyList()) }
+    var transactions by remember { mutableStateOf<List<CategoryHistoryData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -47,7 +49,7 @@ actual fun CategoryHistory(
                         mapOf(
                             "start_date" to startDate.toString(),
                             "end_date" to endDate.toString(),
-                            "category_id" to categoryId
+                            "category_id" to categoryId.toString()
                         )
                     )
                     headers {
@@ -58,7 +60,7 @@ actual fun CategoryHistory(
                 }
 
                 val responseBody = response.bodyAsText()
-                transactions = Json.decodeFromString<List<TransactionHistoryTableData>>(responseBody)
+                transactions = Json.decodeFromString<List<CategoryHistoryData>>(responseBody)
 
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Failed to fetch transactions"
@@ -100,46 +102,73 @@ actual fun CategoryHistory(
                 ChartDataError()
             }
             else -> {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(horizontal = 8.dp, vertical = 12.dp)
-                ) {
-                    Text("ID", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Date", modifier = Modifier.weight(2f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Amount", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Type", modifier = Modifier.weight(2f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Description", modifier = Modifier.weight(3f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Category", modifier = Modifier.weight(2f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Budget", modifier = Modifier.weight(2f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Account", modifier = Modifier.weight(2f), style = MaterialTheme.typography.bodyMedium)
-                    Text("Recurring", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                }
-
                 Divider()
 
-                LazyColumn {
-                    items(transactions) { tx ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 12.dp)
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(transactions, key = { it.id }) { tx ->
+
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                            shadowElevation = 2.dp,
+                            color = MaterialTheme.colorScheme.surface
                         ) {
-                            Text(tx.id.toString(), modifier = Modifier.weight(1f))
-                            Text(tx.date, modifier = Modifier.weight(2f))
-                            Text("$${tx.amount}", modifier = Modifier.weight(1f))
-                            Text(tx.transaction_type, modifier = Modifier.weight(2f))
-                            Text(tx.description, modifier = Modifier.weight(3f))
-                            Text(tx.category, modifier = Modifier.weight(2f))
-                            Text(tx.budget, modifier = Modifier.weight(2f))
-                            Text(tx.account, modifier = Modifier.weight(2f))
-                            Text(
-                                if (tx.is_recurring) "Yes" else "No",
-                                modifier = Modifier.weight(1f)
-                            )
+                            Column(modifier = Modifier.padding(14.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = tx.date,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 14.sp
+                                        )
+                                    )
+
+                                    Text(
+                                        text = if (tx.transaction_type == "income")
+                                            "+$${tx.amount}"
+                                        else
+                                            "-$${tx.amount}",
+                                        color = if (tx.transaction_type == "income")
+                                            Color(0xFF1DB954)
+                                        else
+                                            MaterialTheme.colorScheme.error,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 15.sp
+                                        )
+                                    )
+                                }
+
+                                Spacer(Modifier.height(6.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(Modifier.weight(1f)) {
+                                        Text("Category", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                        Text(tx.category, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                                    }
+                                    Column(Modifier.weight(1f)) {
+                                        Text("Budget", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                        Text(tx.budget, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                                    }
+                                }
+
+                                Spacer(Modifier.height(4.dp))
+
+                                Text(
+                                    text = tx.description.ifEmpty { "(No description)" },
+                                    fontSize = 13.sp,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
                         }
-                        HorizontalDivider()
                     }
                 }
             }
