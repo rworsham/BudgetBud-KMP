@@ -74,7 +74,7 @@ actual fun CategoryHistory(
         fetchTransactions()
     }
 
-    Column(modifier = modifier.padding(16.dp).fillMaxSize()) {
+    Column(modifier = modifier.padding(2.dp).fillMaxSize()) {
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,

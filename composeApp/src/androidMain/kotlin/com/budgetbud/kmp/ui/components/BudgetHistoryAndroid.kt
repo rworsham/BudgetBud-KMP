@@ -45,7 +45,7 @@ actual fun BudgetHistory(
         fetchTransactions()
     }
 
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = modifier.fillMaxSize().padding(2.dp)) {
         DateRangeFilterForm(
             startDate = startDate,
             endDate = endDate,

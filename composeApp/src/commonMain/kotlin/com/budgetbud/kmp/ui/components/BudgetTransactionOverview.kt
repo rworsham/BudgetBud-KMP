@@ -221,6 +221,23 @@ fun BudgetTransactionOverview(
             }
         }
 
+        Spacer(modifier = Modifier.height(4.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
+
+        if (existingBudgets.isNotEmpty()) {
+            BudgetCardList(
+                budgets = existingBudgets,
+                onViewHistory = { id -> handleOpen("viewHistory", id) }
+            )
+        } else {
+            Text("No Budget data found.")
+        }
+
         if (openDialog) {
             when (modalType) {
                 "addBudget" -> {
