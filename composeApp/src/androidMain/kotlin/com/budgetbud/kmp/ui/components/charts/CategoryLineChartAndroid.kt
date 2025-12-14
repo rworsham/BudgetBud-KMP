@@ -3,6 +3,7 @@ package com.budgetbud.kmp.ui.components.charts
 import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.foundation.background
@@ -23,7 +24,6 @@ import com.budgetbud.kmp.models.CategoryHistoryLineChartData
 import com.budgetbud.kmp.models.CategoryOverviewData
 import java.text.SimpleDateFormat
 import java.util.*
-import java.text.NumberFormat
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -42,45 +42,32 @@ actual fun CategoryLineChart(
 
     val chronologicalEntries = remember(historyData) {
         historyData.mapNotNull { entry ->
-            val date = try { inputDateFormat.parse(entry.name) } catch (e: Exception) { null }
-            val balancesMap = entry.balances.mapValues { (_, valueStr) ->
-                parseBalanceToFloat(valueStr)
+            val date = try { inputDateFormat.parse(entry.name) } catch (e: Exception) {
+                Log.e("ChartDebug", "Error parsing date: ${entry.name}", e)
+                null
             }
-            date?.let { it to balancesMap }
+            date?.let { it to entry.balances }
         }
     }
 
     val chronologicalDates = chronologicalEntries.map { it.first }
 
-    val filledDataSeries = remember(chronologicalEntries, chronologicalDates, categoryNames) {
+    val dataSeries = remember(chronologicalEntries, categoryNames) {
         categoryNames.associateWith { categoryName ->
-            val series = mutableListOf<Pair<Date, Float>>()
-            var lastValue: Float? = null
-
-            for ((date, dayData) in chronologicalEntries) {
+            chronologicalEntries.mapNotNull { (date, dayData) ->
                 val currentValue = dayData[categoryName]
-
-                if (currentValue != null) {
-                    lastValue = currentValue
-                }
-
-                if (lastValue != null) {
-                    series.add(date to lastValue)
-                }
+                currentValue?.let { date to it }
             }
-            series
         }
     }
 
-    val allYValues = filledDataSeries.values.flatten().map { it.second }
-    val minY = allYValues.minOrNull() ?: 0f
+    val allYValues = dataSeries.values.flatten().map { it.second }
     val actualMaxY = allYValues.maxOrNull() ?: 1f
 
+    val chartFloorY = 0f
     val chartCeilingY = (actualMaxY * 1.5f).coerceAtLeast(1f)
 
-    val yRange = chartCeilingY - minY
-    val effectiveYRange = if (yRange == 0f) 1f else yRange
-
+    val effectiveYRange = chartCeilingY - chartFloorY
 
     val colors = listOf(
         Color(0xFF1DB954),
@@ -106,13 +93,16 @@ actual fun CategoryLineChart(
                     val selectedDate = chronologicalDates[nearestXIndex]
 
                     val values = categoryNames.associateWithNotNull { cat ->
-                        filledDataSeries[cat]?.find { it.first == selectedDate }?.second
+                        dataSeries[cat]?.find { it.first == selectedDate }?.second
                     }
 
-                    tooltipData = selectedDate to values
-
-                    val xPos = nearestXIndex * stepX.toFloat()
-                    tooltipOffsetPx = Offset(xPos, offset.y)
+                    if (values.isNotEmpty()) {
+                        tooltipData = selectedDate to values
+                        val xPos = nearestXIndex * stepX.toFloat()
+                        tooltipOffsetPx = Offset(xPos, offset.y)
+                    } else {
+                        tooltipData = null
+                    }
                 }
             }
         ) {
@@ -181,16 +171,17 @@ actual fun CategoryLineChart(
                 }
             }
 
-            filledDataSeries.entries.forEachIndexed { index, (_, points) ->
+            dataSeries.entries.forEachIndexed { index, (_, points) ->
                 val color = colors[index % colors.size]
-                if (points.size < 2) return@forEachIndexed
+                if (points.isEmpty()) return@forEachIndexed
 
                 val path = Path()
+
                 val offsets = points.mapNotNull { (date, value) ->
                     val xIndex = chronologicalDates.indexOf(date)
                     if (xIndex >= 0) {
                         val x = xIndex * stepX
-                        val y = size.height - ((value - minY) * yScale)
+                        val y = size.height - (value * yScale)
                         Offset(x, y)
                     } else {
                         null
@@ -252,20 +243,6 @@ actual fun CategoryLineChart(
                 }
             }
         }
-    }
-}
-
-private fun parseBalanceToFloat(value: Any?): Float? {
-    return when (value) {
-        is String -> {
-            try {
-                NumberFormat.getInstance(Locale.US).parse(value)?.toFloat()
-            } catch (e: Exception) {
-                value.toFloatOrNull()
-            }
-        }
-        is Float -> value
-        else -> null
     }
 }
 

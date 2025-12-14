@@ -1,30 +1,56 @@
 package com.budgetbud.kmp.models
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.floatOrNull
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.*
 
-@Serializable
+@Serializable(with = CategoryHistoryParser::class)
 data class CategoryHistoryLineChartData(
     val name: String,
-    val balances: Map<String, Float?> = emptyMap()
+    val balances: Map<String, Float?>
 )
 
-object CategoryHistoryParser {
-    fun parse(jsonString: String): List<CategoryHistoryLineChartData> {
-        val jsonArray = Json.parseToJsonElement(jsonString).jsonArray
-        return jsonArray.map { jsonElement ->
-            val jsonObject = jsonElement.jsonObject
-            val name = jsonObject["name"]?.jsonPrimitive?.content ?: ""
+object CategoryHistoryParser : KSerializer<CategoryHistoryLineChartData> {
 
-            val balances = jsonObject.filterKeys { it != "name" }
-                .mapValues {
-                    it.value.jsonPrimitive.floatOrNull
-                }
-            CategoryHistoryLineChartData(name = name, balances = balances)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("CategoryHistoryLineChartData", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: CategoryHistoryLineChartData) {
+        val jsonOutput = encoder as JsonEncoder
+        val jsonObject = buildJsonObject {
+            put("name", value.name)
+
+            value.balances.forEach { (categoryName, balance) ->
+                put(categoryName, balance?.let { JsonPrimitive(it) } ?: JsonNull)
+            }
         }
+        jsonOutput.encodeJsonElement(jsonObject)
+    }
+
+    override fun deserialize(decoder: Decoder): CategoryHistoryLineChartData {
+        val jsonElement = decoder.decodeSerializableValue(JsonElement.serializer())
+        val jsonObject = jsonElement.jsonObject
+
+        val name = jsonObject["name"]?.jsonPrimitive?.content ?: throw IllegalStateException("Missing 'name' field in category history data.")
+
+        val balances = mutableMapOf<String, Float?>()
+
+        jsonObject.entries.forEach { (key, value) ->
+            if (key != "name") {
+                val balance: Float? = when (value) {
+                    is JsonNull -> null
+                    is JsonPrimitive -> value.contentOrNull?.toFloatOrNull()
+                    else -> null
+                }
+                balances[key] = balance
+            }
+        }
+
+        return CategoryHistoryLineChartData(name, balances)
     }
 }
