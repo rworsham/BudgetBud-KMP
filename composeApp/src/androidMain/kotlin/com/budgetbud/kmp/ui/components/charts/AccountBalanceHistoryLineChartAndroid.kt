@@ -52,17 +52,27 @@ actual fun AccountBalanceHistoryLineChart(
                 }
             }.body<List<AccountData>>()
 
-            val history = apiClient.client.get("https://api.budgetingbud.com/api/accounts/overview-report/") {
+            val rawHistoryMaps = apiClient.client.get("https://api.budgetingbud.com/api/accounts/overview-report/") {
                 parameter("familyView", familyView)
                 headers {
                     tokens?.let {
                         append(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
                     }
                 }
-            }.body<List<AccountOverviewData>>()
+            }.body<List<Map<String, String?>>>()
+
+            val history = rawHistoryMaps.map { map ->
+                val name = map["name"] ?: throw IllegalStateException("History entry missing 'name' field")
+                val balances = map.filterKeys { it != "name" }
+                AccountOverviewData(name = name, balances = balances)
+            }
 
             val dataMax: Double = history
-                .maxOfOrNull { it.balances.values.mapNotNull { it?.toDoubleOrNull() }.maxOrNull() ?: 0.0 }
+                .maxOfOrNull {
+                    it.balances.values.mapNotNull { balanceStr ->
+                        balanceStr?.toDoubleOrNull()
+                    }.maxOrNull() ?: 0.0
+                }
                 ?: 1000.0
 
             chartData = AccountBalanceChartData(accounts, history, dataMax)
@@ -130,12 +140,12 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
             val balancesByDate = sortedDates.map { date ->
                 val dateStr = inputDateFormat.format(date)
                 val entry = history.find { it.name == dateStr }
-                val value = entry?.balances?.get(account.name)?.toFloatOrNull() ?: 0f
-                value
+                entry?.balances?.get(account.name)?.toFloatOrNull()
             }
             account.name to balancesByDate
         }
     }
+
 
     val colors = listOf(
         Color(0xFF1DB954), Color(0xFF6200EE), Color(0xFFFF5722),
@@ -231,21 +241,38 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
 
             dataSeries.entries.forEachIndexed { index, (_, balances) ->
                 val color = colors[index % colors.size]
-                if (balances.size < 2) return@forEachIndexed
 
-                val path = Path()
-                val points = balances.mapIndexed { i, value ->
+                val mappedPoints = balances.mapIndexed { i, value ->
+                    val yValue = value ?: 0f
                     Offset(
                         x = (i * stepX),
-                        y = (size.height - (value * yScale)).toFloat()
-                    )
+                        y = (size.height - (yValue * yScale)).toFloat()
+                    ) to value
                 }
 
-                path.moveTo(points.first().x, points.first().y)
-                points.drop(1).forEach { path.lineTo(it.x, it.y) }
+                var path = Path()
+                var segmentStarted = false
 
-                drawPath(path, color, style = Stroke(width = 4f))
-                points.forEach { drawCircle(color, radius = 8f, center = it) }
+                mappedPoints.forEach { (offset, value) ->
+                    if (value != null) {
+                        if (!segmentStarted) {
+                            path.moveTo(offset.x, offset.y)
+                            segmentStarted = true
+                        } else {
+                            path.lineTo(offset.x, offset.y)
+                        }
+                        drawCircle(color, radius = 8f, center = offset)
+
+                    } else if (segmentStarted) {
+                        drawPath(path, color, style = Stroke(width = 4f))
+                        path = Path()
+                        segmentStarted = false
+                    }
+                }
+
+                if (segmentStarted) {
+                    drawPath(path, color, style = Stroke(width = 4f))
+                }
             }
         }
 
