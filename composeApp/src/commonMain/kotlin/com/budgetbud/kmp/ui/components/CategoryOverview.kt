@@ -169,8 +169,6 @@ fun CategoryOverview(
                 categories = categoryData,
                 onViewHistory = { id -> handleOpen("viewHistory", id) }
             )
-        } else {
-            Text("No category data found.")
         }
 
         HorizontalDivider(

@@ -166,8 +166,6 @@ fun AccountOverview(
                 onViewHistory = { id -> handleOpen("viewHistory", id) },
                 onSetGoal = { id -> handleOpen("setSavingsGoal", id) }
             )
-        } else {
-            Text("No accounts available.")
         }
 
         Spacer(Modifier.height(16.dp))

@@ -234,8 +234,6 @@ fun BudgetTransactionOverview(
                 budgets = existingBudgets,
                 onViewHistory = { id -> handleOpen("viewHistory", id) }
             )
-        } else {
-            Text("No Budget data found.")
         }
 
         if (openDialog) {
