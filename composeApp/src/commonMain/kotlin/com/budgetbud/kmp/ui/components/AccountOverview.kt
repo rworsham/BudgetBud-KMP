@@ -166,6 +166,8 @@ fun AccountOverview(
                 onViewHistory = { id -> handleOpen("viewHistory", id) },
                 onSetGoal = { id -> handleOpen("setSavingsGoal", id) }
             )
+        } else {
+            ChartDataError()
         }
 
         Spacer(Modifier.height(16.dp))

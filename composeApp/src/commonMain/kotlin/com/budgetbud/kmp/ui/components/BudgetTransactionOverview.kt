@@ -234,6 +234,8 @@ fun BudgetTransactionOverview(
                 budgets = existingBudgets,
                 onViewHistory = { id -> handleOpen("viewHistory", id) }
             )
+        } else {
+            ChartDataError()
         }
 
         if (openDialog) {

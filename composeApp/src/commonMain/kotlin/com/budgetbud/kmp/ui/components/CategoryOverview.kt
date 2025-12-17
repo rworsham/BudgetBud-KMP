@@ -169,6 +169,8 @@ fun CategoryOverview(
                 categories = categoryData,
                 onViewHistory = { id -> handleOpen("viewHistory", id) }
             )
+        } else {
+            ChartDataError()
         }
 
         HorizontalDivider(
