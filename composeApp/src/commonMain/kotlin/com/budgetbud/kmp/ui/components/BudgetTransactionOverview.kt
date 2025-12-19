@@ -176,14 +176,6 @@ fun BudgetTransactionOverview(
             thickness = 2.dp
         )
 
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Budgets", style = MaterialTheme.typography.titleMedium)
-        }
-
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -412,7 +404,7 @@ fun BudgetTransactionOverview(
             }
 
             "viewHistory" -> FormDialog(
-                title = "Account History",
+                title = "Budget History",
                 onDismiss = { handleClose() }
             ) {
                 selectedBudgetId?.let {
