@@ -133,8 +133,7 @@ private fun CategoryExpenseChartCanvas(
     val allYValues = dataSeries.values.flatten().map { it.second }
     val maxDataValue = allYValues.maxOrNull()?.toDouble() ?: 1000.0
     val calculatedRoundedMax = ceil(maxDataValue / 1000.0) * 1000.0
-
-    val roundedMax = if (calculatedRoundedMax == 0.0) 1000.0f else calculatedRoundedMax.toFloat()
+    val roundedMax = if (calculatedRoundedMax <= 0.0) 1000.0f else calculatedRoundedMax.toFloat()
 
     val colors = listOf(
         Color(0xFF1DB954), Color(0xFF6200EE), Color(0xFFFF5722),
@@ -154,11 +153,13 @@ private fun CategoryExpenseChartCanvas(
                 .padding(top = 16.dp, bottom = 72.dp, start = 80.dp, end = 32.dp)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
-                        if (sortedDates.size > 1) {
-                            val stepX = size.width / (sortedDates.size - 1)
-                            val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
-                            val selectedDate = sortedDates[index]
+                        if (sortedDates.isNotEmpty()) {
+                            val stepX = if (sortedDates.size > 1) size.width / (sortedDates.size - 1) else size.width
+                            val index = if (sortedDates.size > 1) {
+                                (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
+                            } else 0
 
+                            val selectedDate = sortedDates[index]
                             val valuesAtDate = categoryNames.associateWithNotNull { category ->
                                 dataSeries[category]?.find { it.first == selectedDate }?.second
                             }
@@ -169,33 +170,16 @@ private fun CategoryExpenseChartCanvas(
                     }
                 }
         ) {
-            if (sortedDates.size < 2) {
-                drawContext.canvas.nativeCanvas.drawText(
-                    "Insufficient data to display chart",
-                    center.x,
-                    center.y,
-                    android.graphics.Paint().apply {
-                        color = android.graphics.Color.GRAY
-                        textSize = 40f
-                        textAlign = android.graphics.Paint.Align.CENTER
-                    }
-                )
-                return@Canvas
-            }
+            if (sortedDates.isEmpty()) return@Canvas
 
-            val stepX = size.width / (sortedDates.size - 1)
+            val stepX = if (sortedDates.size > 1) size.width / (sortedDates.size - 1) else size.width / 2
             val yScale = size.height / roundedMax
             val labelTextSize = 30f
             val numDivisions = 5
-            val numGridLines = numDivisions + 1
 
-            repeat(numGridLines) { i ->
+            repeat(numDivisions + 1) { i ->
                 val y = i * size.height / numDivisions
                 drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
-
-                if (i < numGridLines - 1) {
-                    drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
-                }
 
                 val labelValue = roundedMax - (i * roundedMax / numDivisions)
 
@@ -213,7 +197,7 @@ private fun CategoryExpenseChartCanvas(
 
             sortedDates.forEachIndexed { i, date ->
                 if (i % 2 == 0) {
-                    val x = i * stepX
+                    val x = if (sortedDates.size > 1) i * stepX else size.width / 2
                     drawContext.canvas.nativeCanvas.apply {
                         save()
                         rotate(-45f, x, size.height + 65)
@@ -234,20 +218,24 @@ private fun CategoryExpenseChartCanvas(
 
             dataSeries.entries.forEachIndexed { index, (_, points) ->
                 val color = colors[index % colors.size]
-                if (points.size < 2) return@forEachIndexed
+                if (points.isEmpty()) return@forEachIndexed
 
-                val path = Path()
                 val offsets = points.map { (date, value) ->
-                    val x = sortedDates.indexOf(date) * stepX
+                    val x = if (sortedDates.size > 1) sortedDates.indexOf(date) * stepX else size.width / 2
                     val y = size.height - (value * yScale)
                     Offset(x, y)
                 }
 
-                path.moveTo(offsets.first().x, offsets.first().y)
-                offsets.drop(1).forEach { path.lineTo(it.x, it.y) }
+                if (offsets.size >= 2) {
+                    val path = Path()
+                    path.moveTo(offsets.first().x, offsets.first().y)
+                    offsets.drop(1).forEach { path.lineTo(it.x, it.y) }
+                    drawPath(path, color = color, style = Stroke(width = 4f))
+                }
 
-                drawPath(path, color = color, style = Stroke(width = 4f))
-                offsets.forEach { drawCircle(color = color, radius = 8f, center = it) }
+                offsets.forEach { center ->
+                    drawCircle(color = color, radius = 8f, center = center)
+                }
             }
         }
 
