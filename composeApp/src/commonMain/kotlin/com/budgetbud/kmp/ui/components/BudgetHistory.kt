@@ -1,12 +1,13 @@
 package com.budgetbud.kmp.ui.components
 
 import com.budgetbud.kmp.auth.ApiClient
-import com.budgetbud.kmp.models.TransactionHistoryTableData
+import com.budgetbud.kmp.models.AccountHistoryTableData
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.budgetbud.kmp.models.BudgetHistoryData
 
 suspend fun fetchBudgetHistory(
     apiClient: ApiClient,
@@ -14,16 +15,15 @@ suspend fun fetchBudgetHistory(
     startDate: String,
     endDate: String,
     familyView: Boolean,
-    asPdf: Boolean = false
-): List<TransactionHistoryTableData> {
+): List<AccountHistoryTableData> {
     val queryParams = listOf("familyView" to familyView.toString())
     val tokens = apiClient.getTokens()
-    val payload = buildMap {
-        put("budget_id", budgetId)
-        put("start_date", startDate)
-        put("end_date", endDate)
-        if (asPdf) put("format", "pdf")
-    }
+    val payload = BudgetHistoryData(
+        budget_id = budgetId,
+        start_date = startDate,
+        end_date = endDate
+    )
+
 
     return apiClient.client.post("https://api.budgetingbud.com/api/budget-history/") {
         contentType(ContentType.Application.Json)
