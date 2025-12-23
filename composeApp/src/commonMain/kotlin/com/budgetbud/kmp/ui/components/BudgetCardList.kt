@@ -37,7 +37,6 @@ fun BudgetCardList(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
