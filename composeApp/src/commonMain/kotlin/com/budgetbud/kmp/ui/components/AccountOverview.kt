@@ -151,6 +151,8 @@ fun AccountOverview(
             thickness = 2.dp
         )
 
+        Spacer(Modifier.height(4.dp))
+
         Button(
             onClick = { handleOpen("addAccount") },
             modifier = Modifier.fillMaxWidth()
@@ -158,7 +160,15 @@ fun AccountOverview(
             Text("Add Account")
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(4.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
+
+        Spacer(Modifier.height(4.dp))
 
         if (accountData.isNotEmpty()) {
             AccountCardList(

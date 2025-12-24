@@ -121,7 +121,7 @@ fun ReportDashboard(
             thickness = 2.dp
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(4.dp))
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -160,7 +160,15 @@ fun ReportDashboard(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            thickness = 2.dp
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         if (userReports.isNotEmpty()) {
             val startDate = DateUtils.firstDayOfCurrentMonth().toString()
