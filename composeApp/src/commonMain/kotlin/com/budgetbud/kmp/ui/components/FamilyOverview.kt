@@ -203,13 +203,14 @@ fun FamilyOverview(
                 }
 
                 item {
-                    Spacer(Modifier.height(24.dp))
-
                     HorizontalDivider(
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colorScheme.primary,
                         thickness = 2.dp
                     )
+
+                    Spacer(Modifier.height(24.dp))
+
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
