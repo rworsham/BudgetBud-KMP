@@ -14,7 +14,6 @@ fun CategoryCardList(
     onViewHistory: (Int) -> Unit
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         categories.forEach { category ->
