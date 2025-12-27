@@ -89,7 +89,7 @@ actual fun CategoryHistory(
             modifier = Modifier
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         when {
             isLoading -> {
