@@ -180,7 +180,6 @@ fun AccountOverview(
             ChartDataError()
         }
 
-        Spacer(Modifier.height(16.dp))
 
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
