@@ -192,10 +192,16 @@ fun CategoryOverview(
 
         }
 
-        Button(onClick = {}) {
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Button(
+            onClick = {},
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
             Text("Download as PDF")
-            // TBD
         }
+
+        Spacer(modifier = Modifier.height(35.dp))
     }
 
     if (openDialog) {
