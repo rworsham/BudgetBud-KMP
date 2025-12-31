@@ -16,6 +16,8 @@ import com.budgetbud.kmp.ui.components.charts.CategoryLineChart
 import com.budgetbud.kmp.ui.components.forms.CategoryForm
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.utils.DateUtils
+import com.budgetbud.kmp.ui.components.rememberPdfGenerator
+import com.budgetbud.kmp.ui.components.PdfCanvas
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -115,6 +117,31 @@ fun CategoryOverview(
         }
     }
 
+    val generatePdf = rememberPdfGenerator(
+        fileName = "Category_Overview_${DateUtils.firstDayOfCurrentMonth()}.pdf",
+        onResult = { success, message ->
+            if (success) {
+                showSuccessDialog = true
+            } else {
+                errorMessage = message
+            }
+        },
+        onDraw = { canvas ->
+            canvas.drawText("BudgetBud - Category Overview", 50f, 50f, 24f)
+            canvas.drawText("Period: $startDate to $endDate", 50f, 80f, 14f)
+            canvas.drawText("View Type: ${if (familyView) "Family" else "Individual"}", 50f, 100f, 14f)
+
+            var currentY = 150f
+            canvas.drawText("Category Breakdown:", 50f, currentY, 18f)
+            currentY += 30f
+
+            categoryData.forEach { data ->
+                val line = "${data.name}: $${data.balance}"
+                canvas.drawText(line, 60f, currentY, 12f)
+                currentY += 20f
+            }
+        }
+    )
 
     LaunchedEffect(familyView, startDate, endDate) {
         fetchData()
@@ -195,8 +222,9 @@ fun CategoryOverview(
         Spacer(modifier = Modifier.height(25.dp))
 
         Button(
-            onClick = {},
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            onClick = { generatePdf() },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            enabled = categoryData.isNotEmpty()
         ) {
             Text("Download as PDF")
         }
