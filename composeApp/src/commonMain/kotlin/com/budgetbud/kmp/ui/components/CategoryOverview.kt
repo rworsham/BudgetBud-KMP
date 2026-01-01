@@ -118,7 +118,7 @@ fun CategoryOverview(
     }
 
     val generatePdf = rememberPdfGenerator(
-        fileName = "Category_Overview_${DateUtils.firstDayOfCurrentMonth()}.pdf",
+        fileName = "Category_Overview_${startDate}_${endDate}.pdf",
         onResult = { success, message ->
             if (success) {
                 showSuccessDialog = true

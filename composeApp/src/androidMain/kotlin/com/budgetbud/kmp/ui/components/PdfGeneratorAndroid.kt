@@ -50,10 +50,8 @@ actual fun rememberPdfGenerator(
                             val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
                             val page = document.startPage(pageInfo)
 
-                            // Wrap the native canvas in our common interface
                             val wrapper = AndroidPdfCanvas(page.canvas)
 
-                            // Execute the custom drawing logic passed from commonMain
                             onDraw(wrapper)
 
                             document.finishPage(page)
