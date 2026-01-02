@@ -120,6 +120,32 @@ fun AccountOverview(
         }
     }
 
+    val generatePdf = rememberPdfGenerator(
+        fileName = "Account_Overview_${startDate}_${endDate}.pdf",
+        onResult = { success, message ->
+            if (success) {
+                showSuccessDialog = true
+            } else {
+                errorMessage = message
+            }
+        },
+        onDraw = { canvas ->
+            canvas.drawText("BudgetBud - Account Overview", 50f, 50f, 24f)
+            canvas.drawText("Period: $startDate to $endDate", 50f, 80f, 14f)
+            canvas.drawText("View Type: ${if (familyView) "Family" else "Individual"}", 50f, 100f, 14f)
+
+            var currentY = 150f
+            canvas.drawText("Account Breakdown:", 50f, currentY, 18f)
+            currentY += 30f
+
+            accountData.forEach { data ->
+                val line = "${data.name}: $${data.balance}"
+                canvas.drawText(line, 60f, currentY, 12f)
+                currentY += 20f
+            }
+        }
+    )
+
     LaunchedEffect(startDate, endDate, familyView) {
         fetchData()
     }
@@ -192,11 +218,17 @@ fun AccountOverview(
             AccountBalanceLineChart(chartData = data)
         }
 
-        Button(onClick = {
-            // TBD
-        }) {
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Button(
+            onClick = { generatePdf() },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            enabled = accountData.isNotEmpty()
+        ) {
             Text("Download as PDF")
         }
+
+        Spacer(modifier = Modifier.height(35.dp))
     }
 
     if (openDialog) {

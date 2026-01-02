@@ -16,8 +16,6 @@ import com.budgetbud.kmp.ui.components.charts.CategoryLineChart
 import com.budgetbud.kmp.ui.components.forms.CategoryForm
 import com.budgetbud.kmp.ui.components.forms.DateRangeFilterForm
 import com.budgetbud.kmp.utils.DateUtils
-import com.budgetbud.kmp.ui.components.rememberPdfGenerator
-import com.budgetbud.kmp.ui.components.PdfCanvas
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
