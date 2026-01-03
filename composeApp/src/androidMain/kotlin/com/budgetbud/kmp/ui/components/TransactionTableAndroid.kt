@@ -49,7 +49,7 @@ actual fun TransactionTable(
     var editedTransaction by remember { mutableStateOf<TransactionHistoryTableData?>(null) }
 
     val generatePdf = rememberPdfGenerator(
-        fileName = "Transactions_${currentStartDate}_to_${currentEndDate}.pdf",
+        fileName = "Transactions_${currentStartDate}_${currentEndDate}.pdf",
         onResult = { success, message ->
             if (success) showSuccessDialog = true else errorMessage = message
         },
@@ -64,12 +64,13 @@ actual fun TransactionTable(
 
             var currentY = 150f
             canvas.drawText("Date", 40f, currentY, bodyPaintSize + 2f)
-            canvas.drawText("Category", 140f, currentY, bodyPaintSize + 2f)
-            canvas.drawText("Description", 280f, currentY, bodyPaintSize + 2f)
+            canvas.drawText("Account", 140f, currentY, bodyPaintSize + 2f)
+            canvas.drawText("Category", 210f, currentY, bodyPaintSize + 2f)
+            canvas.drawText("Description", 340f, currentY, bodyPaintSize + 2f)
             canvas.drawText("Amount", 500f, currentY, bodyPaintSize + 2f)
 
             currentY += 5f
-            val lineSeparator = "-".repeat(110)
+            val lineSeparator = "-".repeat(200)
             canvas.drawText(lineSeparator, 40f, currentY, bodyPaintSize)
             currentY += 20f
 
@@ -78,8 +79,9 @@ actual fun TransactionTable(
                     val amountPrefix = if (tx.transaction_type == "income") "+" else "-"
 
                     canvas.drawText(tx.date, 40f, currentY, bodyPaintSize)
-                    canvas.drawText(tx.category, 140f, currentY, bodyPaintSize)
-                    canvas.drawText(tx.description.take(20) + if(tx.description.length > 20) ".." else "", 280f, currentY, bodyPaintSize)
+                    canvas.drawText(tx.account,140f, currentY, bodyPaintSize)
+                    canvas.drawText(tx.category, 210f, currentY, bodyPaintSize)
+                    canvas.drawText(tx.description.take(20) + if(tx.description.length > 20) ".." else "", 340f, currentY, bodyPaintSize)
                     canvas.drawText("$amountPrefix$${tx.amount}", 500f, currentY, bodyPaintSize)
 
                     currentY += 18f
