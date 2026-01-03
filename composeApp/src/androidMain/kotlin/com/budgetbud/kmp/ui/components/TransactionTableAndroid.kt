@@ -48,6 +48,46 @@ actual fun TransactionTable(
     var editingRowId by remember { mutableStateOf<Int?>(null) }
     var editedTransaction by remember { mutableStateOf<TransactionHistoryTableData?>(null) }
 
+    val generatePdf = rememberPdfGenerator(
+        fileName = "Transactions_${currentStartDate}_to_${currentEndDate}.pdf",
+        onResult = { success, message ->
+            if (success) showSuccessDialog = true else errorMessage = message
+        },
+        onDraw = { canvas ->
+            val titlePaintSize = 24f
+            val headerPaintSize = 14f
+            val bodyPaintSize = 10f
+
+            canvas.drawText("BudgetBud Transaction Report", 40f, 50f, titlePaintSize)
+            canvas.drawText("Generated for: ${if (familyView) "Family Account" else "Personal Account"}", 40f, 85f, headerPaintSize)
+            canvas.drawText("Date Range: $currentStartDate - $currentEndDate", 40f, 105f, headerPaintSize)
+
+            var currentY = 150f
+            canvas.drawText("Date", 40f, currentY, bodyPaintSize + 2f)
+            canvas.drawText("Category", 140f, currentY, bodyPaintSize + 2f)
+            canvas.drawText("Description", 280f, currentY, bodyPaintSize + 2f)
+            canvas.drawText("Amount", 500f, currentY, bodyPaintSize + 2f)
+
+            currentY += 5f
+            val lineSeparator = "-".repeat(110)
+            canvas.drawText(lineSeparator, 40f, currentY, bodyPaintSize)
+            currentY += 20f
+
+            transactions.forEach { tx ->
+                if (currentY < 750f) {
+                    val amountPrefix = if (tx.transaction_type == "income") "+" else "-"
+
+                    canvas.drawText(tx.date, 40f, currentY, bodyPaintSize)
+                    canvas.drawText(tx.category, 140f, currentY, bodyPaintSize)
+                    canvas.drawText(tx.description.take(20) + if(tx.description.length > 20) ".." else "", 280f, currentY, bodyPaintSize)
+                    canvas.drawText("$amountPrefix$${tx.amount}", 500f, currentY, bodyPaintSize)
+
+                    currentY += 18f
+                }
+            }
+        }
+    )
+
     fun fetchTransactions() {
         coroutineScope.launch {
             isLoading = true
@@ -95,197 +135,199 @@ actual fun TransactionTable(
         }
     }
 
-    val columnModifier = if (maxHeight != null) {
-        Modifier.heightIn(max = maxHeight)
-    } else {
-        Modifier.fillMaxSize()
-    }
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(bottom = 80.dp)
+        ) {
+            if (startDate == null && endDate == null) {
+                DateRangeFilterForm(
+                    startDate = currentStartDate,
+                    endDate = currentEndDate,
+                    onStartDateChange = { newStartDate ->
+                        currentStartDate = newStartDate
+                        fetchTransactions()
+                    },
+                    onEndDateChange = { newEndDate ->
+                        currentEndDate = newEndDate
+                        fetchTransactions()
+                    },
+                    modifier = Modifier
+                )
+                Spacer(Modifier.height(16.dp))
 
-    Column(
-        modifier = modifier.then(columnModifier).padding(16.dp)
-    ) {
-        if (startDate == null && endDate == null) {
-            DateRangeFilterForm(
-                startDate = currentStartDate,
-                endDate = currentEndDate,
-                onStartDateChange = { newStartDate ->
-                    currentStartDate = newStartDate
-                    fetchTransactions()
-                },
-                onEndDateChange = { newEndDate ->
-                    currentEndDate = newEndDate
-                    fetchTransactions()
-                },
-                modifier = Modifier
-            )
-            Spacer(Modifier.height(16.dp))
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                    thickness = 2.dp
+                )
 
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                thickness = 2.dp
-            )
+                Spacer(Modifier.height(16.dp))
+            }
 
-            Spacer(Modifier.height(16.dp))
-        }
+            when {
+                errorMessage != null -> Text(
+                    "Error: $errorMessage",
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 14.sp
+                )
 
-        when {
-            errorMessage != null -> Text(
-                "Error: $errorMessage",
-                color = MaterialTheme.colorScheme.error,
-                fontSize = 14.sp
-            )
+                transactions.isEmpty() && !isLoading -> ChartDataError(message = "No transactions found for the selected range.")
 
-            transactions.isEmpty() -> ChartDataError(message = "No transactions found for the selected range.")
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(transactions, key = { it.id }) { tx ->
+                            val isEditing = tx.id == editingRowId
 
-            else -> {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(transactions, key = { it.id }) { tx ->
-                        val isEditing = tx.id == editingRowId
-
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = MaterialTheme.shapes.medium,
-                            shadowElevation = 2.dp,
-                            color = MaterialTheme.colorScheme.surface
-                        ) {
-                            Column(modifier = Modifier.padding(14.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = tx.date,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 14.sp
-                                        )
-                                    )
-
-                                    Text(
-                                        text = if (tx.transaction_type == "income")
-                                            "+$${tx.amount}"
-                                        else
-                                            "-$${tx.amount}",
-                                        color = if (tx.transaction_type == "income")
-                                            Color(0xFF1DB954)
-                                        else
-                                            MaterialTheme.colorScheme.error,
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 15.sp
-                                        )
-                                    )
-                                }
-
-                                Spacer(Modifier.height(6.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column(Modifier.weight(1f)) {
-                                        Text("Category", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
-                                        Text(tx.category, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                                    }
-                                    Column(Modifier.weight(1f)) {
-                                        Text("Budget", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
-                                        Text(tx.budget, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                                    }
-                                }
-
-                                Spacer(Modifier.height(4.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column(Modifier.weight(1f)) {
-                                        Text("Account", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
-                                        Text(tx.account, fontSize = 13.sp)
-                                    }
-                                    Column(Modifier.weight(1f)) {
-                                        Text("Recurring", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = MaterialTheme.shapes.medium,
+                                shadowElevation = 2.dp,
+                                color = MaterialTheme.colorScheme.surface
+                            ) {
+                                Column(modifier = Modifier.padding(14.dp)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
                                         Text(
-                                            if (tx.is_recurring) "Yes" else "No",
-                                            fontSize = 13.sp,
-                                            color = if (tx.is_recurring) Color(0xFF1DB954)
-                                            else MaterialTheme.colorScheme.onSurfaceVariant
+                                            text = tx.date,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontWeight = FontWeight.SemiBold,
+                                                fontSize = 14.sp
+                                            )
+                                        )
+
+                                        Text(
+                                            text = if (tx.transaction_type == "income")
+                                                "+$${tx.amount}"
+                                            else
+                                                "-$${tx.amount}",
+                                            color = if (tx.transaction_type == "income")
+                                                Color(0xFF1DB954)
+                                            else
+                                                MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp
+                                            )
                                         )
                                     }
-                                }
 
-                                Spacer(Modifier.height(8.dp))
-
-                                if (isEditing) {
-                                    var newDescription by remember { mutableStateOf(tx.description) }
-                                    var newAmount by remember { mutableStateOf(tx.amount) }
-
-                                    OutlinedTextField(
-                                        value = newDescription,
-                                        onValueChange = {
-                                            newDescription = it
-                                            editedTransaction = tx.copy(description = it)
-                                        },
-                                        label = { Text("Description") },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        singleLine = true,
-                                        textStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
-                                    )
-
-                                    Spacer(Modifier.height(8.dp))
-
-                                    OutlinedTextField(
-                                        value = newAmount,
-                                        onValueChange = {
-                                            newAmount = it
-                                            editedTransaction = tx.copy(amount = it)
-                                        },
-                                        label = { Text("Amount") },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        singleLine = true,
-                                        textStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
-                                    )
-
-                                    Spacer(Modifier.height(8.dp))
+                                    Spacer(Modifier.height(6.dp))
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.End
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        IconButton(onClick = { handleSaveClick() }) {
-                                            Icon(Icons.Default.Check, contentDescription = "Save", tint = MaterialTheme.colorScheme.primary)
+                                        Column(Modifier.weight(1f)) {
+                                            Text("Category", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                            Text(tx.category, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                                         }
-                                        IconButton(onClick = {
-                                            editingRowId = null
-                                            editedTransaction = null
-                                        }) {
-                                            Icon(Icons.Default.Close, contentDescription = "Cancel", tint = MaterialTheme.colorScheme.error)
+                                        Column(Modifier.weight(1f)) {
+                                            Text("Budget", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                            Text(tx.budget, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                                         }
                                     }
-                                } else {
-                                    Text(
-                                        text = tx.description.ifEmpty { "(No description)" },
-                                        fontSize = 13.sp,
-                                        modifier = Modifier.padding(top = 4.dp)
-                                    )
+
+                                    Spacer(Modifier.height(4.dp))
 
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 8.dp),
-                                        horizontalArrangement = Arrangement.End
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        IconButton(onClick = {
-                                            editingRowId = tx.id
-                                            editedTransaction = tx
-                                        }) {
-                                            Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                        Column(Modifier.weight(1f)) {
+                                            Text("Account", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                            Text(tx.account, fontSize = 13.sp)
                                         }
-                                        IconButton(onClick = { handleDeleteClick(tx.id) }) {
-                                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                        Column(Modifier.weight(1f)) {
+                                            Text("Recurring", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                            Text(
+                                                if (tx.is_recurring) "Yes" else "No",
+                                                fontSize = 13.sp,
+                                                color = if (tx.is_recurring) Color(0xFF1DB954)
+                                                else MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(Modifier.height(8.dp))
+
+                                    if (isEditing) {
+                                        var newDescription by remember { mutableStateOf(tx.description) }
+                                        var newAmount by remember { mutableStateOf(tx.amount) }
+
+                                        OutlinedTextField(
+                                            value = newDescription,
+                                            onValueChange = {
+                                                newDescription = it
+                                                editedTransaction = tx.copy(description = it)
+                                            },
+                                            label = { Text("Description") },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            singleLine = true,
+                                            textStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
+                                        )
+
+                                        Spacer(Modifier.height(8.dp))
+
+                                        OutlinedTextField(
+                                            value = newAmount,
+                                            onValueChange = {
+                                                newAmount = it
+                                                editedTransaction = tx.copy(amount = it)
+                                            },
+                                            label = { Text("Amount") },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            singleLine = true,
+                                            textStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
+                                        )
+
+                                        Spacer(Modifier.height(8.dp))
+
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            IconButton(onClick = { handleSaveClick() }) {
+                                                Icon(Icons.Default.Check, contentDescription = "Save", tint = MaterialTheme.colorScheme.primary)
+                                            }
+                                            IconButton(onClick = {
+                                                editingRowId = null
+                                                editedTransaction = null
+                                            }) {
+                                                Icon(Icons.Default.Close, contentDescription = "Cancel", tint = MaterialTheme.colorScheme.error)
+                                            }
+                                        }
+                                    } else {
+                                        Text(
+                                            text = tx.description.ifEmpty { "(No description)" },
+                                            fontSize = 13.sp,
+                                            modifier = Modifier.padding(top = 4.dp)
+                                        )
+
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(top = 8.dp),
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            IconButton(onClick = {
+                                                editingRowId = tx.id
+                                                editedTransaction = tx
+                                            }) {
+                                                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                            }
+                                            IconButton(onClick = { handleDeleteClick(tx.id) }) {
+                                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                            }
                                         }
                                     }
                                 }
@@ -296,19 +338,26 @@ actual fun TransactionTable(
             }
         }
 
+        Button(
+            onClick = { generatePdf() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 24.dp),
+            enabled = transactions.isNotEmpty() && !isLoading
+        ) {
+            Text("Download as PDF")
+        }
+
         if (showSuccessDialog) {
             SuccessDialog(onDismiss = { showSuccessDialog = false })
         }
 
         if (isLoading) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentSize(Alignment.Center)
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(modifier = Modifier
-                    .padding(16.dp)
-                    .size(144.dp))
+                CircularProgressIndicator(modifier = Modifier.size(48.dp))
             }
         }
 
