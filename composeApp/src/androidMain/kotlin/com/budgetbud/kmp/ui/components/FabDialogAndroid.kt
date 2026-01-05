@@ -82,7 +82,7 @@ actual fun FabDialog(
 
                         TextButton(
                             onClick = onDismiss,
-                            modifier = Modifier.align(Alignment.End)
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
                             Text("Cancel")
                         }
