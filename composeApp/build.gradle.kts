@@ -23,7 +23,14 @@ kotlin {
     val ktorVersion = "2.3.9"
     
     sourceSets {
-        val desktopMain by getting
+        val desktopMain by getting {
+            kotlin.srcDir("src/desktopMain/kotlin")
+
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutinesSwing)
+            }
+        }
         val androidMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
             resources.srcDir("src/androidMain/res")
@@ -62,10 +69,6 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-        }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutinesSwing)
         }
     }
 }
