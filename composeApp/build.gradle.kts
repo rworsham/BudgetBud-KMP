@@ -29,6 +29,7 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutinesSwing)
+                implementation("io.ktor:ktor-client-cio:${ktorVersion}")
             }
         }
         val androidMain by getting {
@@ -106,7 +107,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.budgetbud.kmp.MainKt"
+        mainClass = "com.budgetbud.kmp.MainActivityDesktopKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
