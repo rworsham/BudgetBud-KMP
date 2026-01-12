@@ -54,7 +54,6 @@ actual fun AppNavigation(apiClient: ApiClient) {
 
         composable("signup") {
             SignUpScreenDesktop(
-                navController = navController,
                 token = null,
                 createUser = { email, username, firstName, lastName, password, token ->
                     val success = apiClient.register(
@@ -66,6 +65,12 @@ actual fun AppNavigation(apiClient: ApiClient) {
                         token = token
                     )
                     if (success) Result.success(Unit) else Result.failure(Exception("Registration failed"))
+                },
+                onNavigateToLogin = {
+                  navController.navigate("login")
+                },
+                onSignUpSuccess = {
+                    navController.navigate("login")
                 }
             )
         }
