@@ -31,6 +31,7 @@ kotlin {
                 implementation(libs.kotlinx.coroutinesSwing)
                 implementation("io.ktor:ktor-client-cio:${ktorVersion}")
                 implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+                implementation("org.apache.pdfbox:pdfbox:2.0.30")
             }
         }
         val androidMain by getting {
