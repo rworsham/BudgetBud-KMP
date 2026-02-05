@@ -12,8 +12,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
 import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 
 class DesktopPdfCanvas(
