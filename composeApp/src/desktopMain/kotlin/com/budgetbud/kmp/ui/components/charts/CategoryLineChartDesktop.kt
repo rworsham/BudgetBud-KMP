@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +33,7 @@ actual fun CategoryLineChart(
 ) {
     if (historyData.isEmpty() || categoryData.isEmpty()) return
 
+    val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
     val categoryNames = categoryData.map { it.name }
 
@@ -39,11 +42,12 @@ actual fun CategoryLineChart(
             try {
                 LocalDate.parse(entry.name) to entry.balances
             } catch (e: Exception) {
-                println("ChartDebug: Error parsing date: ${entry.name}")
                 null
             }
         }
     }
+
+    if (chronologicalEntries.isEmpty()) return
 
     val chronologicalDates = chronologicalEntries.map { it.first }
 
@@ -74,7 +78,8 @@ actual fun CategoryLineChart(
             .height(350.dp)
             .pointerInput(chronologicalDates) {
                 detectTapGestures { offset ->
-                    val stepX = size.width / (chronologicalDates.size - 1).coerceAtLeast(1)
+                    val divisor = (chronologicalDates.size - 1).coerceAtLeast(1)
+                    val stepX = size.width / divisor
                     val nearestXIndex = (offset.x / stepX).toInt().coerceIn(0, chronologicalDates.size - 1)
                     val selectedDate = chronologicalDates[nearestXIndex]
 
@@ -91,7 +96,8 @@ actual fun CategoryLineChart(
                 }
             }
         ) {
-            val stepX = size.width / (chronologicalDates.size - 1).coerceAtLeast(1)
+            val divisor = (chronologicalDates.size - 1).coerceAtLeast(1)
+            val stepX = size.width / divisor
             val yScale = size.height / chartCeilingY
 
             val gridLines = 5
@@ -105,24 +111,26 @@ actual fun CategoryLineChart(
                 )
 
                 val value = chartCeilingY - i * chartCeilingY / gridLines
-                drawText(
-                    textMeasurer = textMeasurer,
-                    text = String.format("%,.2f", value),
-                    topLeft = Offset(4.dp.toPx(), y - 10.dp.toPx()),
-                    style = TextStyle(color = Color.DarkGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                )
+                translate(left = 4.dp.toPx(), top = (y - 12.dp.toPx()).coerceAtLeast(0f)) {
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = value.toMoneyString(),
+                        style = TextStyle(color = Color.DarkGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    )
+                }
             }
 
             chronologicalDates.forEachIndexed { i, date ->
-                val x = i * stepX
+                val x = if (chronologicalDates.size == 1) size.width / 2 else i * stepX
                 if (i % 2 == 0) {
-                    rotate(-45f, Offset(x, size.height + 20f)) {
-                        drawText(
-                            textMeasurer = textMeasurer,
-                            text = "${date.month.name.take(3)} ${date.dayOfMonth}",
-                            topLeft = Offset(x, size.height + 20f),
-                            style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
-                        )
+                    translate(left = x, top = size.height + 15.dp.toPx()) {
+                        rotate(-45f, pivot = Offset.Zero) {
+                            drawText(
+                                textMeasurer = textMeasurer,
+                                text = "${date.month.name.take(3)} ${date.dayOfMonth}",
+                                style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
+                            )
+                        }
                     }
                 }
             }
@@ -132,13 +140,18 @@ actual fun CategoryLineChart(
                 val path = Path()
                 val offsets = points.mapNotNull { (date, value) ->
                     val xIndex = chronologicalDates.indexOf(date)
-                    if (xIndex >= 0) Offset(xIndex * stepX, size.height - (value * yScale)) else null
+                    if (xIndex >= 0) {
+                        val xPos = if (chronologicalDates.size == 1) size.width / 2 else xIndex * stepX
+                        Offset(xPos, size.height - (value * yScale))
+                    } else null
                 }
 
                 if (offsets.isNotEmpty()) {
-                    path.moveTo(offsets.first().x, offsets.first().y)
-                    offsets.drop(1).forEach { path.lineTo(it.x, it.y) }
-                    drawPath(path, color = color, style = Stroke(width = 2.dp.toPx()))
+                    if (offsets.size > 1) {
+                        path.moveTo(offsets.first().x, offsets.first().y)
+                        offsets.drop(1).forEach { path.lineTo(it.x, it.y) }
+                        drawPath(path, color = color, style = Stroke(width = 2.dp.toPx()))
+                    }
                     offsets.forEach { drawCircle(color = color, radius = 4.dp.toPx(), center = it) }
                 }
             }
@@ -159,9 +172,15 @@ actual fun CategoryLineChart(
         }
 
         tooltipData?.let { (date, values) ->
+            val offsetX = with(density) { tooltipOffsetPx.x.toDp() }
+            val offsetY = with(density) { tooltipOffsetPx.y.toDp() }
+
             Surface(
                 modifier = Modifier
-                    .offset(x = (tooltipOffsetPx.x / 2).dp, y = (tooltipOffsetPx.y / 2).dp),
+                    .offset(
+                        x = offsetX.coerceAtMost(300.dp),
+                        y = (offsetY - 80.dp).coerceAtLeast(0.dp)
+                    ),
                 shadowElevation = 8.dp,
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surfaceVariant
@@ -174,13 +193,18 @@ actual fun CategoryLineChart(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(8.dp).background(color))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("$category: $${"%.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
+                            Text("$category: $${amount.toMoneyString()}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
             }
         }
     }
+}
+
+private fun Float.toMoneyString(): String {
+    val rounded = (this * 100).toInt() / 100.0
+    return rounded.toString()
 }
 
 private inline fun <K, V> Iterable<K>.associateWithNotNull(transform: (K) -> V?): Map<K, V> {
