@@ -7,7 +7,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.isSystemInDarkTheme
 import com.budgetbud.kmp.navigation.AppNavigation
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.auth.tokenStorage
@@ -20,19 +19,6 @@ private val AppTypography = Typography(
     displayLarge = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold),
     bodyLarge = TextStyle(fontSize = 16.sp),
     bodyMedium = TextStyle(fontSize = 14.sp, color = LightGray)
-)
-
-private val AppLightColors = lightColorScheme(
-    primary = BBGreen,
-    onPrimary = Color.White,
-    secondary = BBGreen,
-    onSecondary = Color.White,
-    background = Color.White,
-    onBackground = Color.Black,
-    surface = Color(0xFFF7F7F7),
-    onSurface = Color.Black,
-    error = Color.Red,
-    onError = Color.Black
 )
 
 private val AppDarkColors = darkColorScheme(
@@ -49,13 +35,14 @@ private val AppDarkColors = darkColorScheme(
 @Composable
 @Preview
 fun App() {
-    val apiClient = ApiClient(tokenStorage)
-    val isDarkTheme = isSystemInDarkTheme()
+    val apiClient = remember { ApiClient(tokenStorage) }
 
     MaterialTheme(
-        colorScheme = if (!isDarkTheme) AppLightColors else AppDarkColors ,
+        colorScheme = AppDarkColors,
         typography = AppTypography
     ) {
-        AppNavigation(apiClient)
+        Surface(color = MaterialTheme.colorScheme.background) {
+            AppNavigation(apiClient)
+        }
     }
 }
