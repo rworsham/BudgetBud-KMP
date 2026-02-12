@@ -49,7 +49,9 @@ fun MiniDrawer(
                             Text(
                                 text = item.title,
                                 style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                softWrap = false,
+                                maxLines = 1
                             )
                         }
                     }
@@ -81,7 +83,9 @@ fun MiniDrawer(
                                     Text(
                                         text = item.title,
                                         modifier = Modifier.padding(start = 16.dp),
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        softWrap = false,
+                                        maxLines = 1
                                     )
                                 }
                             }
