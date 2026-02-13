@@ -1,10 +1,7 @@
 package com.budgetbud.kmp.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,14 +17,8 @@ actual fun AccountCardList(
     onViewHistory: (Int) -> Unit,
     onSetGoal: (Int) -> Unit
 ) {
-    val scrollState = rememberScrollState()
-
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(scrollState)
-            .padding(vertical = 16.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -36,7 +27,6 @@ actual fun AccountCardList(
                 modifier = Modifier
                     .widthIn(max = 600.dp)
                     .fillMaxWidth()
-                    .wrapContentHeight()
                     .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(4.dp)
