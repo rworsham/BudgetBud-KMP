@@ -13,7 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +34,7 @@ actual fun AccountBalanceLineChart(
 
     if (accounts.isEmpty() || history.isEmpty()) return
 
+    val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
 
     val sortedDates = remember(history) {
@@ -53,22 +56,24 @@ actual fun AccountBalanceLineChart(
     val colors = listOf(Color(0xFF1DB954), Color(0xFF6200EE), Color(0xFF009688))
 
     var tooltipData by remember { mutableStateOf<Pair<LocalDate, Map<String, Float>>?>(null) }
-    var tooltipOffset by remember { mutableStateOf(Offset.Zero) }
+    var tooltipOffsetPx by remember { mutableStateOf(Offset.Zero) }
 
-    Box(modifier = modifier.padding(horizontal = 48.dp, vertical = 32.dp)) {
+    Box(modifier = modifier.padding(start = 60.dp, end = 24.dp, top = 32.dp, bottom = 64.dp)) {
         Canvas(modifier = Modifier
             .fillMaxWidth()
             .height(400.dp)
-            .pointerInput(Unit) {
+            .pointerInput(sortedDates) {
                 detectTapGestures { offset ->
-                    val stepX = size.width / (sortedDates.size - 1).coerceAtLeast(1)
+                    val divisor = (sortedDates.size - 1).coerceAtLeast(1)
+                    val stepX = size.width / divisor
                     val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.size - 1)
                     tooltipData = sortedDates[index] to dataSeries.mapValues { it.value[index] }
-                    tooltipOffset = offset
+                    tooltipOffsetPx = offset
                 }
             }
         ) {
-            val stepX = size.width / (sortedDates.size - 1).coerceAtLeast(1)
+            val divisor = (sortedDates.size - 1).coerceAtLeast(1)
+            val stepX = size.width / divisor
             val yScale = size.height / yRange
 
             val gridLines = 5
@@ -81,12 +86,14 @@ actual fun AccountBalanceLineChart(
                     strokeWidth = 1f
                 )
 
-                drawText(
-                    textMeasurer = textMeasurer,
-                    text = "$${(dataMax - i * dataMax / gridLines).toInt()}",
-                    topLeft = Offset(-45.dp.toPx(), y - 10.dp.toPx()),
-                    style = TextStyle(color = Color.Gray, fontSize = 10.sp)
-                )
+                val labelValue = (dataMax - i * dataMax / gridLines).toInt().toString()
+                translate(left = -50.dp.toPx(), top = y - 10.dp.toPx()) {
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = "$$labelValue",
+                        style = TextStyle(color = Color.Gray, fontSize = 10.sp)
+                    )
+                }
             }
 
             sortedDates.forEachIndexed { i, date ->
@@ -94,13 +101,14 @@ actual fun AccountBalanceLineChart(
                     val x = i * stepX
                     val dateText = "${date.month.name.take(3)} ${date.dayOfMonth}"
 
-                    rotate(degrees = -45f, pivot = Offset(x, size.height + 20f)) {
-                        drawText(
-                            textMeasurer = textMeasurer,
-                            text = dateText,
-                            topLeft = Offset(x - 15.dp.toPx(), size.height + 20f),
-                            style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
-                        )
+                    translate(left = x, top = size.height + 20f) {
+                        rotate(degrees = -45f, pivot = Offset.Zero) {
+                            drawText(
+                                textMeasurer = textMeasurer,
+                                text = dateText,
+                                style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
+                            )
+                        }
                     }
                 }
             }
@@ -123,7 +131,7 @@ actual fun AccountBalanceLineChart(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(top = 24.dp),
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             accounts.forEachIndexed { index, account ->
@@ -137,9 +145,12 @@ actual fun AccountBalanceLineChart(
         }
 
         tooltipData?.let { (date, values) ->
+            val offsetX = with(density) { tooltipOffsetPx.x.toDp() }
+            val offsetY = with(density) { tooltipOffsetPx.y.toDp() }
+
             Surface(
                 modifier = Modifier
-                    .offset(x = (tooltipOffset.x / 2).dp, y = (tooltipOffset.y / 2).dp),
+                    .offset(x = offsetX, y = offsetY - 100.dp),
                 shadowElevation = 8.dp,
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surfaceVariant
@@ -152,7 +163,7 @@ actual fun AccountBalanceLineChart(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(8.dp).background(color))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("$accountName: $${"%.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
+                            Text("$accountName: $${(amount.toInt())}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
