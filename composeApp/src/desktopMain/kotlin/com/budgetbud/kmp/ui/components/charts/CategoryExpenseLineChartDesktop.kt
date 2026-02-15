@@ -13,7 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,8 +39,6 @@ actual fun CategoryExpenseLineChart(
     var error by remember { mutableStateOf<String?>(null) }
     var categoryData by remember { mutableStateOf<List<CategoryOverviewData>>(emptyList()) }
     var historyData by remember { mutableStateOf<List<CategoryHistoryLineChartData>>(emptyList()) }
-
-    val fixedChartHeight = Modifier.height(400.dp)
 
     LaunchedEffect(familyView) {
         onLoadingStatusChange(true)
@@ -79,7 +79,7 @@ actual fun CategoryExpenseLineChart(
                 CategoryExpenseChartCanvas(
                     categoryData = categoryData,
                     historyData = historyData,
-                    modifier = Modifier.then(fixedChartHeight).fillMaxWidth()
+                    modifier = Modifier.height(400.dp).fillMaxWidth()
                 )
             }
         }
@@ -93,6 +93,7 @@ private fun CategoryExpenseChartCanvas(
     historyData: List<CategoryHistoryLineChartData>,
     modifier: Modifier
 ) {
+    val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
     val categoryNames = categoryData.map { it.name }
 
@@ -120,55 +121,60 @@ private fun CategoryExpenseChartCanvas(
     )
 
     var tooltipData by remember { mutableStateOf<Pair<LocalDate, Map<String, Float>>?>(null) }
-    var tooltipOffset by remember { mutableStateOf(Offset.Zero) }
+    var tooltipOffsetPx by remember { mutableStateOf(Offset.Zero) }
 
     Box(modifier = modifier.padding(16.dp).background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium)) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 20.dp, bottom = 80.dp, start = 80.dp, end = 40.dp)
-                .pointerInput(Unit) {
+                .pointerInput(sortedDates) {
                     detectTapGestures { offset ->
                         if (sortedDates.isNotEmpty()) {
-                            val stepX = if (sortedDates.size > 1) size.width / (sortedDates.size - 1) else size.width
+                            val divisor = (sortedDates.size - 1).coerceAtLeast(1)
+                            val stepX = size.width / divisor
                             val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
                             val selectedDate = sortedDates[index]
                             val valuesAtDate = categoryNames.associateWithNotNull { category ->
                                 dataSeries[category]?.find { it.first == selectedDate }?.second
                             }
                             tooltipData = selectedDate to valuesAtDate
-                            tooltipOffset = offset
+                            tooltipOffsetPx = offset
                         }
                     }
                 }
         ) {
             if (sortedDates.isEmpty()) return@Canvas
 
-            val stepX = if (sortedDates.size > 1) size.width / (sortedDates.size - 1) else size.width / 2
+            val divisor = (sortedDates.size - 1).coerceAtLeast(1)
+            val stepX = size.width / divisor
             val yScale = size.height / roundedMax
 
             repeat(6) { i ->
                 val y = i * size.height / 5
                 drawLine(Color.LightGray.copy(alpha = 0.5f), Offset(0f, y), Offset(size.width, y))
                 val label = "$${(roundedMax - (i * roundedMax / 5)).toInt()}"
-                drawText(
-                    textMeasurer = textMeasurer,
-                    text = label,
-                    topLeft = Offset(-70f, y - 10f),
-                    style = TextStyle(color = Color.Gray, fontSize = 10.sp)
-                )
+
+                translate(left = -70f, top = y - 10f) {
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = label,
+                        style = TextStyle(color = Color.Gray, fontSize = 10.sp)
+                    )
+                }
             }
 
             sortedDates.forEachIndexed { i, date ->
                 if (i % 2 == 0) {
-                    val x = if (sortedDates.size > 1) i * stepX else size.width / 2
-                    rotate(-45f, Offset(x, size.height + 25f)) {
-                        drawText(
-                            textMeasurer = textMeasurer,
-                            text = "${date.month.name.take(3)} ${date.dayOfMonth}",
-                            topLeft = Offset(x, size.height + 25f),
-                            style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
-                        )
+                    val x = i * stepX
+                    translate(left = x, top = size.height + 25f) {
+                        rotate(-45f, pivot = Offset.Zero) {
+                            drawText(
+                                textMeasurer = textMeasurer,
+                                text = "${date.month.name.take(3)} ${date.dayOfMonth}",
+                                style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
+                            )
+                        }
                     }
                 }
             }
@@ -199,14 +205,17 @@ private fun CategoryExpenseChartCanvas(
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp)) {
                     Box(Modifier.size(10.dp).background(colors[index % colors.size], MaterialTheme.shapes.small))
                     Spacer(Modifier.width(4.dp))
-                    Text(name, style = MaterialTheme.typography.labelSmall)
+                    Text(name, style = MaterialTheme.typography.labelSmall, softWrap = false)
                 }
             }
         }
 
         tooltipData?.let { (date, values) ->
+            val tooltipX = with(density) { (80.dp.toPx() + tooltipOffsetPx.x).toDp() }
+            val tooltipY = with(density) { (20.dp.toPx() + tooltipOffsetPx.y).toDp() }
+
             Surface(
-                modifier = Modifier.offset(x = (tooltipOffset.x / 2).dp, y = (tooltipOffset.y / 2).dp),
+                modifier = Modifier.offset(x = tooltipX, y = tooltipY - 100.dp),
                 shadowElevation = 8.dp,
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surfaceVariant
