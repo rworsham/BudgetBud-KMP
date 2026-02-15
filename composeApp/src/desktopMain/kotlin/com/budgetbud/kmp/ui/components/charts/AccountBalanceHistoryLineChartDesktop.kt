@@ -12,7 +12,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,7 +38,6 @@ actual fun AccountBalanceHistoryLineChart(
 ) {
     var chartData by remember { mutableStateOf<AccountBalanceChartData?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
-    val fixedChartHeight = Modifier.height(400.dp)
 
     LaunchedEffect(familyView) {
         onLoadingStatusChange(true)
@@ -73,33 +74,33 @@ actual fun AccountBalanceHistoryLineChart(
         }
     }
 
-    chartData?.let { data ->
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .then(fixedChartHeight)
-                .padding(vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        chartData?.let { data ->
             Text(
                 text = "Account Balance History",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(16.dp)
             )
 
-            ChartCanvas(data = data, modifier = Modifier.weight(1f))
+            ChartCanvas(
+                data = data,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp)
+            )
         }
-    }
 
-    error?.let {
-        Text(it, color = Color.Red, modifier = Modifier.padding(16.dp))
+        error?.let {
+            Text(it, color = Color.Red, modifier = Modifier.padding(16.dp))
+        }
     }
 }
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
+    val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
     val accounts = data.accounts
     val history = data.history
@@ -123,50 +124,55 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
     )
 
     var tooltipData by remember { mutableStateOf<Pair<LocalDate, Map<String, Float>>?>(null) }
-    var tooltipOffset by remember { mutableStateOf(Offset.Zero) }
+    var tooltipOffsetPx by remember { mutableStateOf(Offset.Zero) }
 
-    Box(modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium)) {
+    Box(modifier = modifier.padding(16.dp).background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium)) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 16.dp, bottom = 72.dp, start = 80.dp, end = 32.dp)
-                .pointerInput(Unit) {
+                .pointerInput(sortedDates) {
                     detectTapGestures { offset ->
                         if (sortedDates.size > 1) {
-                            val stepX = size.width / (sortedDates.size - 1)
+                            val divisor = (sortedDates.size - 1).coerceAtLeast(1)
+                            val stepX = size.width / divisor
                             val index = (offset.x / stepX).toInt().coerceIn(0, sortedDates.lastIndex)
                             tooltipData = sortedDates[index] to dataSeries.mapValues { it.value[index] ?: 0f }
-                            tooltipOffset = offset
+                            tooltipOffsetPx = offset
                         }
                     }
                 }
         ) {
             if (sortedDates.size < 2) return@Canvas
 
-            val stepX = size.width / (sortedDates.size - 1)
+            val divisor = (sortedDates.size - 1).coerceAtLeast(1)
+            val stepX = size.width / divisor
             val yScale = size.height / roundedMax.toFloat()
 
             repeat(6) { i ->
                 val y = i * size.height / 5
-                drawLine(Color.LightGray, Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
+                drawLine(Color.LightGray.copy(alpha = 0.5f), Offset(0f, y), Offset(size.width, y), strokeWidth = 1f)
                 val label = "$${(roundedMax - (i * roundedMax / 5)).toInt()}"
-                drawText(
-                    textMeasurer = textMeasurer,
-                    text = label,
-                    topLeft = Offset(-70f, y - 10f),
-                    style = TextStyle(color = Color.Gray, fontSize = 10.sp)
-                )
+
+                translate(left = -70f, top = y - 10f) {
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = label,
+                        style = TextStyle(color = Color.Gray, fontSize = 10.sp)
+                    )
+                }
             }
 
             sortedDates.forEachIndexed { i, date ->
                 if (i % 2 == 0) {
                     val x = i * stepX
-                    drawText(
-                        textMeasurer = textMeasurer,
-                        text = "${date.month.name.take(3)} ${date.dayOfMonth}",
-                        topLeft = Offset(x - 20f, size.height + 20f),
-                        style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
-                    )
+                    translate(left = x - 20f, top = size.height + 20f) {
+                        drawText(
+                            textMeasurer = textMeasurer,
+                            text = "${date.month.name.take(3)} ${date.dayOfMonth}",
+                            style = TextStyle(color = Color.DarkGray, fontSize = 10.sp)
+                        )
+                    }
                 }
             }
 
@@ -206,9 +212,11 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
         }
 
         tooltipData?.let { (date, values) ->
+            val tooltipX = with(density) { (80.dp.toPx() + tooltipOffsetPx.x).toDp() }
+            val tooltipY = with(density) { (16.dp.toPx() + tooltipOffsetPx.y).toDp() }
+
             Surface(
-                modifier = Modifier
-                    .offset(x = (tooltipOffset.x / 2).dp, y = (tooltipOffset.y / 2).dp),
+                modifier = Modifier.offset(x = tooltipX, y = tooltipY - 100.dp),
                 shadowElevation = 8.dp,
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surfaceVariant
