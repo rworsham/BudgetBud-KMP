@@ -108,7 +108,7 @@ actual fun TransactionTable(
     ) {
         Column(
             modifier = Modifier
-                .widthIn(max = 800.dp)
+                .fillMaxWidth()
                 .fillMaxSize()
                 .padding(16.dp)
                 .padding(bottom = 80.dp)
