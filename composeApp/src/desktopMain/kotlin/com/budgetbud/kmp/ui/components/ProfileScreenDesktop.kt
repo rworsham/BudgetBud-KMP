@@ -37,14 +37,10 @@ actual fun ProfileScreen(
         try {
             val tokens = apiClient.getTokens()
             val details: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/user/") {
-                headers {
-                    tokens?.let { append(HttpHeaders.Authorization, "Bearer ${it.accessToken}") }
-                }
+                headers { tokens?.let { append(HttpHeaders.Authorization, "Bearer ${it.accessToken}") } }
             }
             val stats: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/profile/stats/") {
-                headers {
-                    tokens?.let { append(HttpHeaders.Authorization, "Bearer ${it.accessToken}") }
-                }
+                headers { tokens?.let { append(HttpHeaders.Authorization, "Bearer ${it.accessToken}") } }
             }
             userDetails = details.body()
             userStats = stats.body()
@@ -55,101 +51,114 @@ actual fun ProfileScreen(
         }
     }
 
-    if (isLoading) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-        return
-    }
-
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState()),
-        contentAlignment = Alignment.TopCenter
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .widthIn(max = 800.dp)
-                .padding(32.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
+        if (isLoading) {
+            CircularProgressIndicator(color = Color.White)
+        } else {
+            Surface(
+                modifier = Modifier
+                    .widthIn(max = 500.dp)
+                    .fillMaxWidth(0.9f)
+                    .wrapContentHeight()
+                    .padding(16.dp),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = 4.dp,
+                shadowElevation = 24.dp
             ) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "User Avatar",
-                    tint = MaterialTheme.colorScheme.primary,
+                Column(
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape),
-                )
-                Column {
-                    Text(
-                        text = userDetails?.username ?: "N/A",
-                        style = MaterialTheme.typography.displaySmall
-                    )
-                    Text(
-                        text = userDetails?.email ?: "N/A",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Gray
-                    )
-                }
-            }
-
-            HorizontalDivider()
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Card(Modifier.weight(1f)) {
-                    Column(Modifier.padding(20.dp)) {
-                        Text("General Stats", style = MaterialTheme.typography.titleLarge)
-                        HorizontalDivider(Modifier.padding(vertical = 12.dp))
-                        StatRow("Transactions", userStats?.total_transactions)
-                        StatRow("Joined Date", userStats?.joined_date)
-                        StatRow("Goals Met", userStats?.savings_goals_met)
-                    }
-                }
-
-                Card(
-                    Modifier.weight(1f),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(Modifier.padding(20.dp)) {
-                        Text("Financial Overview", style = MaterialTheme.typography.titleLarge)
-                        HorizontalDivider(Modifier.padding(vertical = 12.dp))
-                        StatRow("Net Income", "$${userStats?.net_income}")
-                        StatRow("Net Expense", "$${userStats?.net_expense}")
-                        StatRow("Net Balance", "$${userStats?.net_balance}")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "User Avatar",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .size(70.dp)
+                                .clip(CircleShape),
+                        )
+                        Column {
+                            Text(
+                                text = userDetails?.username ?: "N/A",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                            Text(
+                                text = userDetails?.email ?: "N/A",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
+                            )
+                        }
                     }
-                }
-            }
 
-            error?.let {
-                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyLarge)
+                    HorizontalDivider()
+
+                    Card(Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "User Stats",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+
+                            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceAround
+                            ) {
+                                StatItem("Transactions", userStats?.total_transactions)
+                                StatItem("Joined", userStats?.joined_date)
+                                StatItem("Goals Met", userStats?.savings_goals_met)
+                            }
+                        }
+                    }
+
+                    Card(Modifier.fillMaxWidth()) {
+                        Column(Modifier.padding(16.dp)) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceAround
+                            ) {
+                                StatItem("Income", "$${userStats?.net_income}")
+                                StatItem("Expense", "$${userStats?.net_expense}")
+                                StatItem("Balance", "$${userStats?.net_balance}")
+                            }
+                        }
+                    }
+
+                    error?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
 }
 
 @Composable
-private fun StatRow(label: String, value: Any?) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyLarge)
+private fun StatItem(label: String, value: Any?) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
         Text(
-            value?.toString() ?: "-",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            text = value?.toString() ?: "-",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
         )
     }
 }
