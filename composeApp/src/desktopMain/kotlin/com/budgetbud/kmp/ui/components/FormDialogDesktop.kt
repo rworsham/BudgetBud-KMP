@@ -27,7 +27,6 @@ actual fun FormDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
                 .clickable(onClick = onDismiss),
             contentAlignment = Alignment.Center
         ) {

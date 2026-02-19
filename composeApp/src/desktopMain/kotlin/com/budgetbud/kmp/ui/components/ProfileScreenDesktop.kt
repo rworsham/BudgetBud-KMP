@@ -54,7 +54,7 @@ actual fun ProfileScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f)),
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
         if (isLoading) {
