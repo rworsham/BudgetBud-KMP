@@ -12,6 +12,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 
 @Composable
 actual fun FormDialog(
@@ -27,18 +29,21 @@ actual fun FormDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable(onClick = onDismiss),
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { onDismiss() })
+                }
+                .background(Color.Black.copy(alpha = 0.4f)),
             contentAlignment = Alignment.Center
         ) {
             Surface(
                 modifier = Modifier
                     .widthIn(max = 500.dp)
                     .padding(16.dp)
-                    .clickable(enabled = false) { },
+                    .pointerInput(Unit) { detectTapGestures { } },
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 6.dp,
-                shadowElevation = 8.dp
+                tonalElevation = 0.dp,
+                shadowElevation = 12.dp
             ) {
                 Column(
                     modifier = Modifier
@@ -58,9 +63,9 @@ actual fun FormDialog(
                         color = MaterialTheme.colorScheme.outlineVariant
                     )
 
-                    content()
-
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(modifier = Modifier.weight(1f, fill = false)) {
+                        content()
+                    }
 
                     Box(
                         modifier = Modifier.fillMaxWidth(),
