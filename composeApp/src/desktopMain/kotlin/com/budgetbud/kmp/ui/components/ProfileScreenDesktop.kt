@@ -13,7 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.UserStatsData
 import com.budgetbud.kmp.models.UserDetailsData
@@ -53,7 +56,6 @@ actual fun ProfileScreen(
 
     Box(
         modifier = modifier
-            .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.4f)),
         contentAlignment = Alignment.Center
     ) {
@@ -62,17 +64,18 @@ actual fun ProfileScreen(
         } else {
             Surface(
                 modifier = Modifier
-                    .widthIn(max = 500.dp)
+                    .widthIn(max = 1200.dp)
                     .fillMaxWidth(0.9f)
                     .wrapContentHeight()
                     .padding(16.dp),
                 shape = MaterialTheme.shapes.large,
-                tonalElevation = 4.dp,
+                tonalElevation = 0.dp,
                 shadowElevation = 24.dp
             ) {
                 Column(
                     modifier = Modifier
                         .padding(24.dp)
+                        .wrapContentHeight()
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -101,47 +104,73 @@ actual fun ProfileScreen(
                         }
                     }
 
-                    HorizontalDivider()
+                    HorizontalDivider(
+                        thickness = 2.dp,
+                        color = Color(0xFF1DB954)
+                    )
 
-                    Card(Modifier.fillMaxWidth()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(2.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
                                 text = "User Stats",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier.padding(bottom = 12.dp)
                             )
 
-                            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                            HorizontalDivider(Modifier.padding(bottom = 16.dp))
 
                             Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceAround
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                StatItem("Transactions", userStats?.total_transactions)
-                                StatItem("Joined", userStats?.joined_date)
-                                StatItem("Goals Met", userStats?.savings_goals_met)
+                                StatItem(Modifier.weight(1f), "Transaction Count", userStats?.total_transactions)
+                                StatItem(Modifier.weight(1f), "Date Joined", userStats?.joined_date)
+                                StatItem(Modifier.weight(1f), "Goals Met", userStats?.savings_goals_met)
                             }
                         }
                     }
 
-                    Card(Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(16.dp)) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(2.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp)) {
                             Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceAround
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                StatItem("Income", "$${userStats?.net_income}")
-                                StatItem("Expense", "$${userStats?.net_expense}")
-                                StatItem("Balance", "$${userStats?.net_balance}")
+                                StatItem(
+                                    modifier = Modifier.weight(1f),
+                                    label = "Income Total",
+                                    value = "$${userStats?.net_income ?: "0.00"}",
+                                    valueColor = Color(0xFF1DB954)
+                                )
+                                StatItem(
+                                    modifier = Modifier.weight(1f),
+                                    label = "Expense Total",
+                                    value = "$${userStats?.net_expense ?: "0.00"}",
+                                    valueColor = MaterialTheme.colorScheme.error
+                                )
+                                StatItem(
+                                    modifier = Modifier.weight(1f),
+                                    label = "Lifetime Balance",
+                                    value = "$${userStats?.net_balance ?: "0.00"}",
+                                    valueColor = MaterialTheme.colorScheme.primary
+                                )
                             }
                         }
                     }
 
                     error?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
+                        Text(it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -152,13 +181,31 @@ actual fun ProfileScreen(
 }
 
 @Composable
-private fun StatItem(label: String, value: Any?) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+private fun StatItem(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: Any?,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            maxLines = 1
+        )
         Text(
             text = value?.toString() ?: "-",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            ),
+            color = valueColor,
+            textAlign = TextAlign.Center
         )
     }
 }
