@@ -5,6 +5,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.AccountData
 import com.budgetbud.kmp.ui.components.AlertHandler
@@ -114,10 +117,24 @@ fun AccountForm(
 
         OutlinedTextField(
             value = newAccountBalance,
-            onValueChange = { newAccountBalance = it },
+            onValueChange = { input ->
+                if (input.all { it.isDigit() || it == '.' || it == ',' }) {
+                    newAccountBalance = input
+                }
+            },
             label = { Text("Balance") },
-            leadingIcon = { Text("$") },
+            leadingIcon = {
+                Text(
+                    text = "$",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            },
+            placeholder = { Text("0.00") },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal
+            ),
             modifier = Modifier.fillMaxWidth()
         )
 
