@@ -158,10 +158,24 @@ fun TransactionForm(
 
         OutlinedTextField(
             value = amount,
-            onValueChange = { amount = it },
+            onValueChange = { input ->
+                if (input.all { it.isDigit() || it == '.' || it == ',' }) {
+                    amount = input
+                }
+            },
             label = { Text("Amount") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            leadingIcon = {
+                Text(
+                    text = "$",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            },
+            placeholder = { Text("0.00") },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal
+            ),
             modifier = Modifier.fillMaxWidth()
         )
 
