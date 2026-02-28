@@ -1,14 +1,11 @@
 package com.budgetbud.kmp.ui.components.forms
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxWidth
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> DropdownSelector(
     label: String,
@@ -18,20 +15,26 @@ fun <T> DropdownSelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.fillMaxWidth()
+    ) {
         OutlinedTextField(
             value = options.find { it.first == selectedOption }?.second ?: "",
             onValueChange = {},
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true,
+            label = { Text(label) },
             trailingIcon = {
-                IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                }
-            }
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
         )
-        DropdownMenu(
+
+        ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
@@ -41,7 +44,8 @@ fun <T> DropdownSelector(
                     onClick = {
                         onOptionSelected(value)
                         expanded = false
-                    }
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                 )
             }
         }
