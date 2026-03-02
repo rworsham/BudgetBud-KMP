@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.AccountData
 import com.budgetbud.kmp.ui.components.AlertHandler
@@ -30,6 +30,7 @@ fun AccountForm(
     var isLoading by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
     var existingAccounts by remember { mutableStateOf<List<AccountData>>(emptyList()) }
+    val maxChar = 35
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -109,16 +110,31 @@ fun AccountForm(
     ) {
         OutlinedTextField(
             value = newAccount,
-            onValueChange = { newAccount = it },
+            onValueChange = {
+                if (it.length <= maxChar) {
+                    newAccount = it
+                }
+            },
             label = { Text("New Account") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            supportingText = {
+                Text(
+                    text = "${newAccount.length} / $maxChar",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                )
+            },
+            isError = newAccount.length >= maxChar
         )
 
         OutlinedTextField(
             value = newAccountBalance,
             onValueChange = { input ->
-                if (input.all { it.isDigit() || it == '.' || it == ',' }) {
+                val isValidNum = input.all { it.isDigit() || it == '.' || it == ',' }
+                val isUnderLimit = input.length <= maxChar
+
+                if (isValidNum && isUnderLimit) {
                     newAccountBalance = input
                 }
             },
