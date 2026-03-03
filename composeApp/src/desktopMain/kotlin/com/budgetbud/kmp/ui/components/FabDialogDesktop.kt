@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -35,8 +36,10 @@ actual fun FabDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f))
-                .clickable(onClick = onDismiss),
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { onDismiss() })
+                }
+                .background(Color.Black.copy(alpha = 0.4f)),
             contentAlignment = Alignment.BottomEnd
         ) {
             AnimatedVisibility(
@@ -45,13 +48,14 @@ actual fun FabDialog(
                 exit = fadeOut()
             ) {
                 Surface(
-                    shadowElevation = 12.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surface,
                     modifier = Modifier
                         .padding(24.dp)
                         .width(320.dp)
-                        .clickable(enabled = false) { }
+                        .pointerInput(Unit) { detectTapGestures { } },
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 12.dp
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -64,6 +68,11 @@ actual fun FabDialog(
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.primary
+                        )
+
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant
                         )
 
                         FabDialogOption(
