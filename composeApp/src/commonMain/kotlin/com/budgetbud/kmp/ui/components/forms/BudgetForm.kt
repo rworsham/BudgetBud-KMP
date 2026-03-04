@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.BudgetData
 import com.budgetbud.kmp.ui.components.AlertHandler
@@ -30,6 +31,7 @@ fun BudgetForm(
     var isSubmitting by remember { mutableStateOf(false) }
     var existingBudgets by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    val maxChar = 35
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -58,7 +60,7 @@ fun BudgetForm(
             return false
         }
 
-        if (existingBudgets.contains(newBudget)) {
+        if (existingBudgets.any { it.equals(newBudget, ignoreCase = true) }) {
             errorMessage = "Budget name already exists"
             return false
         }
@@ -81,7 +83,7 @@ fun BudgetForm(
                     setBody(
                         mapOf(
                             "name" to newBudget,
-                            "total_amount" to amount
+                            "total_amount" to amount.replace(",", "")
                         )
                     )
                     headers {
@@ -109,16 +111,30 @@ fun BudgetForm(
     ) {
         OutlinedTextField(
             value = newBudget,
-            onValueChange = { newBudget = it },
+            onValueChange = {
+                if (it.length <= maxChar) {
+                    newBudget = it
+                }
+            },
             label = { Text("New Budget") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            supportingText = {
+                Text(
+                    text = "${newBudget.length} / $maxChar",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                )
+            },
+            isError = newBudget.length >= maxChar
         )
 
         OutlinedTextField(
             value = amount,
             onValueChange = { input ->
-                if (input.all { it.isDigit() || it == '.' || it == ',' }) {
+                val isValidNum = input.all { it.isDigit() || it == '.' || it == ',' }
+
+                if (isValidNum) {
                     amount = input
                 }
             },
