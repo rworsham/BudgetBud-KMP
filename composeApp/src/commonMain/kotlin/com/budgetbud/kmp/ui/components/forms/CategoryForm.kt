@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.CategoryData
 import com.budgetbud.kmp.ui.components.AlertHandler
@@ -27,6 +28,7 @@ fun CategoryForm(
     var isSubmitting by remember { mutableStateOf(false) }
     var existingCategories by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    val maxChar = 35
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -105,10 +107,22 @@ fun CategoryForm(
     ) {
         OutlinedTextField(
             value = newCategory,
-            onValueChange = { newCategory = it },
+            onValueChange = {
+                if (it.length <= maxChar) {
+                    newCategory = it
+                }
+            },
             label = { Text("New Category") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            supportingText = {
+                Text(
+                    text = "${newCategory.length} / $maxChar",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                )
+            },
+            isError = newCategory.length >= maxChar
         )
 
         Button(
