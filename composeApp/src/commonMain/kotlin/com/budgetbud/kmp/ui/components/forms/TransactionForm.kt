@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.NewTransactionData
@@ -47,6 +48,7 @@ fun TransactionForm(
     var isLoading by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
 
+    val maxChar = 35
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -159,7 +161,10 @@ fun TransactionForm(
         OutlinedTextField(
             value = amount,
             onValueChange = { input ->
-                if (input.all { it.isDigit() || it == '.' || it == ',' }) {
+                val isValidNum = input.all { it.isDigit() || it == '.' || it == ',' }
+                val isUnderLimit = input.length <= maxChar
+
+                if (isValidNum && isUnderLimit) {
                     amount = input
                 }
             },
@@ -188,9 +193,21 @@ fun TransactionForm(
 
         OutlinedTextField(
             value = description,
-            onValueChange = { description = it },
+            onValueChange = {
+                if (it.length <= maxChar) {
+                    description = it
+                }
+            },
             label = { Text("Description") },
             modifier = Modifier.fillMaxWidth(),
+            supportingText = {
+                Text(
+                    text = "${description.length} / $maxChar",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                )
+            },
+            isError = description.length >= maxChar,
             maxLines = 3
         )
 
