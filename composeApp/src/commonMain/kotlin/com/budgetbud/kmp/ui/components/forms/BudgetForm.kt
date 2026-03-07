@@ -132,9 +132,12 @@ fun BudgetForm(
         OutlinedTextField(
             value = amount,
             onValueChange = { input ->
-                val isValidNum = input.all { it.isDigit() || it == '.' || it == ',' }
+                val isValidChar = input.all { it.isDigit() || it == '.' }
+                val singleDecimal = input.count { it == '.' } <= 1
 
-                if (isValidNum) {
+                val isUnderLimit = input.length <= 12
+
+                if (isValidChar && singleDecimal && isUnderLimit) {
                     amount = input
                 }
             },
@@ -148,6 +151,7 @@ fun BudgetForm(
             },
             placeholder = { Text("0.00") },
             singleLine = true,
+            visualTransformation = CurrencyAmountInputVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
             ),
