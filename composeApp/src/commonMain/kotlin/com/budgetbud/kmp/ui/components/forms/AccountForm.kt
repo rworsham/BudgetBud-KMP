@@ -131,14 +131,16 @@ fun AccountForm(
         OutlinedTextField(
             value = newAccountBalance,
             onValueChange = { input ->
-                val isValidNum = input.all { it.isDigit() || it == '.' || it == ',' }
-                val isUnderLimit = input.length <= maxChar
+                val isValidChar = input.all { it.isDigit() || it == '.' }
+                val singleDecimal = input.count { it == '.' } <= 1
 
-                if (isValidNum && isUnderLimit) {
+                val isUnderLimit = input.length <= 12
+
+                if (isValidChar && singleDecimal && isUnderLimit) {
                     newAccountBalance = input
                 }
             },
-            label = { Text("Balance") },
+            label = { Text("Amount") },
             leadingIcon = {
                 Text(
                     text = "$",
@@ -148,6 +150,7 @@ fun AccountForm(
             },
             placeholder = { Text("0.00") },
             singleLine = true,
+            visualTransformation = CurrencyAmountInputVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
             ),
