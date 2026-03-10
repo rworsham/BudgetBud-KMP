@@ -161,10 +161,12 @@ fun TransactionForm(
         OutlinedTextField(
             value = amount,
             onValueChange = { input ->
-                val isValidNum = input.all { it.isDigit() || it == '.' || it == ',' }
-                val isUnderLimit = input.length <= maxChar
+                val isValidNum = input.all { it.isDigit() || it == '.' }
+                val singleDecimal = input.count { it == '.' } <= 1
 
-                if (isValidNum && isUnderLimit) {
+                val isUnderLimit = input.length <= 12
+
+                if (isValidNum && singleDecimal && isUnderLimit) {
                     amount = input
                 }
             },
@@ -178,6 +180,7 @@ fun TransactionForm(
             },
             placeholder = { Text("0.00") },
             singleLine = true,
+            visualTransformation = CurrencyAmountInputVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
             ),
