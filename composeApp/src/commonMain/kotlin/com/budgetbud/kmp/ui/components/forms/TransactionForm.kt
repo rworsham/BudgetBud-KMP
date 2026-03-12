@@ -38,7 +38,7 @@ fun TransactionForm(
     var account by remember { mutableIntStateOf(0) }
     var isRecurring by remember { mutableStateOf(false) }
     var recurringType by remember { mutableStateOf("") }
-    var nextOccurrence by remember { mutableStateOf("") }
+    var nextOccurrence by remember { mutableStateOf<LocalDate?>(null) }
 
     var categories by remember { mutableStateOf<List<CategoryData>>(emptyList()) }
     var budgetData by remember { mutableStateOf<List<BudgetData>>(emptyList()) }
@@ -123,7 +123,7 @@ fun TransactionForm(
                     account = account.toLong(),
                     is_recurring = isRecurring,
                     recurring_type = if (isRecurring && recurringType.isNotBlank()) recurringType else null,
-                    next_occurrence = if (isRecurring && nextOccurrence.isNotBlank()) nextOccurrence else null
+                    next_occurrence = if (isRecurring) nextOccurrence?.toString() else null
                 )
 
                 apiClient.client.post("https://api.budgetingbud.com/api/transaction/") {
@@ -256,11 +256,10 @@ fun TransactionForm(
                 onOptionSelected = { recurringType = it }
             )
 
-            OutlinedTextField(
-                value = nextOccurrence,
-                onValueChange = { nextOccurrence = it },
-                label = { Text("Next Occurrence (YYYY-MM-DD)") },
-                singleLine = true,
+            FormDatePicker(
+                label = "Next Occurrence",
+                selectedDate = nextOccurrence,
+                onDateSelected = { nextOccurrence = it },
                 modifier = Modifier.fillMaxWidth()
             )
         }
