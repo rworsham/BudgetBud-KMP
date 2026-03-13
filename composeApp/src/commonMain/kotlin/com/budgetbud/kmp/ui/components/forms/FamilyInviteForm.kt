@@ -35,7 +35,7 @@ fun FamilyInviteForm(
             val response: HttpResponse = apiClient.client.get("https://api.budgetingbud.com/api/family/")
             existingFamily = response.body()
         } catch (e: Exception) {
-            errorMessage = "Failed to fetch family information"
+            errorMessage = "Failed to fetch family information ${e.message}"
         } finally {
             isLoading = false
         }

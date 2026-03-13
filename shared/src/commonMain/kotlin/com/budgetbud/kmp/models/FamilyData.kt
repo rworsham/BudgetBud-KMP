@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FamilyData(
-    val id: Int,
-    val name: String
+    val id: Long,
+    val username: String,
+    val email: String? = null
 )
