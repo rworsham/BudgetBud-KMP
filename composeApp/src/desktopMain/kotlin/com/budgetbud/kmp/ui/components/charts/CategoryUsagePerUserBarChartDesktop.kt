@@ -12,6 +12,7 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyCategoryOverviewData
 import io.ktor.client.call.*
@@ -79,7 +80,10 @@ private fun FamilyBarChart(data: List<FamilyCategoryOverviewData>) {
             text = "Family Category Usage Bar Chart",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
         Canvas(
