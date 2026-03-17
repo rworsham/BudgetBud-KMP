@@ -33,11 +33,12 @@ actual fun FamilyCategoryBarChart(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = "Category Usage Per User",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            textAlign = TextAlign.Center
+                .padding(bottom = 16.dp)
         )
 
         Canvas(

@@ -76,7 +76,10 @@ private fun FamilyContributionChart(data: List<FamilyTransactionOverviewData>, m
             text = "Family Contributions Bar Chart",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
         Canvas(
