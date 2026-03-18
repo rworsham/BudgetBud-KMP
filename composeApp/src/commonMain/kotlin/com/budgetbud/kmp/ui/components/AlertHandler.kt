@@ -3,7 +3,11 @@ package com.budgetbud.kmp.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -11,22 +15,38 @@ fun AlertHandler(
     alertMessage: String,
     modifier: Modifier = Modifier
 ) {
-    var visible by remember { mutableStateOf(true) }
+    var visible by remember(alertMessage) { mutableStateOf(true) }
 
     if (visible) {
         Snackbar(
-            action = {
-                TextButton(onClick = { visible = false }) {
-                    Text("Dismiss", color = MaterialTheme.colorScheme.onError.copy(alpha = 1f))
-                }
-            },
             modifier = modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            containerColor = MaterialTheme.colorScheme.error.copy(alpha = 1f),
-            contentColor = MaterialTheme.colorScheme.onError.copy(alpha = 1f)
+            containerColor = Color(0xFFD32F2F),
+            contentColor = Color.White,
+            action = {}
         ) {
-            Text(alertMessage)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = alertMessage,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextButton(
+                    onClick = { visible = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
+                ) {
+                    Text("DISMISS", fontWeight = FontWeight.ExtraBold)
+                }
+            }
         }
     }
 }
