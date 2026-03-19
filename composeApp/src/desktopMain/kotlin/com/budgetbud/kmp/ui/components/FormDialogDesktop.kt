@@ -60,7 +60,7 @@ actual fun FormDialog(
 
                     HorizontalDivider(
                         thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        color = Color(0xFF1DB954)
                     )
 
                     Box(modifier = Modifier.weight(1f, fill = false)) {
