@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.ExpenseCategoriesPieChartData
 
@@ -52,7 +54,15 @@ private fun DrawTransactionPieChart(
     ) {
         if (totalAmount <= 0f) return@Column
 
-
+        Text(
+            text = "Expense Categories",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        )
 
         Canvas(
             modifier = Modifier

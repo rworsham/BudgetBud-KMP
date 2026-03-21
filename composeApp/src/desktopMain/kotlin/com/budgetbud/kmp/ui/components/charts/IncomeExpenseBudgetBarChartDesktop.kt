@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budgetbud.kmp.models.IncomeExpenseBarChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 import kotlin.math.ceil
 
 @OptIn(ExperimentalTextApi::class)
@@ -24,7 +25,7 @@ actual fun IncomeExpenseBudgetBarChart(
     modifier: Modifier
 ) {
     if (data.isEmpty()) {
-        Text("No data available", modifier = modifier)
+        ChartDataError()
         return
     }
 
@@ -33,6 +34,16 @@ actual fun IncomeExpenseBudgetBarChart(
     val roundedMaxValue = (ceil(maxValue / 1000.0) * 1000.0).coerceAtLeast(1000.0)
 
     Column(modifier = modifier.fillMaxWidth()) {
+
+        Text(
+            text = "Income Vs. Expense Bar Chart",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        )
 
         Canvas(
             modifier = Modifier
