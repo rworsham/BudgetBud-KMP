@@ -118,7 +118,7 @@ actual fun CategoryHistory(
                 else -> {
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        color = Color(0xFF1DB954)
                     )
 
                     LazyColumn(

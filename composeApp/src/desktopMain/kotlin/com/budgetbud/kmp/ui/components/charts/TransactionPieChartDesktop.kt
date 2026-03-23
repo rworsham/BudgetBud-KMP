@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.TransactionPieChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -19,9 +20,7 @@ actual fun TransactionPieChart(
     modifier: Modifier
 ) {
     if (data.isEmpty()) {
-        Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("No data available", style = MaterialTheme.typography.bodyMedium)
-        }
+        ChartDataError()
         return
     }
 

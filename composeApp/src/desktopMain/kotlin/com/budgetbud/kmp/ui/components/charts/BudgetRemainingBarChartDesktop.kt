@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 import kotlin.math.ceil
 
 @Composable
@@ -23,7 +24,18 @@ actual fun BudgetRemainingBarChart(
     modifier: Modifier
 ) {
     if (data.isEmpty()) {
-        Text("No data available", modifier = modifier.padding(16.dp))
+        Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
+            Text(
+                text = "Budget Usage",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            )
+            ChartDataError()
+        }
     } else {
         DrawChart(data = data, modifier = modifier)
     }

@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.ExpenseCategoriesPieChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -73,7 +74,7 @@ actual fun ExpenseCategoriesPieChart(
 
         when {
             error != null -> Text(error ?: "Unknown Error", color = MaterialTheme.colorScheme.error)
-            chartData.isEmpty() -> Text("No data available", style = MaterialTheme.typography.bodyMedium)
+            chartData.isEmpty() -> ChartDataError()
             else -> DrawTransactionPieChart(chartData)
         }
     }

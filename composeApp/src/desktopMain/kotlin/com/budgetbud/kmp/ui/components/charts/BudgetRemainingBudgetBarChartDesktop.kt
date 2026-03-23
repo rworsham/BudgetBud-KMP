@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.BudgetRemainingBudgetBarChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -76,7 +77,7 @@ actual fun BudgetRemainingBudgetBarChart(
         )
 
         if (error != null) {
-            Text(text = error!!, color = MaterialTheme.colorScheme.error)
+            ChartDataError()
         } else {
             DrawChart(chartItems, Modifier.fillMaxWidth().height(350.dp))
         }

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyCategoryOverviewData
+import com.budgetbud.kmp.ui.components.ChartDataError
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -59,12 +60,20 @@ actual fun CategoryUsagePerUserBarChart(
         }
     }
 
-    Box(modifier = modifier.fillMaxWidth()) {
-        when {
-            error != null -> Text(error!!, color = Color.Red, modifier = Modifier.padding(16.dp))
-            data.isEmpty() -> Text("No data available for this period.", modifier = Modifier.padding(16.dp))
-            else -> FamilyBarChart(data)
+    if (data.isEmpty()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Text(
+                text = "Family Category Usage Bar Chart",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+            ChartDataError()
         }
+        return
     }
 }
 

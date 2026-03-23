@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.ExpenseCategoryBarChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -75,7 +76,7 @@ actual fun ExpenseCategoriesBarChart(
 
         when {
             error != null -> Text(error ?: "Unknown Error", color = MaterialTheme.colorScheme.error)
-            chartData.isEmpty() -> Text("No data available", style = MaterialTheme.typography.bodyMedium)
+            chartData.isEmpty() -> ChartDataError()
             else -> DrawExpenseChart(chartData, Modifier.fillMaxWidth().height(350.dp))
         }
     }

@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.models.ExpenseCategoriesPieChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 
 @Composable
 actual fun ExpenseCategoriesBudgetPieChart(
@@ -19,8 +20,21 @@ actual fun ExpenseCategoriesBudgetPieChart(
     modifier: Modifier
 ) {
     if (data.isEmpty()) {
-        Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("No data available", style = MaterialTheme.typography.bodyMedium)
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Expense Categories",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            )
+            ChartDataError()
         }
     } else {
         DrawTransactionPieChart(data, modifier)

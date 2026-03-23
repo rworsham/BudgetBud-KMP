@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budgetbud.kmp.models.TransactionBarChartData
+import com.budgetbud.kmp.ui.components.ChartDataError
 import kotlin.math.ceil
 
 @OptIn(ExperimentalTextApi::class)
@@ -21,7 +22,10 @@ actual fun TransactionBarChart(
     data: List<TransactionBarChartData>,
     modifier: Modifier
 ) {
-    if (data.isEmpty()) return
+    if (data.isEmpty()) {
+        ChartDataError()
+        return
+    }
 
     val textMeasurer = rememberTextMeasurer()
 
@@ -35,6 +39,10 @@ actual fun TransactionBarChart(
 
     Column(modifier = modifier.fillMaxWidth()) {
 
+        if (data.isEmpty()) {
+            ChartDataError()
+            return
+        }
 
         Canvas(modifier = Modifier
             .fillMaxWidth()
