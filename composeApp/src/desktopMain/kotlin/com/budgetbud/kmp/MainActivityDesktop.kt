@@ -17,6 +17,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "BudgetBud",
+        undecorated = true,
         state = windowState
     ) {
         window.minimumSize = Dimension(1000, 800)

@@ -120,8 +120,17 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.budgetbud.kmp"
+            packageName = "Budget Bud"
             packageVersion = "1.0.0"
+
+            windows {
+                iconFile.set(project.file("src/desktopMain/resources/budget_icon.ico"))
+
+                menu = true
+                shortcut = true
+
+                menuGroup = "Budget Bud"
+            }
         }
     }
 }
