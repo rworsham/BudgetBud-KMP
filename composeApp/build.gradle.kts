@@ -119,7 +119,7 @@ compose.desktop {
         mainClass = "com.budgetbud.kmp.MainActivityDesktopKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "Budget Bud"
             packageVersion = "1.0.0"
 
@@ -130,6 +130,8 @@ compose.desktop {
                 shortcut = true
 
                 menuGroup = "Budget Bud"
+
+                dirChooser = true
             }
         }
     }
