@@ -310,7 +310,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(10.dp).background(color, MaterialTheme.shapes.small))
                             Spacer(Modifier.width(6.dp))
-                            Text("$name: $${"%.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
+                            Text("$name: $${"%,.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }

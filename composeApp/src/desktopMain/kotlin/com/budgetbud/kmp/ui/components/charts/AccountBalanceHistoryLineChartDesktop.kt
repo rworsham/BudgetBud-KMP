@@ -233,7 +233,7 @@ fun ChartCanvas(data: AccountBalanceChartData, modifier: Modifier) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(8.dp).background(color))
                             Spacer(Modifier.width(8.dp))
-                            Text("$name: $${"%.2f".format(amount.toDouble())}", style = MaterialTheme.typography.bodySmall)
+                            Text("$name: $${"%,.2f".format(amount.toDouble())}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }

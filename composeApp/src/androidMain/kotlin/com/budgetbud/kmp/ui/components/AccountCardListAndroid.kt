@@ -52,7 +52,7 @@ actual fun AccountCardList(
                     )
 
                     Text(
-                        text = "Balance: $${String.format("%.2f", account.balance.toDoubleOrNull() ?: 0.0)}",
+                        text = "Balance: $${String.format("%,.2f", account.balance.toDoubleOrNull() ?: 0.0)}",
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )

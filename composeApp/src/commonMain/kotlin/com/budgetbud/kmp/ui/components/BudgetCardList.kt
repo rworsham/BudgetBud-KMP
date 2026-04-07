@@ -32,7 +32,7 @@ fun BudgetCardList(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Balance: $${"%.2f".format(budget.total_amount.toDoubleOrNull() ?: 0.0)}",
+                        text = "Balance: $${"%,.2f".format(budget.total_amount.toDoubleOrNull() ?: 0.0)}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
