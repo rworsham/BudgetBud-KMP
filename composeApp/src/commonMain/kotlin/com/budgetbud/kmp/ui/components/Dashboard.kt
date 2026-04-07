@@ -24,6 +24,7 @@ fun Dashboard(
     modifier: Modifier = Modifier,
     initialSegment: String = "dashboard",
     apiClient: ApiClient,
+    showTopBarTitle: Boolean = true
 ) {
     var currentSegment by remember { mutableStateOf(initialSegment) }
     var drawerOpen by remember { mutableStateOf(true) }
@@ -57,15 +58,17 @@ fun Dashboard(
                     }
                 },
                 title = {
-                    Text(
-                        text = "BudgetBud",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFF1DB954), Color(0xFF006400))
+                    if (showTopBarTitle) {
+                        Text(
+                            text = "BudgetBud",
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF1DB954), Color(0xFF006400))
+                                )
                             )
                         )
-                    )
+                    }
                 },
                 actions = {
                     Row(

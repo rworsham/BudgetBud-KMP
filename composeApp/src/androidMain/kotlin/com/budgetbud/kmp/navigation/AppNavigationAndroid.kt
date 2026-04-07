@@ -44,7 +44,7 @@ actual fun AppNavigation(apiClient: ApiClient) {
         }
 
         composable("dashboard") {
-            Dashboard(apiClient = apiClient)
+            Dashboard(apiClient = apiClient, showTopBarTitle = true)
         }
 
         composable("signup") {
