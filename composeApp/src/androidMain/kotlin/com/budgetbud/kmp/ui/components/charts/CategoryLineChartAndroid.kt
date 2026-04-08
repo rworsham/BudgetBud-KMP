@@ -237,7 +237,7 @@ actual fun CategoryLineChart(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(10.dp).background(color))
                             Spacer(Modifier.width(6.dp))
-                            Text("$category: $${"%.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
+                            Text("$category: $${"%,.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }

@@ -232,7 +232,7 @@ private fun CategoryExpenseChartCanvas(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(8.dp).background(color))
                             Spacer(Modifier.width(8.dp))
-                            Text("$category: $${"%.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
+                            Text("$category: $${"%,.2f".format(amount)}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }

@@ -353,15 +353,15 @@ fun BudgetTransactionOverview(
                     )
 
                     Text(
-                        text = "Total Income: $${"%.2f".format(incomeExpenseData[0].value)}",
+                        text = "Total Income: $${"%,.2f".format(incomeExpenseData[0].value)}",
                     )
 
                     Text(
-                        text = "Total Expenses: $${"%.2f".format(incomeExpenseData[1].value)}",
+                        text = "Total Expenses: $${"%,.2f".format(incomeExpenseData[1].value)}",
                     )
 
                     Text(
-                        text = "Remaining Budget: $${"%.2f".format(budgetChartData.sumOf { it.remaining_budget })}",
+                        text = "Remaining Budget: $${"%,.2f".format(budgetChartData.sumOf { it.remaining_budget })}",
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = MaterialTheme.colorScheme.primary
                         )
