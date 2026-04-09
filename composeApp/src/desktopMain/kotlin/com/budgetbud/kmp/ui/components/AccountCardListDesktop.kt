@@ -102,12 +102,4 @@ actual fun AccountCardList(
     }
 }
 
-private fun Double.toTwoDecimalPlaces(): String {
-    val rounded = (kotlin.math.round(this * 100) / 100.0).toString()
-    return if (rounded.contains(".")) {
-        val parts = rounded.split(".")
-        if (parts[1].length == 1) "${rounded}0" else rounded
-    } else {
-        "$rounded.00"
-    }
-}
+private fun Double.toTwoDecimalPlaces(): String = "%,.2f".format(this)
