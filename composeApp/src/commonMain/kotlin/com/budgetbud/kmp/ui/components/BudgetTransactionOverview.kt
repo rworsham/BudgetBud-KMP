@@ -224,7 +224,14 @@ fun BudgetTransactionOverview(
         if (existingBudgets.isNotEmpty()) {
             BudgetCardList(
                 budgets = existingBudgets,
-                onViewHistory = { id -> handleOpen("viewHistory", id) }
+                onViewHistory = { id ->
+                    selectedBudgetId = id
+                    handleOpen("viewHistory", id)
+                },
+                onSetBudgetGoal = { id ->
+                    selectedBudgetId = id
+                    handleOpen("setBudgetGoal", id)
+                }
             )
         } else {
             ChartDataError()
