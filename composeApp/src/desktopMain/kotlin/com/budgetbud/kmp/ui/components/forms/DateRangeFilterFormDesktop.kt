@@ -1,10 +1,16 @@
 package com.budgetbud.kmp.ui.components.forms
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.*
@@ -20,37 +26,81 @@ actual fun DateRangeFilterForm(
     onEndDateChange: (KxLocalDate) -> Unit,
     modifier: Modifier
 ) {
+    var expanded by remember { mutableStateOf(false) }
     var showStartPicker by remember { mutableStateOf(false) }
     var showEndPicker by remember { mutableStateOf(false) }
 
-    Surface(
+    Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            OutlinedButton(
-                onClick = { showStartPicker = true },
-                modifier = Modifier.fillMaxWidth()
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "Start Date: $startDate",
-                    maxLines = 1,
-                    style = TextStyle(fontSize = 14.sp)
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                        Text(
+                            text = "Showing results for $startDate - $endDate",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            )
+                        )
+                    }
+                }
+
+                Icon(
+                    imageVector = Icons.Default.ExpandMore,
+                    contentDescription = "Expand",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .rotate(if (expanded) 180f else 0f)
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
+            AnimatedVisibility(visible = expanded) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Filter by Date Range",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
 
-            OutlinedButton(
-                onClick = { showEndPicker = true },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "End Date: $endDate",
-                    maxLines = 1,
-                    style = TextStyle(fontSize = 14.sp)
-                )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { showStartPicker = true },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Start: $startDate")
+                        }
+
+                        OutlinedButton(
+                            onClick = { showEndPicker = true },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("End: $endDate")
+                        }
+                    }
+                }
             }
         }
     }
