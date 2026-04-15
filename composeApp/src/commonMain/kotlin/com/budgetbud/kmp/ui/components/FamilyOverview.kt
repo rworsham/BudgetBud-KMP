@@ -1,13 +1,13 @@
 package com.budgetbud.kmp.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.Alignment
 import com.budgetbud.kmp.auth.models.User
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.FamilyTransactionOverviewData
@@ -30,6 +30,7 @@ fun FamilyOverview(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     var familyData by remember { mutableStateOf<List<User>>(emptyList()) }
     var transactionOverview by remember { mutableStateOf<List<FamilyTransactionOverviewData>>(emptyList()) }
@@ -116,9 +117,12 @@ fun FamilyOverview(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(scrollState)
+        ) {
             DateRangeFilterForm(
                 startDate = startDate,
                 endDate = endDate,
@@ -167,89 +171,71 @@ fun FamilyOverview(
                 thickness = 2.dp
             )
 
-        }
+            Spacer(Modifier.height(16.dp))
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 230.dp, start = 10.dp, end = 10.dp),
-            contentPadding = PaddingValues(bottom = 150.dp)
-        ) {
-            if (familyData.isNotEmpty()) {
-                items(familyData) { user ->
-                    Card(modifier = Modifier
+            familyData.forEach { user ->
+                Card(
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp, horizontal = 30.dp)) {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(vertical = 4.dp, horizontal = 16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            user.username,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Button(
+                            onClick = { handleOpen("viewHistory", user.id) },
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(
-                                user.username,
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Button(
-                                onClick = { handleOpen("viewHistory", user.id) },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("View User History")
-                            }
-                        }
-                    }
-                }
-
-                item {
-                    HorizontalDivider(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        thickness = 2.dp
-                    )
-
-                    Spacer(Modifier.height(24.dp))
-
-
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        if (transactionOverview.isNotEmpty()) {
-                            FamilyTransactionBarChart(data = transactionOverview)
-                        } else {
-                            ChartDataError()
-                        }
-                    }
-                }
-
-                item {
-                    Spacer(Modifier.height(24.dp))
-
-                    HorizontalDivider(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        thickness = 2.dp
-                    )
-
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        if (categoryOverview.isNotEmpty()) {
-                            FamilyCategoryBarChart(data = categoryOverview)
-                        } else {
-                            ChartDataError()
+                            Text("View User History")
                         }
                     }
                 }
             }
 
-            errorMessage?.let {
-                item {
-                    AlertHandler(alertMessage = it)
+            if (familyData.isNotEmpty()) {
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.primary, thickness = 2.dp)
+                Spacer(Modifier.height(24.dp))
+
+                if (transactionOverview.isNotEmpty()) {
+                    FamilyTransactionBarChart(data = transactionOverview)
+                } else {
+                    ChartDataError()
                 }
+
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.primary, thickness = 2.dp)
+                Spacer(Modifier.height(24.dp))
+
+                if (categoryOverview.isNotEmpty()) {
+                    FamilyCategoryBarChart(data = categoryOverview)
+                } else {
+                    ChartDataError()
+                }
+            }
+
+            errorMessage?.let {
+                AlertHandler(alertMessage = it)
+            }
+
+            Spacer(Modifier.height(100.dp))
+        }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(144.dp))
             }
         }
     }
