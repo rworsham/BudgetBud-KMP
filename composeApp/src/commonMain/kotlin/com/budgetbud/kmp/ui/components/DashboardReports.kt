@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.budgetbud.kmp.auth.ApiClient
 import com.budgetbud.kmp.models.TransactionBarChartData
@@ -125,7 +127,13 @@ fun DashboardReports(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Transaction Bar Chart", style = MaterialTheme.typography.titleMedium)
+            Text("Transaction Bar Chart", style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            )
         }
 
         if (barChartData.isNotEmpty()) {
@@ -146,7 +154,13 @@ fun DashboardReports(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Expense Pie Chart", style = MaterialTheme.typography.titleMedium)
+            Text("Expense Pie Chart", style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            )
         }
 
         if (pieChartData.isNotEmpty()) {
@@ -167,7 +181,13 @@ fun DashboardReports(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Transaction Grid", style = MaterialTheme.typography.titleMedium)
+            Text("Transaction Grid",style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            )
         }
 
         if (transactionRows.isNotEmpty()) {
