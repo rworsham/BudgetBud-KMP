@@ -181,7 +181,10 @@ fun AccountOverview(
 
         Button(
             onClick = { handleOpen("addAccount") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .width(600.dp)
         ) {
             Text("Add Account")
         }

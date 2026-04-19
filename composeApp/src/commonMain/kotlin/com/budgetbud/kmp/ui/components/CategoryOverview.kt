@@ -176,7 +176,11 @@ fun CategoryOverview(
 
         Button(
             onClick = { handleOpen("addCategory") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .width(600.dp)
+
         ) {
             Text("Add Category")
         }

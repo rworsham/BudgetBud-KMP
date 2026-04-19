@@ -183,7 +183,9 @@ fun BudgetTransactionOverview(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp),
+                .padding(horizontal = 4.dp)
+                .requiredWidthIn(max = 800.dp)
+                .wrapContentWidth(Alignment.CenterHorizontally),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Button(

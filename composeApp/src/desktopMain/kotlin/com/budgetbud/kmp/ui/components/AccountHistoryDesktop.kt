@@ -132,7 +132,7 @@ actual fun AccountHistory(
                                             else
                                                 "-$${tx.amount}",
                                             color = if (tx.transaction_type.lowercase() == "income")
-                                                Color(0xFF1DB954) // Vibrant Green
+                                                Color(0xFF1DB954)
                                             else
                                                 MaterialTheme.colorScheme.error,
                                             style = MaterialTheme.typography.bodyMedium.copy(

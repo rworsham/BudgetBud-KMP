@@ -84,8 +84,7 @@ actual fun DateRangeFilterForm(
 
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .widthIn(max = 250.dp),
+                            .widthIn(max = 800.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         OutlinedButton(
