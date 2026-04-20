@@ -125,7 +125,11 @@ fun ReportDashboard(
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp)
+            .requiredWidthIn(max = 800.dp)
+            .wrapContentWidth(Alignment.CenterHorizontally),
         ) {
             Button(
                 onClick = { handleOpen("addReport") },

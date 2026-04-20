@@ -150,14 +150,20 @@ fun FamilyOverview(
             if (familyData.isNotEmpty()) {
                 Button(
                     onClick = { handleOpen("addAccount") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .width(600.dp)
                 ) {
                     Text("Invite New Member")
                 }
             } else {
                 Button(
                     onClick = { handleOpen("createFamily") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                        .width(600.dp)
                 ) {
                     Text("Create Family Group")
                 }
