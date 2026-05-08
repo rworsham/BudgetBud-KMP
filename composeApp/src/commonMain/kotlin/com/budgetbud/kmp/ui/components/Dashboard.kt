@@ -1,5 +1,6 @@
 package com.budgetbud.kmp.ui.components
 
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,7 @@ fun Dashboard(
     apiClient: ApiClient,
     showTopBarTitle: Boolean = true
 ) {
+    val coroutineScope = rememberCoroutineScope()
     var currentSegment by remember { mutableStateOf(initialSegment) }
     var drawerOpen by remember { mutableStateOf(true) }
     var showDialog by remember { mutableStateOf(false) }
@@ -96,13 +98,15 @@ fun Dashboard(
                                     .scale(0.7f)
                             )
                         }
-                        IconButton(onClick = { openDialog("Profile") }) {
-                            Icon(
-                                Icons.Default.AccountCircle,
-                                contentDescription = "Profile",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                        UserProfileMenu(
+                            onOpenProfile = { openDialog("Profile") },
+                            onContact = { openDialog("Contact")},
+                            onLogout = {
+                                coroutineScope.launch {
+                                    apiClient.logout()
+                                }
+                            }
+                        )
                     }
                 }
             )
@@ -164,6 +168,9 @@ fun Dashboard(
                                     familyView = familyView.value
                                 )
                                 "Profile" -> ProfileScreen(
+                                    apiClient = apiClient
+                                )
+                                "Contact" -> ContactForm(
                                     apiClient = apiClient
                                 )
                                 "FAB" -> FabDialog(

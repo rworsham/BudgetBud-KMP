@@ -92,7 +92,7 @@ fun CategoryForm(
                 onSuccess()
 
             } catch (e: Exception) {
-                errorMessage = "Failed to create new budget"
+                errorMessage = "Failed to create new category"
             } finally {
                 isSubmitting = false
             }
